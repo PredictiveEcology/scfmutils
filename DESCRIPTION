@@ -5,9 +5,9 @@ Description: The original fire model is described by Cumming et al. (1998),
     It has recently been implemented as a collection of 'SpaDES' modules by
     Cumming, McIntire, Eddy, and Chubaty, available from
     <https://github.com/PredictiveEcology/scfm>.
-URL: 
-    https://scfmutils.predictiveecology.org,
-    https://github.com/PredictiveEcology/scfmutils
+URL: https://scfmutils.predictiveecology.org,
+    https://github.com/PredictiveEcology/scfmutils,
+    https://predictiveecology.github.io/scfmutils/
 Date: 2022-11-17
 Version: 0.0.0.9000
 Authors@R: c(
