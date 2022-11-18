@@ -13,6 +13,7 @@ Useful links:
 \itemize{
   \item \url{https://scfmutils.predictiveecology.org}
   \item \url{https://github.com/PredictiveEcology/scfmutils}
+  \item \url{https://predictiveecology.github.io/scfmutils/}
   \item Report bugs at \url{https://github.com/PredictiveEcology/scfmutils/issues}
 }
 
