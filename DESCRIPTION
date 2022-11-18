@@ -1,0 +1,60 @@
+Package: scfmutils
+Title: Tools and Utilities for Working With the SCFM Wildfire Simulation Model
+Description: The original fire model is described by Cumming et al. (1998),
+    and more accessibly in Armstrong and Cumming (2003).
+    It has recently been implemented as a collection of 'SpaDES' modules by
+    Cumming, McIntire, Eddy, and Chubaty, available from
+    <https://github.com/PredictiveEcology/scfm>.
+URL: 
+    https://scfmutils.predictiveecology.org,
+    https://github.com/PredictiveEcology/scfmutils
+Date: 2022-11-17
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
+           role = c("aut")),
+    person("Alex M", "Chubaty", email = "achubaty@for-cast.ca",
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7146-8135")),
+    person("Eliot J B", "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
+           role = c("aut"), comment = c(ORCID = "0000-0002-6914-8316")),
+    person("Ian M S", "Eddy", email = "ian.eddy@nrcan-rncan.gc.ca",
+           role = c("aut"), comment = c(ORCID = "0000-0001-7397-2116")),
+    person(paste("His Majesty the King in Right of Canada,",
+                 "as represented by the Minister of Natural Resources Canada"),
+           role = "cph")
+    )
+Depends:
+    R (>= 4.2)
+Imports:
+    data.table,
+    fasterize,
+    ggplot2,
+    methods,
+    raster,
+    reproducible,
+    rlang,
+    scam,
+    sf,
+    SpaDES.core,
+    SpaDES.tools,
+    stats
+Suggests:
+    covr,
+    gridExtra,
+    knitr,
+    rmarkdown,
+    roxygen2,
+    terra,
+    testthat
+Remotes:
+    PredictiveEcology/reproducible@development,
+    PredictiveEcology/SpaDES.core@development,
+    PredictiveEcology/SpaDES.tools@development
+Encoding: UTF-8
+Language: en-CA
+License: GPL (>= 3)
+VignetteBuilder: knitr, rmarkdown
+BugReports: https://github.com/PredictiveEcology/scfmutils/issues
+ByteCompile: yes
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.2
