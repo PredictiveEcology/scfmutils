@@ -32,6 +32,7 @@ jobs:
         with:
           extra-packages: |
             any::pkgdown
+            any::XML
             local::.
           needs: website
 
