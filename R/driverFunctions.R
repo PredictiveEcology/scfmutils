@@ -294,12 +294,12 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   kcount <- 50
   scamFormula <- "finalSize ~ s(p, bs = 'micx', k = kcount)"
   calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
-  while (count < 5 & inherits(calibModel, 'try-error')) {
+  while (count < 5 & inherits(calibModel, "try-error")) {
     kcount <- kcount + 5
     count <- count + 1
     calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
   }
-  if (inherits(calibModel, 'try-error')) {
+  if (inherits(calibModel, "try-error")) {
     stop("could not calibrate fire model. Contact module developers")
   }
   xBar <- regime$xBar / cellSize
@@ -312,7 +312,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
                               extendInt = "no",
                               tol = 0.00001
     ), silent = TRUE)
-    if (inherits(Res) == "try-error") {
+    if (inherits(Res, "try-error")) {
       ## TODO: should pick the closest value (of min and max) if error is value not of opposite sign
       pJmp <- min(cD$p)
       message("the loess model may underestimate the spread probability for polygon ", polygonType)
