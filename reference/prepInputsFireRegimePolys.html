@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">scfmutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,6 +83,12 @@ If <code>url</code> to BEC zones shapefile is provided, can also be one of "BECS
 "BECZONE".</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p><code>prepInputs()</code> is used internally, which uses <code>rasterToMatch</code> but not <code>studyArea</code> for
+reprojecting. Therefore, if not passing <code>rasterToMatch</code>, you should ensure the output
+crs matches what you were expecting, and subsequently reproject if needed.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
