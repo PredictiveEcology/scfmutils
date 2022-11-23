@@ -2,16 +2,27 @@ utils::globalVariables(c(
   "cellSize"
 ))
 
-#' @keyword internal
+#' `scfmLandCoverInit`: `.makeLandscapeAttr`
+#'
+#' Calculate the cell size, total area, and number of flammable cells, etc.
+#' All areas in `ha`.
+#'
+#' @keywords internal
 #'
 #' @importFrom purrr transpose
 #' @importFrom raster extract focal getValues
 #' @importFrom stats na.omit
 .makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys) {
-  neighMap <- raster::focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(...,na.rm)
+  cellSize <- prod(res(flammableMap)) / 1e4 # in ha
+
+  neighMap <- raster::focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
 
   # extract table for each polygon
-  valsByPoly <- raster::extract(neighMap, fireRegimePolys, cellnumbers = TRUE)
+  valsByPoly <- raster::extract(neighMap, fireRegimePolys, cellnumbers = TRUE) ## TODO: use terra
+
+  ## terra version doesn't return a list of 2-col matrices, but a 3-col data.frame with poly ID in first col
+  # valsByPoly <- terra::extract(terra::rast(neighMap), terra::vect(fireRegimePolys), cells = TRUE)
+
   valsByPoly <- lapply(valsByPoly, na.omit)
   names(valsByPoly) <- fireRegimePolys$PolyID
   uniqueZoneNames <- unique(fireRegimePolys$PolyID) # get unique zones.
@@ -61,10 +72,6 @@ utils::globalVariables(c(
 #' @export
 #' @importFrom raster res
 genFireMapAttr <- function(flammableMap, fireRegimePolys, neighbours) {
-  # calculate the cell size, total area, and number of flammable cells, etc.
-  # All areas in ha
-  cellSize <- prod(res(flammableMap)) / 1e4 # in ha
-
   if (neighbours == 8) {
     w <- matrix(c(1, 1, 1, 1, 0, 1, 1, 1, 1), nrow = 3, ncol = 3)
   } else if (neighbours == 4) {
