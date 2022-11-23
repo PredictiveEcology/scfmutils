@@ -47,7 +47,6 @@ genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {
   return(calibrationLandscape)
 }
 
-
 #' `scfmDriver`: `makeDesign`
 #'
 #' @note This version of `makeDesign` is the simplest possible.
@@ -104,7 +103,7 @@ executeDesign <- function(L, dT, maxCells) {
 
   startTime <- Sys.time()
 
-  .executeDesignInternal <- function(x, L, ProbRas) { ## L, P are rasters, passed by reference
+  .executeDesignInternal <- function(x, L, ProbRas, startTime) { ## L, P are rasters, passed by reference
     iter <<- iter + 1
     currentTime <- Sys.time()
     diffTime <- currentTime - startTime
