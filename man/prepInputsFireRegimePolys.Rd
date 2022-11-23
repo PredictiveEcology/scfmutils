@@ -30,3 +30,8 @@ If \code{url} to BEC zones shapefile is provided, can also be one of "BECSUBZONE
 \description{
 Create fire regime polygons for \code{scfmRegime}.
 }
+\note{
+\code{prepInputs()} is used internally, which uses \code{rasterToMatch} but not \code{studyArea} for
+reprojecting. Therefore, if not passing \code{rasterToMatch}, you should ensure the output
+crs matches what you were expecting, and subsequently reproject if needed.
+}

@@ -20,6 +20,10 @@ utils::globalVariables(c(
 #'             If `url` to BEC zones shapefile is provided, can also be one of "BECSUBZONE" or
 #'             "BECZONE".
 #'
+#' @note `prepInputs()` is used internally, which uses `rasterToMatch` but not `studyArea` for
+#'       reprojecting. Therefore, if not passing `rasterToMatch`, you should ensure the output
+#'       crs matches what you were expecting, and subsequently reproject if needed.
+#'
 #' @export
 #' @importFrom dplyr %>% group_by summarise ungroup
 #' @importFrom reproducible prepInputs
