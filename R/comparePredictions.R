@@ -95,6 +95,10 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 #' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_minimal
 #' @rdname comparePredictions
 comparePredictions_meanFireSize <- function(dt) {
+  if (any(is.null(dt))) {
+    stop("all arguments must be provided and cannot be NULL.")
+  }
+
   ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
     geom_point(aes(histMeanSize, modMeanSize)) +
     labs(y = "modeled mean fire size", x = "historical mean fire size") +
@@ -107,7 +111,11 @@ comparePredictions_meanFireSize <- function(dt) {
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_fireReturnInterval <- function(dt) {
+comparePredictions_fireReturnInterval <- function(dt, times) {
+  if (any(is.null(dt), is.null(times))) {
+    stop("all arguments must be provided and cannot be NULL.")
+  }
+
   ## remove the infinite FRI caused by no simulated fires
   ## simulated FRI will likely be off where targetFRI is < 1/4 of the simulated time
 
@@ -129,6 +137,10 @@ comparePredictions_fireReturnInterval <- function(dt) {
 }
 
 comparePredictions_annualIgnitions <- function(dt) {
+  if (any(is.null(dt))) {
+    stop("all arguments must be provided and cannot be NULL.")
+  }
+
   ggplot(dt, aes(x = targetIgnitions, y = achievedIgnitions)) +
     geom_point() +
     labs(y = "simulation annual ignitions", x = "estimated annual ignitions") +

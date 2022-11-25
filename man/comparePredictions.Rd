@@ -17,7 +17,7 @@ comparePredictions_summaryDT(
 
 comparePredictions_meanFireSize(dt)
 
-comparePredictions_fireReturnInterval(dt)
+comparePredictions_fireReturnInterval(dt, times)
 }
 \arguments{
 \item{scfmDriverPars}{list of burn parameters for each polygon, produced by \code{scfmDriverPars} module}
