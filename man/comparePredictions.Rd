@@ -6,22 +6,29 @@
 \alias{comparePredictions_fireReturnInterval}
 \title{Create \code{data.table} to compare scfm predictions with historical observations}
 \usage{
-comparePredictions_summaryDT(sim)
+comparePredictions_summaryDT(
+  scfmDriverPars = NULL,
+  scfmRegimePars = NULL,
+  landscapeAttr = NULL,
+  fireRegimePoints = NULL,
+  burnSummary = NULL,
+  times = NULL
+)
 
 comparePredictions_meanFireSize(dt)
 
 comparePredictions_fireReturnInterval(dt)
 }
 \arguments{
-\item{sim}{a \code{simList} object with completed scfm simulations.
-Must contain the following objects:
-\itemize{
-\item \code{burnSummary}
-\item \code{fireRegimePoints}
-\item \code{landscapeAttr}
-\item \code{scfmDriverPars}
-\item \code{scfmRegimePars}
-}}
+\item{scfmDriverPars}{list of burn parameters for each polygon, produced by \code{scfmDriverPars} module}
+
+\item{scfmRegimePars}{list of fire regime parameters, produced by \code{scfmRegime} module}
+
+\item{landscapeAttr}{list of landscape attributes for each polygon, produced by \code{scfmLandcoverInit} module}
+
+\item{fireRegimePoints}{\code{SpatialPointsDataFrame}, produced by \code{scfmRegime} module}
+
+\item{burnSummary}{\code{data.table}, produced by \code{scfmSpread} module}
 
 \item{dt}{scfm summary \code{data.table} produced by \code{comparePredictions_summaryDT()}}
 }
@@ -35,7 +42,11 @@ Create \code{data.table} to compare scfm predictions with historical observation
 \examples{
 \dontrun{
 ## assumes user has run scfm to produce the simList `mySimOut`
-df <- comparePredictions_summaryDT(mySimOut)
+dt <- comparePredictions_summaryDT(scfmDriverPars = mySimOut$scfmDriverPars,
+                                   scfmRegimePars = mySimOut$scfmRegimePars,
+                                   landscapeAttr = mySimOut$landscapeAttr,
+                                   fireRegimePoints = mySimOut$fireRegimePoints,
+                                   burnSummary = mySimOut$burnSummary)
 
 gg_mfs <- comparePredictions_meanFireSize(dt)
 gg_fri <- comparePredictions_fireReturnInterval(dt)

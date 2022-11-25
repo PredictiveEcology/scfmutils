@@ -5,13 +5,12 @@ utils::globalVariables(c(
 
 #' Create `data.table` to compare scfm predictions with historical observations
 #'
-#' @param sim a `simList` object with completed scfm simulations.
-#'   Must contain the following objects:
-#'   - `burnSummary`
-#'   - `fireRegimePoints`
-#'   - `landscapeAttr`
-#'   - `scfmDriverPars`
-#'   - `scfmRegimePars`
+#' @param burnSummary `data.table`, produced by `scfmSpread` module
+#' @param fireRegimePoints `SpatialPointsDataFrame`, produced by `scfmRegime` module
+#' @param landscapeAttr list of landscape attributes for each polygon, produced by `scfmLandcoverInit` module
+#' @param scfmDriverPars list of burn parameters for each polygon, produced by `scfmDriverPars` module
+#' @param scfmRegimePars list of fire regime parameters, produced by `scfmRegime` module
+#' @param times list of simulation start and end times (i.e., output from `times(sim)`)
 #'
 #' @return `comparePredictions_summaryDT` returns a `data.table` object;
 #'         other functions return `ggplot` objects.
@@ -19,7 +18,11 @@ utils::globalVariables(c(
 #' @examples
 #' \dontrun{
 #' ## assumes user has run scfm to produce the simList `mySimOut`
-#' df <- comparePredictions_summaryDT(mySimOut)
+#' dt <- comparePredictions_summaryDT(scfmDriverPars = mySimOut$scfmDriverPars,
+#'                                    scfmRegimePars = mySimOut$scfmRegimePars,
+#'                                    landscapeAttr = mySimOut$landscapeAttr,
+#'                                    fireRegimePoints = mySimOut$fireRegimePoints,
+#'                                    burnSummary = mySimOut$burnSummary)
 #'
 #' gg_mfs <- comparePredictions_meanFireSize(dt)
 #' gg_fri <- comparePredictions_fireReturnInterval(dt)
@@ -34,20 +37,30 @@ utils::globalVariables(c(
 #' @importFrom data.table rbindlist
 #' @importFrom SpaDES.core times
 #' @rdname comparePredictions
-comparePredictions_summaryDT <- function(sim) {
-  out <- lapply(names(sim$scfmDriverPars), function(x) {
-    regime <- sim$scfmRegimePars[[x]]
-    simLength <- times(sim)$end - times(sim)$start + 1
-    driver <- sim$scfmDriverPars[[x]]
-    landscapeAttr <- sim$landscapeAttr[[x]]
-    fireRegimePoints <- sim$fireRegimePoints[sim$fireRegimePoints$PolyID == as.numeric(x), ]
+comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
+                                         scfmRegimePars = NULL,
+                                         landscapeAttr = NULL,
+                                         fireRegimePoints = NULL,
+                                         burnSummary = NULL,
+                                         times = NULL) {
+  if (any(is.null(scfmDriverPars), is.null(scfmRegimePars), is.null(landscapeAttr),
+          is.null(fireRegimePoints), is.null(burnSummary), is.null(times))) {
+    stop("all arguments must be provided and cannot be NULL.")
+  }
+
+  out <- lapply(names(scfmDriverPars), function(x) {
+    regime <- scfmRegimePars[[x]]
+    simLength <- times$end - times$start + 1
+    driver <- scfmDriverPars[[x]]
+    landscapeAttr <- landscapeAttr[[x]]
+    fireRegimePoints <- fireRegimePoints[fireRegimePoints$PolyID == as.numeric(x), ]
 
     ## This is a long way of saying 'sum of fires / (flammable landscape * fire epoch)'.
     ## hist_mfs will be NaN if there were no fires larger than one pixel
 
     pSpread <- driver$pSpread
     pIg <- regime$ignitionRate
-    burnSum <- sim$burnSummary[sim$burnSummary$polyID == x, ]
+    burnSum <- burnSummary[burnSummary$polyID == x, ]
     burnSum$N <- as.numeric(burnSum$N)
     targetIgnitions <- regime$ignitionRate * landscapeAttr$burnyArea
     achievedIgnitions <- nrow(burnSum) / simLength
