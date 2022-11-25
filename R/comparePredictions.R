@@ -136,6 +136,8 @@ comparePredictions_fireReturnInterval <- function(dt, times) {
     geom_text(aes(label = PolyId, vjust = "inward", hjust = "inward"))
 }
 
+#' @export
+#' @rdname comparePredictions
 comparePredictions_annualIgnitions <- function(dt) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
