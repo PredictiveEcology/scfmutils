@@ -30,6 +30,8 @@ comparePredictions_fireReturnInterval(dt)
 
 \item{burnSummary}{\code{data.table}, produced by \code{scfmSpread} module}
 
+\item{times}{list of simulation start and end times (i.e., output from \code{times(sim)})}
+
 \item{dt}{scfm summary \code{data.table} produced by \code{comparePredictions_summaryDT()}}
 }
 \value{
