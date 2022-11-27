@@ -2,6 +2,12 @@ utils::globalVariables(c(
   "geometry", "USETHIS"
 ))
 
+#' @export
+#' @rdname prepInputsFireRegimePolys
+fireRegimePolyTypes <- function() {
+  c("BECSUBZONE", "BECZONE", "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE")
+}
+
 #' `prepInputsFireRegimePolys`
 #'
 #' Create fire regime polygons for `scfmRegime`.
@@ -31,7 +37,7 @@ utils::globalVariables(c(
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                                       studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION") {
   type <- toupper(type)
-  allowedTypes <- c("BECSUBZONE", "BECZONE", "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE")
+  allowedTypes <- fireRegimePolyTypes()
 
   stopifnot(type %in% allowedTypes)
 
