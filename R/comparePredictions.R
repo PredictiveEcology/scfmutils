@@ -92,7 +92,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 #'
 #' @export
 #' @importFrom ggplot2 aes geom_abline geom_point geom_text ggplot labs
-#' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_minimal
+#' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_bw
 #' @rdname comparePredictions
 comparePredictions_meanFireSize <- function(dt) {
   if (any(is.null(dt))) {
@@ -102,7 +102,7 @@ comparePredictions_meanFireSize <- function(dt) {
   ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
     geom_point(aes(histMeanSize, modMeanSize)) +
     labs(y = "modeled mean fire size", x = "historical mean fire size") +
-    theme_minimal() +
+    theme_bw() +
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyId), vjust = "inward", hjust = "inward") +
@@ -129,7 +129,7 @@ comparePredictions_fireReturnInterval <- function(dt, times) {
               targetFRI < c(times$end - times$start) * 4], aes(x = targetFRI, y = achievedFRI)) +
     geom_point() +
     labs(y = "simulation FRI (years)", x = "estimated FRI (years)") +
-    theme_minimal() +
+    theme_bw() +
     geom_abline(slope = 1) +
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
@@ -146,7 +146,7 @@ comparePredictions_annualIgnitions <- function(dt) {
   ggplot(dt, aes(x = targetIgnitions, y = achievedIgnitions)) +
     geom_point() +
     labs(y = "simulation annual ignitions", x = "estimated annual ignitions") +
-    theme_minimal() +  #+
+    theme_bw() +
     geom_abline(slope = 1) +
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
