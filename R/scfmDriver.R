@@ -140,6 +140,7 @@ executeDesign <- function(L, dT, maxCells) {
     spreadState0 <- SpaDES.tools::spread2(landscape = L,
                                           start = i,
                                           iterations = 1,
+                                          maxSize = maxCells,
                                           spreadProb = ProbRas,
                                           asRaster = FALSE)
 
