@@ -37,7 +37,7 @@ Imports:
     rlang,
     scam,
     sf,
-    SpaDES.core,
+    SpaDES.core (>= 1.0.10.9015),
     SpaDES.tools,
     stats
 Suggests:
