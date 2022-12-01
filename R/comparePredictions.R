@@ -124,9 +124,9 @@ comparePredictions_fireReturnInterval <- function(dt, times) {
     warning("achievedFRI may be off where targetFRI is less than 4x the simulated time.")
   }
 
-  ## TODO: remove the targetFRI filter below?
-  ggplot(dt[!is.infinite(achievedFRI) &
-              targetFRI < c(times$end - times$start) * 4], aes(x = targetFRI, y = achievedFRI)) +
+  ## TODO: remove the targetFRI filter below. plot those points differently to indicate poor estimates
+  ggplot(dt[!is.infinite(achievedFRI) & targetFRI < c(times$end - times$start) * 4],
+         aes(x = targetFRI, y = achievedFRI)) +
     geom_point() +
     labs(y = "simulation FRI (years)", x = "estimated FRI (years)") +
     theme_bw() +
