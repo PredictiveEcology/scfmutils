@@ -10,10 +10,10 @@ utils::globalVariables(c(
 #' @keywords internal
 #'
 #' @importFrom purrr transpose
-#' @importFrom raster extract focal getValues
+#' @importFrom raster extract focal getValues res
 #' @importFrom stats na.omit
 .makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys) {
-  cellSize <- prod(res(flammableMap)) / 1e4 # in ha
+  cellSize <- prod(raster::res(flammableMap)) / 1e4 # in ha
 
   neighMap <- raster::focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
 
