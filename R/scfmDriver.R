@@ -300,7 +300,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
     calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
   }
   if (inherits(calibModel, "try-error")) {
-    stop("could not calibrate fire model. Contact module developers")
+    stop("could not calibrate fire model.")
   }
   xBar <- regime$xBar / cellSize
 
