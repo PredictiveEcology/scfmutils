@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  "achievedFRI", "achievedIgnitions", "histMeanSize", "modMeanSize", "PolyId",
+  "achievedFRI", "achievedIgnitions", "histMeanSize", "modMeanSize", "PolyID",
   "targetFRI", "targetIgnitions"
 ))
 
@@ -74,7 +74,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     #starting in year 1 and ending in year 10 means you have 10 years, so
     meanBurn <- ifelse(nrow(burnSum) == 0, yes = 0, no = mean(burnSum$areaBurned))
-    pred <- data.frame("PolyId" = x, #Polygon ID
+    pred <- data.frame("PolyID" = x,
                        "histMeanSize" = regime$xBar, ## predicted (empirical) mean size of fires
                        "modMeanSize" = meanBurn, ## modeled mean size of fires
                        "achievedFRI" = achievedFRI,
@@ -105,7 +105,7 @@ comparePredictions_meanFireSize <- function(dt) {
     theme_bw() +
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
-    geom_text(aes(label = PolyId), vjust = "inward", hjust = "inward") +
+    geom_text(aes(label = PolyID), vjust = "inward", hjust = "inward") +
     geom_abline(slope = 1)
 }
 
@@ -133,7 +133,7 @@ comparePredictions_fireReturnInterval <- function(dt, times) {
     geom_abline(slope = 1) +
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
-    geom_text(aes(label = PolyId, vjust = "inward", hjust = "inward"))
+    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
 }
 
 #' @export
@@ -150,5 +150,5 @@ comparePredictions_annualIgnitions <- function(dt) {
     geom_abline(slope = 1) +
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
-    geom_text(aes(label = PolyId, vjust = "inward", hjust = "inward"))
+    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
 }
