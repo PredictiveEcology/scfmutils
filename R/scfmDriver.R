@@ -287,7 +287,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
               pEscape = ifelse(regime$pEscape == 0, 0.1, regime$pEscape),
               L = calibLand$flammableMap,
               maxCells = maxBurnCells,
-              userTags = c('scfmDriver', "executeDesign", polygonType),
+              userTags = c("scfmDriver", "executeDesign", polygonType),
               omitArgs = c("indices"))
 
   count <- 0
