@@ -27,14 +27,9 @@ Defaults are provided for Canadian ecodistrict, ecoregion, ecoprovince, and ecoz
 
 \item{type}{character. The polygon type to use:
 Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", or "ECOZONE".
-If \code{url} to BEC zones shapefile is provided, can also be one of "BECSUBZONE" or
-"BECZONE".}
+If \code{url} to BEC shapefile is provided, can also be one of:
+"BECNDT", "BECSUBZONE", or "BECZONE".}
 }
 \description{
 Create fire regime polygons for \code{scfmRegime}.
-}
-\note{
-\code{prepInputs()} is used internally, which uses \code{rasterToMatch} but not \code{studyArea} for
-reprojecting. Therefore, if not passing \code{rasterToMatch}, you should ensure the output
-crs matches what you were expecting, and subsequently reproject if needed.
 }

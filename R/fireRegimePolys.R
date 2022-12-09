@@ -5,7 +5,7 @@ utils::globalVariables(c(
 #' @export
 #' @rdname prepInputsFireRegimePolys
 fireRegimePolyTypes <- function() {
-  c("BECSUBZONE", "BECZONE", "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE")
+  c("BECNDT", "BECSUBZONE", "BECZONE", "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE")
 }
 
 #' `prepInputsFireRegimePolys`
@@ -23,15 +23,12 @@ fireRegimePolyTypes <- function() {
 #'
 #' @param type character. The polygon type to use:
 #'             Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", or "ECOZONE".
-#'             If `url` to BEC zones shapefile is provided, can also be one of "BECSUBZONE" or
-#'             "BECZONE".
-#'
-#' @note `prepInputs()` is used internally, which uses `rasterToMatch` but not `studyArea` for
-#'       reprojecting. Therefore, if not passing `rasterToMatch`, you should ensure the output
-#'       crs matches what you were expecting, and subsequently reproject if needed.
+#'             If `url` to BEC shapefile is provided, can also be one of:
+#'             "BECNDT", "BECSUBZONE", or "BECZONE".
 #'
 #' @export
 #' @importFrom dplyr %>% group_by summarise ungroup
+#' @importFrom raster crs
 #' @importFrom reproducible prepInputs
 #' @importFrom sf st_as_sf st_collection_extract st_union
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
@@ -44,7 +41,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   if (is.null(url)) {
     if (grepl("BEC", type)) {
       ## no public url available? user must pass their own, e.g. google drive link
-      stop("url must be provided when using type 'BECSUBZONE' or 'BECZONE'.")
+      stop("url must be provided when using type 'BECNDT', 'BECSUBZONE' or 'BECZONE'.")
     } else {
       urlList <- list(
         ecodistrict = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
@@ -65,17 +62,27 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                     studyArea = studyArea,
                     rasterToMatch = rasterToMatch,
                     fun = "sf::st_read",
-                    overwrite = TRUE)
+                    overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
+
+  ## workaround issues with prepInputs() not reprojecting:
+  if (!is.null(rasterToMatch)) {
+    tmp <- sf::st_transform(tmp, raster::crs(rasterToMatch))
+  } else if (is.null(rasterToMatch) && !is.null(studyArea)) {
+    tmp <- sf::st_transform(tmp, sf::st_crs(studyArea))
+  }
 
   if (grepl("^ECO", type)) {
     cols2keep <- substr(type, 1, 10) ## colname abbrev to 10 chars
-  } else {
+  } else if (grepl("^BEC.*ZONE", type)) {
     cols2keep <- c("ZONE", "SUBZONE")
+  } else if (type == "BECNDT") {
+    cols2keep <- "NTRL_DSTRD"
   }
 
   tmp <- tmp[, cols2keep]
 
   tmp$USETHIS <- switch(type,
+                        BECNDT = tmp[[cols2keep[1]]],
                         BECSUBZONE = paste0(tmp[["ZONE"]], "_", tmp[["SUBZONE"]]),
                         BECZONE = tmp[["ZONE"]],
                         ECODISTRICT = tmp[[cols2keep[1]]],
