@@ -97,3 +97,115 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
   return(polys)
 }
+
+#' Check for various issues with `fireRegimePolys`
+#'
+#' @param fireRegimePolys TODO
+#' @param studyArea TODO
+#' @param rasterToMatch TODO
+#' @param flammableMap TODO
+#' @param sliverThresh TODO
+#' @param cacheTag TODO
+#'
+#' @return a cleaned up `fireRegimePolys` object
+#'
+#' @export
+#' @importFrom raster compareCRS
+#' @importFrom reproducible Cache
+#' @importFrom sf st_area st_is_longlat
+checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableMap, sliverThresh, cacheTag) {
+  compareCRS(rasterToMatch, flammableMap, fireRegimePolys) ## TODO: is there a better check?
+
+  if (is.null(fireRegimePolys[["PolyID"]])) {
+    stop("please supply fireRegimePolys with a PolyID")
+  }
+
+  if (st_is_longlat(fireRegimePolys)) {
+    stop("scfm requires projected coordinate systems - lat/lon too prone to error.")
+  }
+  fireRegimePolys$trueArea <- round(st_area(fireRegimePolys), digits = 0)
+
+  if (any(as.numeric(fireRegimePolys$trueArea) < sliverThresh)) {
+    message("sliver polygon(s) detected. Merging to their nearest valid neighbour")
+    fireRegimePolys <- Cache(deSliver, fireRegimePolys, threshold = sliverThresh, userTags = cacheTag)
+  }
+
+  return(fireRegimePolys)
+}
+
+#' Merge sliver polygons into non-sliver neighbours
+#'
+#' The threshold is applied to the area of the multipolygon object, not each individual polygon.
+#' Non-sliver polygons keep their original attributes.
+#' Intended to be used when it is important to retain the original extent of an
+#' area while removing sliver polygons.
+#'
+#' @param x a `SpatialPolygons*` or `sf` object
+#'
+#' @param threshold the minimum area below which a polygon is considered a sliver
+#'
+#' @return an object of class `sf` with sliver polygons merged to their nearest valid neighbour.
+#'
+#' @export
+#' @importFrom sf st_area st_buffer st_cast st_is_valid st_nearest_feature st_union
+deSliver <- function(x, threshold) {
+  x$tempArea <- as.numeric(st_area(x))
+
+  ## determine slivers by area
+  xSlivers <- x[x$tempArea < threshold, ]
+  xNotSlivers <- x[x$tempArea > threshold, ]
+  if (nrow(xNotSlivers) < 1) {
+    stop("Threshold exceeds the area of every polygon. Please select a smaller number")
+  }
+
+  ## split slivers from multipolygon, or nearest feature may be incorrect
+  xSlivers <- suppressWarnings(st_cast(xSlivers, "POLYGON"))
+
+  ## find nearest non-sliver
+  nearestFeature <- st_nearest_feature(xSlivers, xNotSlivers)
+
+  ## merge each sliver polygon into nearest neighbour
+  mergeSlivers <- lapply(
+    unique(nearestFeature),
+    FUN = function(i,
+                   ns = xNotSlivers,
+                   s = xSlivers,
+                   nf = nearestFeature) {
+      featurePolys <- nearestFeature == i
+      xMerge <- st_union(s[featurePolys, ])
+      yMerge <- ns[i, ]
+      out <- st_union(x = xMerge, y = yMerge) # convert slivers back to multipolygon
+      yMerge$geometry <- out # update the geometry
+      return(yMerge)
+    }
+  )
+  otherPolys <- xNotSlivers[!(1:nrow(xNotSlivers) %in% nearestFeature),]
+  if (length(mergeSlivers) > 1) {
+    ## these polygons must be tracked and merged.
+    ## they may be nrow(0) if every feature was modified in some way
+    if (nrow(otherPolys) != 0) {
+      mergeSlivers <- do.call(rbind, mergeSlivers)
+      m <- rbind(otherPolys, mergeSlivers)
+    } else {
+      m <- rbind(mergeSlivers)
+    }
+  } else { #lapply over length 1 is special
+    if (nrow(otherPolys) != 0) {
+      mergeSlivers <- mergeSlivers[[1]]
+      m <- rbind(mergeSlivers, otherPolys)
+    } else {
+      m <- mergeSlivers[[1]]
+    }
+  }
+  ## the geometry will be sfc
+  m <- st_cast(m, to = "MULTIPOLYGON")
+  m$tempArea <- NULL # remove the temporary column
+
+  ## remove self-intersecting geometries
+  if (any(!st_is_valid(m))) {
+    #m <- rgeos::gBuffer(spgeom = m, byid = TRUE, width = 0) ## TODO: use sf here
+    m <- st_buffer(m, dist = 0) ## done by geometry
+  }
+
+  return(m)
+}
