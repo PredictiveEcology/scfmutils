@@ -140,7 +140,7 @@ checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableM
 #' Intended to be used when it is important to retain the original extent of an
 #' area while removing sliver polygons.
 #'
-#' @param x a `SpatialPolygons*` or `sf` object
+#' @param x an `sf` POLYGONS or MULTIPLOYGONS object
 #'
 #' @param threshold the minimum area below which a polygon is considered a sliver
 #'
@@ -153,7 +153,7 @@ deSliver <- function(x, threshold) {
 
   ## determine slivers by area
   xSlivers <- x[x$tempArea < threshold, ]
-  xNotSlivers <- x[x$tempArea > threshold, ]
+  xNotSlivers <- x[x$tempArea >= threshold, ]
   if (nrow(xNotSlivers) < 1) {
     stop("Threshold exceeds the area of every polygon. Please select a smaller number")
   }

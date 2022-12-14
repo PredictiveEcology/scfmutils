@@ -7,7 +7,7 @@
 deSliver(x, threshold)
 }
 \arguments{
-\item{x}{a \verb{SpatialPolygons*} or \code{sf} object}
+\item{x}{an \code{sf} POLYGONS or MULTIPLOYGONS object}
 
 \item{threshold}{the minimum area below which a polygon is considered a sliver}
 }
