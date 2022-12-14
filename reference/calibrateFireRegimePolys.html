@@ -61,7 +61,8 @@
 <span>  <span class="va">pMax</span>,</span>
 <span>  <span class="va">neighbours</span>,</span>
 <span>  flammableMap <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  plotPath <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  plotPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  optimizer <span class="op">=</span> <span class="st">"bfgs"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -118,6 +119,10 @@
 <dt>plotPath</dt>
 <dd><p>file name specifying an output directory to use for producing plots of the scam
 fit for each polygon.</p></dd>
+
+
+<dt>optimizer</dt>
+<dd><p>the numerical optimization method to use with scam fitting; see <code>?scam</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
