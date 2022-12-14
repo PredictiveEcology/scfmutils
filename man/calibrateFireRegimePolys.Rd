@@ -17,7 +17,8 @@ calibrateFireRegimePolys(
   pMax,
   neighbours,
   flammableMap = NULL,
-  plotPath = NULL
+  plotPath = NULL,
+  optimizer = "bfgs"
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ calibrateFireRegimePolys(
 
 \item{plotPath}{file name specifying an output directory to use for producing plots of the scam
 fit for each polygon.}
+
+\item{optimizer}{the numerical optimization method to use with scam fitting; see \code{?scam}.}
 }
 \value{
 TODO
