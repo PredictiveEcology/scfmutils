@@ -16,7 +16,8 @@ calibrateFireRegimePolys(
   pMin,
   pMax,
   neighbours,
-  flammableMap = NULL
+  flammableMap = NULL,
+  plotPath = NULL
 )
 }
 \arguments{
@@ -43,6 +44,9 @@ calibrateFireRegimePolys(
 \item{neighbours}{TODOs}
 
 \item{flammableMap}{TODO}
+
+\item{plotPath}{file name specifying an output directory to use for producing plots of the scam
+fit for each polygon.}
 }
 \value{
 TODO

@@ -237,10 +237,13 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @param pMax TODO
 #' @param neighbours TODOs
 #' @param flammableMap TODO
+#' @param plotPath file name specifying an output directory to use for producing plots of the scam
+#'                 fit for each polygon.
 #'
 #' @return TODO
 #'
 #' @export
+#' @importFrom grDevices dev.off png
 #' @importFrom raster ncell
 #' @importFrom reproducible Cache
 #' @importFrom rlang eval_tidy
@@ -248,7 +251,8 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @importFrom stats as.formula optimise uniroot
 calibrateFireRegimePolys <- function(polygonType, regime,
                                      targetN,  landAttr, cellSize, fireRegimePolys,
-                                     buffDist, pJmp, pMin, pMax, neighbours, flammableMap = NULL) {
+                                     buffDist, pJmp, pMin, pMax, neighbours, flammableMap = NULL,
+                                     plotPath = NULL) {
   maxBurnCells <- as.integer(round(regime$emfs_ha / cellSize)) ## will return NA if emfs is NA
   if (is.na(maxBurnCells)) {
     warning("maxBurnCells cannot be NA... there is a problem with scfmRegime")
@@ -301,6 +305,12 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   }
   if (inherits(calibModel, "try-error")) {
     stop("could not calibrate fire model.")
+  } else {
+    ## TODO: create scam plot for the current polygon
+    png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
+        height = 600, width = 800)
+    plot(calibModel, main = paste("polygon", polygonType))
+    dev.off()
   }
   xBar <- regime$xBar / cellSize
 
