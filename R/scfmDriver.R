@@ -239,6 +239,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @param flammableMap TODO
 #' @param plotPath file name specifying an output directory to use for producing plots of the scam
 #'                 fit for each polygon.
+#' @param optimizer the numerical optimization method to use with scam fitting; see `?scam`.
 #'
 #' @return TODO
 #'
@@ -252,7 +253,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 calibrateFireRegimePolys <- function(polygonType, regime,
                                      targetN,  landAttr, cellSize, fireRegimePolys,
                                      buffDist, pJmp, pMin, pMax, neighbours, flammableMap = NULL,
-                                     plotPath = NULL) {
+                                     plotPath = NULL, optimizer = "bfgs") {
   maxBurnCells <- as.integer(round(regime$emfs_ha / cellSize)) ## will return NA if emfs is NA
   if (is.na(maxBurnCells)) {
     warning("maxBurnCells cannot be NA... there is a problem with scfmRegime")
@@ -299,7 +300,10 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   scamFormula <- "finalSize ~ s(p, bs = 'micx', k = kcount)"
 
   message("fitting scam model...")
-  calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
+  stopifnot(optimizer %in% c("bfgs", "efs", "nlm", "nlm.fd", "optim")) ## see ?scam
+  calibModel <- try({
+    scam::scam(as.formula(scamFormula), data = cD, optimizer = optimizer)
+  }, silent = TRUE)
   while (count < 5 & inherits(calibModel, "try-error")) {
     kcount <- kcount + 5
     count <- count + 1
