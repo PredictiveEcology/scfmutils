@@ -112,10 +112,10 @@ executeDesign <- function(L, dT, maxCells) {
     timeLeft <- (NROW(dT) - iter) * timePer
     timeLeft <- round(as.difftime(timeLeft, units = "mins")/60, 1)
     nrowDT <- NROW(dT)
-    if (iter %% 200 == 0)
+    if (iter %% 200 == 0) {
       message("  ", iter, " of ", nrowDT, " total; estimated time remaining: ",
               format(timeLeft, units = "mins"))
-
+    }
 
     threadsDT <- data.table::getDTthreads()
     data.table::setDTthreads(1)
@@ -297,16 +297,19 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   count <- 0
   kcount <- 50
   scamFormula <- "finalSize ~ s(p, bs = 'micx', k = kcount)"
+
+  message("fitting scam model...")
   calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
   while (count < 5 & inherits(calibModel, "try-error")) {
     kcount <- kcount + 5
     count <- count + 1
+    message("|_ failed! retrying scam fitting (attempt ", count, "/5) ...")
     calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
   }
   if (inherits(calibModel, "try-error")) {
     stop("could not calibrate fire model.")
   } else {
-    ## TODO: create scam plot for the current polygon
+    message("|_ success!")
     png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
         height = 600, width = 800)
     plot(calibModel, main = paste("polygon", polygonType))
@@ -338,12 +341,13 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   w <- w / sum(w)
   hatPE <- regime$pEscape
   if (hatPE == 0) {
-    # no fires in polygon zone escapted
+    # no fires in polygon zone escaped
     p0 <- 0
   } else if (hatPE == 1) {
     # all fires in polygon zone escaped
     p0 <- 1
   } else {
+    message("running optimise() to determine p0...")
     res <- optimise(escapeProbDelta,
                     interval = c(hatP0(hatPE, neighbours),
                                  hatP0(hatPE, floor(sum(w * 0:8)))),
