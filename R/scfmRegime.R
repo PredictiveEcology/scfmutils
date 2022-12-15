@@ -133,12 +133,13 @@ calcZonalRegimePars <- function(polygonID, firePolys,
   }
 
   ## max fire size is returned twice - I think this is a backwards compatibility decision
-  return(list(ignitionRate = rate,
-              pEscape = pEscape,
-              xBar = xBar,           ## mean fire size
-              lxBar = lxBar,         ## mean log(fire size)
-              xMax = xMax,           ## maximum observed size
-              emfs_ha = maxFireSize, ## Estimated Maximum Fire Size in ha
-              empiricalBurnRate = empiricalBurnRate
+  return(list(
+    ignitionRate = rate,
+    pEscape = pEscape,
+    xBar = xBar,           ## mean fire size
+    lxBar = lxBar,         ## mean log(fire size)
+    xMax = xMax,           ## maximum observed size
+    emfs_ha = maxFireSize, ## Estimated Maximum Fire Size in ha
+    empiricalBurnRate = empiricalBurnRate
   ))
 }
