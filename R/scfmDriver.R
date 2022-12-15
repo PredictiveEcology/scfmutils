@@ -246,7 +246,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @export
 #' @importFrom grDevices dev.off png
 #' @importFrom raster ncell
-#' @importFrom reproducible Cache
+#' @importFrom reproducible Cache checkPath
 #' @importFrom rlang eval_tidy
 #' @importFrom scam scam
 #' @importFrom stats as.formula optimise uniroot
@@ -314,6 +314,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
     stop("could not calibrate fire model.")
   } else {
     message("|_ success!")
+    plotPath <- checkPath(plotPath, create = TRUE)
     png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
         height = 600, width = 800)
     plot(calibModel, main = paste("polygon", polygonType))
