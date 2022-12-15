@@ -60,7 +60,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     pSpread <- driver$pSpread
     pIg <- regime$ignitionRate
-    burnSum <- burnSummary[burnSummary$polyID == x, ]
+    burnSum <- burnSummary[PolyID == x, ]
     burnSum$N <- as.numeric(burnSum$N)
     targetIgnitions <- pIg * landscapeAttr$burnyArea
     achievedIgnitions <- nrow(burnSum) / simLength
