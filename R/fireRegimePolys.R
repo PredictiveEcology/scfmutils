@@ -76,7 +76,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else if (grepl("^BEC.*ZONE", type)) {
     cols2keep <- c("ZONE", "SUBZONE")
   } else if (type == "BECNDT") {
-    cols2keep <- "NTRL_DSTRD"
+    cols2keep <- names(tmp)[names(tmp) %in% c("NTRL_DSTRD", "NTRLDSTRBN")]
   }
 
   tmp <- tmp[, cols2keep]
