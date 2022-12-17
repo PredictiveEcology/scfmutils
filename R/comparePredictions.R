@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  "achievedFRI", "achievedIgnitions", "histMeanSize", "modMeanSize", "PolyID",
+  ".SD", "achievedFRI", "achievedIgnitions", "grp", "histMeanSize", "modMeanSize", "N", "PolyID",
   "targetFRI", "targetIgnitions"
 ))
 
@@ -60,23 +60,36 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     pSpread <- driver$pSpread
     pIg <- regime$ignitionRate
+
+    if (!"grp" %in% names(burnSummary)) {
+      stop("burnSummary data.table does not have a 'grp' column.\n",
+           "Are you running a recent version of scfmSpread (>= 2.0.0)?")
+    }
+
+    ## burnSummary data.table from scfmSpread is coded as follows:
+    ## grp 1: pixels from fires ignited in SAR & spread in SAR
+    ## grp 2: pixels from fires ignited in SAR & spread outside SAR
+    ## grp 3: pixels from fires ignited outside SAR & spread in SAR
+    ## grp 4: pixels from fires ignited outside SAR & spread outside SAR
+
     burnSum <- burnSummary[PolyID == x, ]
-    burnSum$N <- as.numeric(burnSum$N)
     targetIgnitions <- pIg * landscapeAttr$burnyArea
-    achievedIgnitions <- nrow(burnSum) / simLength
+    achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 would double count ignitions
 
-    burnSum$areaBurned <- as.numeric(burnSum$areaBurned)
-    burnSum <- burnSum[burnSum$N > 1]
+    ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
+    burnSum1 <- burnSum[grp %in% c(1, 2) & N > 1, lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    meanFireSize <- ifelse(nrow(burnSum1) == 0, 0, mean(burnSum1$areaBurned))
 
+    ## Mean Annual Area Burned: total area of all burned pixels in SAR over n years of simulation
+    burnSum2 <- burnSum[grp %in% c(1, 3) & N > 1, lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    MAAB <- sum(burnSum2$areaBurned) / simLength
+
+    achievedFRI <- simLength / ( sum(0, burnSum2$areaBurned) / landscapeAttr$burnyArea)
     targetFRI  <- 1 / regime$empiricalBurnRate
-    #the length of simulation over the proportion that actually burned
-    achievedFRI <- simLength / (sum(burnSum$areaBurned) / landscapeAttr$burnyArea)
 
-    #starting in year 1 and ending in year 10 means you have 10 years, so
-    meanBurn <- ifelse(nrow(burnSum) == 0, yes = 0, no = mean(burnSum$areaBurned))
     pred <- data.frame("PolyID" = x,
                        "histMeanSize" = regime$xBar, ## predicted (empirical) mean size of fires
-                       "modMeanSize" = meanBurn, ## modeled mean size of fires
+                       "modMeanSize" = meanFireSize,
                        "achievedFRI" = achievedFRI,
                        "targetFRI" = targetFRI,
                        "targetIgnitions" = targetIgnitions,
