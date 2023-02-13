@@ -5,7 +5,8 @@ utils::globalVariables(c(
 #' @export
 #' @rdname prepInputsFireRegimePolys
 fireRegimePolyTypes <- function() {
-  c("BECNDT", "BECSUBZONE", "BECZONE", "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE")
+  c("BECNDT", "BECSUBZONE", "BECZONE", "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE",
+    "FRT", "FRU")
 }
 
 #' `prepInputsFireRegimePolys`
@@ -13,7 +14,9 @@ fireRegimePolyTypes <- function() {
 #' Create fire regime polygons for `scfmRegime`.
 #'
 #' @param url character. URL from which to download and prepare fire regime polygons.
-#'            Defaults are provided for Canadian ecodistrict, ecoregion, ecoprovince, and ecozone.
+#'            Defaults are provided for Canadian ecodistrict, ecoregion, ecoprovince, and ecozone,
+#'            as well as national Fire Regime Types and Fire Regime Units from Erni et al. (2020)
+#'            \doi{10.1139/cjfr-2019-0191}.
 #'
 #' @param destinationPath character. Path to directory where data will be downloaded.
 #'
@@ -22,7 +25,8 @@ fireRegimePolyTypes <- function() {
 #' @param rasterToMatch TODO
 #'
 #' @param type character. The polygon type to use:
-#'             Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", or "ECOZONE".
+#'             Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", "ECOZONE",
+#'             "FRT", or "FRU".
 #'             If `url` to BEC shapefile is provided, can also be one of:
 #'             "BECNDT", "BECSUBZONE", or "BECZONE".
 #'
@@ -31,6 +35,28 @@ fireRegimePolyTypes <- function() {
 #' @importFrom raster crs
 #' @importFrom reproducible prepInputs
 #' @importFrom sf st_as_sf st_collection_extract st_union
+#'
+#' @examples
+#' library(sf)
+#' library(sp)
+#'
+#' ## random study area in central Alberta
+#' studyArea <- SpatialPoints(data.frame(lon = -115, lat = 55), proj4string = CRS("EPSG:4326")) |>
+#' st_as_sf() |>
+#'   st_transform(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
+#'                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
+#'   as_Spatial() |>
+#'   SpaDES.tools::randomStudyArea(center = _, seed = 60, size = 1e10) |>
+#'   st_as_sf()
+#'
+#' frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyArea, type = "ECOREGION")
+#' plot(frpEcoregion)
+#'
+#' frpFRT <- prepInputsFireRegimePolys(studyArea = studyArea, type = "FRT")
+#' plot(frpFRT)
+#'
+#' frpFRU <- prepInputsFireRegimePolys(studyArea = studyArea, type = "FRU")
+#' plot(frpFRU)
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                                       studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION") {
   type <- toupper(type)
@@ -47,7 +73,9 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
         ecodistrict = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
         ecoregion = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/region/ecoregion_shp.zip",
         ecoprovince = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/province/ecoprovince_shp.zip",
-        ecozone = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip"
+        ecozone = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
+        frt = "https://zenodo.org/record/4458156/files/FRT.zip",
+        fru = "https://zenodo.org/record/4458156/files/FRU.zip"
       )
       url <- urlList[[tolower(type)]]
     }
@@ -77,6 +105,10 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
     cols2keep <- c("ZONE", "SUBZONE")
   } else if (type == "BECNDT") {
     cols2keep <- names(tmp)[names(tmp) %in% c("NTRL_DSTRD", "NTRLDSTRBN")]
+  } else if (type == "FRT") {
+    cols2keep <- "Cluster"
+  } else if (type == "FRU") {
+    cols2keep <- "GRIDCODE"
   }
 
   tmp <- tmp[, cols2keep]
@@ -85,15 +117,13 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                         BECNDT = tmp[[cols2keep[1]]],
                         BECSUBZONE = paste0(tmp[["ZONE"]], "_", tmp[["SUBZONE"]]),
                         BECZONE = tmp[["ZONE"]],
-                        ECODISTRICT = tmp[[cols2keep[1]]],
-                        ECOREGION = tmp[[cols2keep[1]]],
-                        ECOPROVINCE = tmp[[cols2keep[1]]],
-                        ECOZONE = tmp[[cols2keep[1]]])
+                        tmp[[cols2keep[1]]])
   tmp$USETHIS <- as.factor(tmp$USETHIS)
 
   tmp2 <- group_by(tmp, USETHIS) %>% summarise(geometry = sf::st_union(geometry)) %>% ungroup()
   polys <- sf::st_collection_extract(tmp2)
-  polys[["PolyID"]] <- 1:nrow(polys)
+  polys[["PolyID"]] <- as.integer(1:nrow(polys))
+  polys[["USETHIS"]] <- NULL
 
   return(polys)
 }
