@@ -41,12 +41,12 @@ library(sf)
 library(sp)
 
 ## random study area in central Alberta
-studyArea <- SpatialPoints(data.frame(lon = -115, lat = 55), proj4string = CRS("EPSG:4326")) |>
-st_as_sf() |>
+studyArea <- SpatialPoints(data.frame(lon = -115, lat = 55), proj4string = CRS("EPSG:4326")) \%>\%
+st_as_sf() \%>\%
   st_transform(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
-                   "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
-  as_Spatial() |>
-  SpaDES.tools::randomStudyArea(center = _, seed = 60, size = 1e10) |>
+                   "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) \%>\%
+  as_Spatial() \%>\%
+  SpaDES.tools::randomStudyArea(center = _, seed = 60, size = 1e10) \%>\%
   st_as_sf()
 
 frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyArea, type = "ECOREGION")
