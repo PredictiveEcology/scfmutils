@@ -92,7 +92,79 @@ If <code>url</code> to BEC shapefile is provided, can also be one of:
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE</span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edzer/sp/" class="external-link">sp</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## random study area in central Alberta</span></span></span>
+<span class="r-in"><span><span class="va">studyArea</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="op">-</span><span class="fl">115</span>, lat <span class="op">=</span> <span class="fl">55</span><span class="op">)</span>, proj4string <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span><span class="st">"EPSG:4326"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95"</span>,</span></span>
+<span class="r-in"><span>                   <span class="st">"+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/coerce-methods.html" class="external-link">as_Spatial</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">SpaDES.tools</span><span class="fu">::</span><span class="fu"><a href="https://spades-tools.predictiveecology.org/reference/randomStudyArea.html" class="external-link">randomStudyArea</a></span><span class="op">(</span>center <span class="op">=</span> <span class="va">.</span>, seed <span class="op">=</span> <span class="fl">60</span>, size <span class="op">=</span> <span class="fl">1e10</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">frpEcoregion</span> <span class="op">&lt;-</span> <span class="fu">prepInputsFireRegimePolys</span><span class="op">(</span>studyArea <span class="op">=</span> <span class="va">studyArea</span>, type <span class="op">=</span> <span class="st">"ECOREGION"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Running preProcess</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Preparing: </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Checking local files...</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Finished checking local files.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in downloadFile(archive = if (isTRUE(is.na(archive))) NULL else archive,     targetFile = targetFile, neededFiles = neededFiles, destinationPath = destinationPath,     quick = quick, checkSums = checkSums, dlFun = dlFun, url = url,     checksumFile = asPath(checkSumFilePath), needChecksums = needChecksums,     overwrite = overwrite, purge = purge, verbose = verbose,     .tempPath = .tempPath, ...):</span> Download of  from https://sis.agr.gc.ca/cansis/nsdb/ecostrat/region/ecoregion_shp.zip failed. Please check the url that it is correct.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> If the url is correct, it is possible that manually downloading it will work. To try this, with your browser, go to</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> https://sis.agr.gc.ca/cansis/nsdb/ecostrat/region/ecoregion_shp.zip,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>  ... then download it manually, give it this name: 'ecoregion_shp.zip', and place file here: /tmp/RtmpRAnZIC.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> -------------------</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> If manual download was successful, you will likely also need to run Checksums manually after you download the file with this command: reproducible:::appendChecksumsTable(checkSumFilePath = '/tmp/RtmpRAnZIC/CHECKSUMS.txt', filesToChecksum = '', destinationPath = '/tmp/RtmpRAnZIC', append = TRUE)</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">frpEcoregion</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'frpEcoregion' not found</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">frpFRT</span> <span class="op">&lt;-</span> <span class="fu">prepInputsFireRegimePolys</span><span class="op">(</span>studyArea <span class="op">=</span> <span class="va">studyArea</span>, type <span class="op">=</span> <span class="st">"FRT"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Running preProcess</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Preparing: </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Checking local files...</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Finished checking local files.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in downloadFile(archive = if (isTRUE(is.na(archive))) NULL else archive,     targetFile = targetFile, neededFiles = neededFiles, destinationPath = destinationPath,     quick = quick, checkSums = checkSums, dlFun = dlFun, url = url,     checksumFile = asPath(checkSumFilePath), needChecksums = needChecksums,     overwrite = overwrite, purge = purge, verbose = verbose,     .tempPath = .tempPath, ...):</span> Download of  from https://zenodo.org/record/4458156/files/FRT.zip failed. Please check the url that it is correct.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> If the url is correct, it is possible that manually downloading it will work. To try this, with your browser, go to</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> https://zenodo.org/record/4458156/files/FRT.zip,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>  ... then download it manually, give it this name: 'FRT.zip', and place file here: /tmp/RtmpRAnZIC.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> -------------------</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> If manual download was successful, you will likely also need to run Checksums manually after you download the file with this command: reproducible:::appendChecksumsTable(checkSumFilePath = '/tmp/RtmpRAnZIC/CHECKSUMS.txt', filesToChecksum = '', destinationPath = '/tmp/RtmpRAnZIC', append = TRUE)</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">frpFRT</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'frpFRT' not found</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">frpFRU</span> <span class="op">&lt;-</span> <span class="fu">prepInputsFireRegimePolys</span><span class="op">(</span>studyArea <span class="op">=</span> <span class="va">studyArea</span>, type <span class="op">=</span> <span class="st">"FRU"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Running preProcess</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Preparing: </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Checking local files...</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Finished checking local files.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in downloadFile(archive = if (isTRUE(is.na(archive))) NULL else archive,     targetFile = targetFile, neededFiles = neededFiles, destinationPath = destinationPath,     quick = quick, checkSums = checkSums, dlFun = dlFun, url = url,     checksumFile = asPath(checkSumFilePath), needChecksums = needChecksums,     overwrite = overwrite, purge = purge, verbose = verbose,     .tempPath = .tempPath, ...):</span> Download of  from https://zenodo.org/record/4458156/files/FRU.zip failed. Please check the url that it is correct.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> If the url is correct, it is possible that manually downloading it will work. To try this, with your browser, go to</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> https://zenodo.org/record/4458156/files/FRU.zip,</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>  ... then download it manually, give it this name: 'FRU.zip', and place file here: /tmp/RtmpRAnZIC.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> -------------------</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> If manual download was successful, you will likely also need to run Checksums manually after you download the file with this command: reproducible:::appendChecksumsTable(checkSumFilePath = '/tmp/RtmpRAnZIC/CHECKSUMS.txt', filesToChecksum = '', destinationPath = '/tmp/RtmpRAnZIC', append = TRUE)</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">frpFRU</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'frpFRU' not found</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
