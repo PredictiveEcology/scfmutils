@@ -49,8 +49,10 @@ st_as_sf() \%>\%
   SpaDES.tools::randomStudyArea(center = ., seed = 60, size = 1e10) \%>\%
   st_as_sf()
 
+\donttest{
 frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyArea, type = "ECOREGION")
 plot(frpEcoregion)
+}
 
 frpFRT <- prepInputsFireRegimePolys(studyArea = studyArea, type = "FRT")
 plot(frpFRT)
