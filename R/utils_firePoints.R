@@ -29,9 +29,12 @@ getFirePoints_NFDB_scfm <- function(url = NULL,
   whIsOK <- which(check$result[whRowIsShp] == "OK")
   needNewDownload <- TRUE
   if (any(whIsOK)) {
-    filesToCheck <- tools::file_path_sans_ext(unlist(lapply(check[whRowIsShp[whIsOK], "expectedFile"], as.character)))
-    dateOfFile <- substr(x = filesToCheck, start = nchar(filesToCheck) - 8 +
-                           1, nchar(filesToCheck))
+    filesToCheck <- file_path_sans_ext(unlist(lapply(check[whRowIsShp[whIsOK],
+                                                           "expectedFile"],
+                                                     as.character)))
+    dateOfFile <- substr(x = filesToCheck,
+                         start = nchar(filesToCheck) - 8 + 1,
+                         nchar(filesToCheck))
     if (any((as.Date(dateOfFile, format = "%Y%m%d") + dyear(redownloadIn)) > Sys.Date())) {
       needNewDownload <- FALSE
     }
@@ -49,17 +52,14 @@ getFirePoints_NFDB_scfm <- function(url = NULL,
     NFDBs <- grep(list.files(NFDB_pointPath), pattern = "^NFDB", value = TRUE)
     shps <- grep(list.files(NFDB_pointPath), pattern = ".shp$", value = TRUE)
     aFile <- NFDBs[NFDBs %in% shps][1] #in case there are multiple files
-    firePoints <- sf::read_sf(file.path(NFDB_pointPath, aFile))
+    firePoints <- read_sf(file.path(NFDB_pointPath, aFile))
 
-    useTerra <- getOption("reproducible.useTerra") ## TODO: reproducible#242
-    options(reproducible.useTerra = FALSE) ## TODO: reproducible#242
     firePoints <- Cache(postProcess,
                         x = firePoints,
                         studyArea = studyArea,
                         filename2 = NULL,
                         rasterToMatch = rasterToMatch,
                         userTags = c("cacheTags", "NFDB"))
-    options(reproducible.useTerra = useTerra) ## TODO: reproducible#242
   }
 
   return(firePoints)
