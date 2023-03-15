@@ -142,11 +142,12 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 #' @return a cleaned up `fireRegimePolys` object
 #'
 #' @export
-#' @importFrom raster compareCRS
+#' @importFrom LandR .compareCRS
 #' @importFrom reproducible Cache
 #' @importFrom sf st_area st_is_longlat
 checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableMap, sliverThresh, cacheTag) {
-  compareCRS(rasterToMatch, flammableMap, fireRegimePolys) ## TODO: is there a better check?
+  .compareCRS(rasterToMatch, flammableMap) ## TODO: is there a better check?
+  .compareCRS(rasterToMatch, fireRegimePolys)
 
   if (is.null(fireRegimePolys[["PolyID"]])) {
     stop("please supply fireRegimePolys with a PolyID")

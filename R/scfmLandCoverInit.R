@@ -13,12 +13,12 @@ utils::globalVariables(c(
 #' @importFrom raster extract focal getValues res
 #' @importFrom stats na.omit
 .makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys) {
-  cellSize <- prod(raster::res(flammableMap)) / 1e4 # in ha
+  cellSize <- prod(res(flammableMap)) / 1e4 # in ha
 
-  neighMap <- raster::focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
+  neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
 
   # extract table for each polygon
-  valsByPoly <- raster::extract(neighMap, fireRegimePolys, cellnumbers = TRUE) ## TODO: use terra
+  valsByPoly <- extract(neighMap, fireRegimePolys, cellnumbers = TRUE) ## TODO: use terra
 
   ## terra version doesn't return a list of 2-col matrices, but a 3-col data.frame with poly ID in first col
   # valsByPoly <- terra::extract(terra::rast(neighMap), terra::vect(fireRegimePolys), cells = TRUE)
@@ -43,7 +43,8 @@ utils::globalVariables(c(
   })
 
   nFlammable <- lapply(valsByZone, function(x) {
-    sum(getValues(flammableMap)[x[, 1]], na.rm = TRUE) # sums flammable pixels in FRI polygons
+    flamVals <- values(x, mat = FALSE)
+    sum(flamVals, na.rm = TRUE) # sums flammable pixels in FRI polygons
   })
 
   landscapeAttr <- purrr::transpose(list(
@@ -63,7 +64,7 @@ utils::globalVariables(c(
 
 #' `scfmLandCoverInit`: `genFireMapAttr`
 #'
-#' @param flammableMap `RasterLayer`. TODO.
+#' @param flammableMap `SpatRaster`. TODO.
 #' @param fireRegimePolys TODO
 #' @param neighbours TODO
 #'
