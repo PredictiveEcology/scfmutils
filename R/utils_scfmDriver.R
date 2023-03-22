@@ -13,8 +13,7 @@ utils::globalVariables(c(
 #' @return list containing `fireRegimePoly`, `landscapeIndex`, `flammableMap` objects.
 #'
 #' @export
-#' @importFrom fasterize fasterize
-#' @importFrom raster raster
+#' @importFrom terra rast rasterize
 #' @importFrom reproducible Cache postProcess
 #' @importFrom sf st_buffer st_cast st_difference st_is_valid
 genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {

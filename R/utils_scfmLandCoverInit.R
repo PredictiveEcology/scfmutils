@@ -10,48 +10,52 @@ utils::globalVariables(c(
 #' @keywords internal
 #'
 #' @importFrom purrr transpose
-#' @importFrom raster extract focal getValues res
+#' @importFrom terra extract focal values res
 #' @importFrom stats na.omit
 .makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys) {
-  cellSize <- prod(res(flammableMap)) / 1e4 # in ha
 
+  cellSize <- prod(res(flammableMap)) / 1e4 # in ha
   neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
 
   # extract table for each polygon
-  valsByPoly <- extract(neighMap, fireRegimePolys, cellnumbers = TRUE) ## TODO: use terra
+  valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE) ## TODO: use terra
+  valsByPoly <- as.data.table(valsByPoly)
+  valsByPoly[, flam := values(flammableMap, mat = FALSE)[cell]]
 
-  ## terra version doesn't return a list of 2-col matrices, but a 3-col data.frame with poly ID in first col
-  # valsByPoly <- terra::extract(terra::rast(neighMap), terra::vect(fireRegimePolys), cells = TRUE)
+  #get the FRP ID
+  tempDT <- data.table(PolyID = fireRegimePolys$PolyID, ID = 1:nrow(fireRegimePolys))
+  valsByPoly <- valsByPoly[tempDT, on = c("ID")]
 
-  valsByPoly <- lapply(valsByPoly, na.omit)
-  names(valsByPoly) <- fireRegimePolys$PolyID
-  uniqueZoneNames <- unique(fireRegimePolys$PolyID) # get unique zones.
-  valsByZone <- lapply(uniqueZoneNames, function(ecoName) {
-    aa <- valsByPoly[names(valsByPoly) == ecoName]
-    if (is.list(aa)) {
-      aa <- do.call(rbind, aa)
-    }
-    return(aa)
+  valsByZone <- lapply(fireRegimePolys$PolyID, FUN = function(x, df = valsByPoly){
+    df[PolyID == x]
   })
-  names(valsByZone) <- uniqueZoneNames
 
-  # Derive frequency tables of number of flammable cells, per polygon type, currently ECOREGION
+  #there are occasional NAs - rasterize/extract differences?
+  valsByZone <- lapply(valsByZone, na.omit)
+  names(valsByZone) <- fireRegimePolys$PolyID
+
+  #Derive frequency tables of number of flammable cells, per polygon type, currently ECOREGION
   nNbrs <- lapply(valsByZone, function(x) {
-    nNbrs <- tabulate(x[, 2] + 1, 9) # depends on sfcmLandCoverInit
-    names(nNbrs) <- 0:8
+    nNbrs <- x[, .N, .(focal_sum)] # depends on sfcmLandCoverInit
+
+    possibleNbrs <- data.table(nbr = 0:8)
+    nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr")]
+    nNbrs <- nNbrs$N
+    names(nNbrs) <- possibleNbrs$nbr
     return(nNbrs)
   })
 
-  nFlammable <- lapply(valsByZone, function(x) {
-    flamVals <- values(x, mat = FALSE)
-    sum(flamVals, na.rm = TRUE) # sums flammable pixels in FRI polygons
-  })
+
+  #find total flammable pixels in cell
+  flamByPoly <- valsByPoly[, .(flam = sum(flam, na.rm = TRUE)), PolyID]
+  nFlammable <- as.list(flamByPoly$flam)
+
 
   landscapeAttr <- purrr::transpose(list(
-    cellSize = rep(list(cellSize), length(nFlammable)),
+    cellSize = as.list(rep(cellSize, times = length(nNbrs))),
     nFlammable = nFlammable,
     nNbrs = nNbrs,
-    cellsByZone = lapply(valsByZone, function(x) x[, 1])
+    cellsByZone = lapply(valsByZone, function(x){x$cell})
   ))
 
   landscapeAttr <- lapply(landscapeAttr, function(x) {

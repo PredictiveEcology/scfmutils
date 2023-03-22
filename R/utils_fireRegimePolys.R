@@ -183,7 +183,6 @@ checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableM
 #' @importFrom sf st_area st_buffer st_cast st_is_valid st_nearest_feature st_union
 deSliver <- function(x, threshold) {
   x$tempArea <- as.numeric(st_area(x))
-
   ## determine slivers by area
   xSlivers <- x[x$tempArea < threshold, ]
   xNotSlivers <- x[x$tempArea >= threshold, ]
