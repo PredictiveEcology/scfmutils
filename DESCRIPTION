@@ -42,15 +42,14 @@ Imports:
     SpaDES.core (>= 1.0.10.9015),
     SpaDES.tools,
     stats,
+    terra,
     tools
 Suggests:
-    covr,
     gridExtra,
     knitr,
     rmarkdown,
     roxygen2,
     sp,
-    terra,
     testthat
 Remotes:
     PredictiveEcology/reproducible@development,

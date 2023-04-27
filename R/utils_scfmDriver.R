@@ -8,12 +8,12 @@ utils::globalVariables(c(
 #'
 #' @param coreLand TODO
 #' @param buffDist distance to buffer `coreLand`
-#' @param flammableMap `RasterLayer` with values 0 indicating non-flammable pixels, 1 flammable.
+#' @param flammableMap `SpatRaster` with values 0 indicating non-flammable pixels, 1 flammable.
 #'
 #' @return list containing `fireRegimePoly`, `landscapeIndex`, `flammableMap` objects.
 #'
 #' @export
-#' @importFrom terra rast rasterize
+#' @importFrom terra rasterize
 #' @importFrom reproducible Cache postProcess
 #' @importFrom sf st_buffer st_cast st_difference st_is_valid
 genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {
@@ -38,7 +38,7 @@ genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {
                         useSAcrs = TRUE, filename2 = NULL)
 
   #Generate landscape Index raster
-  landscapeIndex <- fasterize(polyLandscape, raster(flammableMap), "fooField")
+  landscapeIndex <- rasterize(polyLandscape, flammableMap, fun = 'min', "fooField")
 
   calibrationLandscape <- list(polyLandscape, landscapeIndex, flammableMap)
   names(calibrationLandscape) <- c("fireRegimePoly", "landscapeIndex", "flammableMap")
@@ -91,15 +91,13 @@ makeDesign <- function(indices, targetN, pEscape = 0.1, pmin, pmax, q = 1) {
 #'
 #' @export
 #' @importFrom data.table getDTthreads setDTthreads
-#' @importFrom raster raster
+#' @importFrom terra rast
 #' @importFrom reproducible Cache
 #' @importFrom SpaDES.tools adj spread2
 executeDesign <- function(L, dT, maxCells) {
   ## extract elements of dT into a three column matrix where column 1,2,3 = igLoc, p0, p
   iter <- 0
-  probRas <- raster(L)
-  probRas[] <- L[]
-
+  probRas <- L
   startTime <- Sys.time()
 
   .executeDesignInternal <- function(x, L, ProbRas, startTime) { ## L, P are rasters, passed by reference
@@ -134,7 +132,9 @@ executeDesign <- function(L, dT, maxCells) {
       return(res) #really defaults
     ## P is still flammableMap.
 
-    ProbRas[nbrs] <- p0
+    ProbVals <- as.vector(ProbRas)
+    ProbVals[nbrs] <- p0
+    ProbRas <- setValues(ProbRas, ProbVals)
     #Now it is 1, 0, p0, and NA
     spreadState0 <- SpaDES.tools::spread2(landscape = L,
                                           start = i,
@@ -145,9 +145,11 @@ executeDesign <- function(L, dT, maxCells) {
 
     tmp <- nrow(spreadState0)
     res[2:3] <- c(tmp - 1,tmp)
-    if (tmp == 1) # the fire did not spread
+    if (tmp == 1) { # the fire did not spread
       return(res)
-    ProbRas[] <- L[]*p
+    }
+
+    ProbRas <- setValues(ProbRas, as.vector(L) * p)
     spreadState1 <- SpaDES.tools::spread2(landscape = L,
                                           start = spreadState0,
                                           spreadProb = ProbRas,
@@ -224,18 +226,18 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #'
 #' Calibrate fire regime polygons ... (TODO)
 #'
-#' @param polygonType TODO
-#' @param regime TODO
-#' @param targetN TODO
-#' @param landAttr TODO
-#' @param cellSize TODO
-#' @param fireRegimePolys TODO
-#' @param buffDist TODO
-#' @param pJmp TODO
-#' @param pMin TODO
-#' @param pMax TODO
-#' @param neighbours TODOs
-#' @param flammableMap TODO
+#' @param polygonType the names of polygons, i.e. PolyID
+#' @param regime the regime characteristics of each polygon
+#' @param targetN the number of fires to simulate during calibration
+#' @param landAttr the landscapeAttr object with characteristics for each polygon
+#' @param cellSize the cell size in metres
+#' @param fireRegimePolys fire regime polygons
+#' @param buffDist buffer distance for cells available to be burned outside of each regime polygon
+#' @param pJmp default spread probability for degerenate polygons
+#' @param pMin minimum spread probability
+#' @param pMax maximum allowable spread probability
+#' @param neighbours number of neighbours during spread
+#' @param flammableMap file path to flammableMap raster - for parallel purposes
 #' @param plotPath file name specifying an output directory to use for producing plots of the scam
 #'                 fit for each polygon.
 #' @param optimizer the numerical optimization method to use with scam fitting; see `?scam`.
@@ -244,7 +246,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #'
 #' @export
 #' @importFrom grDevices dev.off png
-#' @importFrom raster ncell
+#' @importFrom terra ncell rast
 #' @importFrom reproducible Cache checkPath
 #' @importFrom rlang eval_tidy
 #' @importFrom scam scam
@@ -253,6 +255,9 @@ calibrateFireRegimePolys <- function(polygonType, regime,
                                      targetN,  landAttr, cellSize, fireRegimePolys,
                                      buffDist, pJmp, pMin, pMax, neighbours, flammableMap = NULL,
                                      plotPath = NULL, optimizer = "bfgs") {
+  #must be a file path when run in parallel as SpatRaster can't be serialized
+ flammableMap <- terra::rast(flammableMap)
+
   maxBurnCells <- as.integer(round(regime$emfs_ha / cellSize)) ## will return NA if emfs is NA
   if (is.na(maxBurnCells)) {
     warning("maxBurnCells cannot be NA... there is a problem with scfmRegime")

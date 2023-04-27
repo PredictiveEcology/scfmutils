@@ -11,7 +11,7 @@ genSimLand(coreLand, buffDist, flammableMap = NULL)
 
 \item{buffDist}{distance to buffer \code{coreLand}}
 
-\item{flammableMap}{\code{RasterLayer} with values 0 indicating non-flammable pixels, 1 flammable.}
+\item{flammableMap}{\code{SpatRaster} with values 0 indicating non-flammable pixels, 1 flammable.}
 }
 \value{
 list containing \code{fireRegimePoly}, \code{landscapeIndex}, \code{flammableMap} objects.
