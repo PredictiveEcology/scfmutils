@@ -22,29 +22,29 @@ calibrateFireRegimePolys(
 )
 }
 \arguments{
-\item{polygonType}{TODO}
+\item{polygonType}{the names of polygons, i.e. PolyID}
 
-\item{regime}{TODO}
+\item{regime}{the regime characteristics of each polygon}
 
-\item{targetN}{TODO}
+\item{targetN}{the number of fires to simulate during calibration}
 
-\item{landAttr}{TODO}
+\item{landAttr}{the landscapeAttr object with characteristics for each polygon}
 
-\item{cellSize}{TODO}
+\item{cellSize}{the cell size in metres}
 
-\item{fireRegimePolys}{TODO}
+\item{fireRegimePolys}{fire regime polygons}
 
-\item{buffDist}{TODO}
+\item{buffDist}{buffer distance for cells available to be burned outside of each regime polygon}
 
-\item{pJmp}{TODO}
+\item{pJmp}{default spread probability for degerenate polygons}
 
-\item{pMin}{TODO}
+\item{pMin}{minimum spread probability}
 
-\item{pMax}{TODO}
+\item{pMax}{maximum allowable spread probability}
 
-\item{neighbours}{TODOs}
+\item{neighbours}{number of neighbours during spread}
 
-\item{flammableMap}{TODO}
+\item{flammableMap}{file path to flammableMap raster - for parallel purposes}
 
 \item{plotPath}{file name specifying an output directory to use for producing plots of the scam
 fit for each polygon.}

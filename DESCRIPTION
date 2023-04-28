@@ -9,7 +9,7 @@ URL: https://scfmutils.predictiveecology.org,
     https://github.com/PredictiveEcology/scfmutils,
     https://predictiveecology.github.io/scfmutils/
 Date: 2022-02-13
-Version: 0.0.7.9000
+Version: 0.0.7.9001
 Authors@R: c(
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
            role = c("aut")),
@@ -54,6 +54,7 @@ Suggests:
 Remotes:
     PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.core@development,
+    PredictiveEcology/LandR@development,
     PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
