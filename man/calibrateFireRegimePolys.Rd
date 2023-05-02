@@ -36,7 +36,7 @@ calibrateFireRegimePolys(
 
 \item{buffDist}{buffer distance for cells available to be burned outside of each regime polygon}
 
-\item{pJmp}{default spread probability for degerenate polygons}
+\item{pJmp}{default spread probability for degenerate polygons}
 
 \item{pMin}{minimum spread probability}
 
@@ -44,7 +44,7 @@ calibrateFireRegimePolys(
 
 \item{neighbours}{number of neighbours during spread}
 
-\item{flammableMap}{file path to flammableMap raster - for parallel purposes}
+\item{flammableMap}{a packed \code{SpatRaster} - see \code{terra::wrap}}
 
 \item{plotPath}{file name specifying an output directory to use for producing plots of the scam
 fit for each polygon.}
