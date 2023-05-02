@@ -233,11 +233,11 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @param cellSize the cell size in metres
 #' @param fireRegimePolys fire regime polygons
 #' @param buffDist buffer distance for cells available to be burned outside of each regime polygon
-#' @param pJmp default spread probability for degerenate polygons
+#' @param pJmp default spread probability for degenerate polygons
 #' @param pMin minimum spread probability
 #' @param pMax maximum allowable spread probability
 #' @param neighbours number of neighbours during spread
-#' @param flammableMap file path to flammableMap raster - for parallel purposes
+#' @param flammableMap a packed \code{SpatRaster} - see \code{terra::wrap}
 #' @param plotPath file name specifying an output directory to use for producing plots of the scam
 #'                 fit for each polygon.
 #' @param optimizer the numerical optimization method to use with scam fitting; see `?scam`.
@@ -246,7 +246,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #'
 #' @export
 #' @importFrom grDevices dev.off png
-#' @importFrom terra ncell rast
+#' @importFrom terra ncell unwrap
 #' @importFrom reproducible Cache checkPath
 #' @importFrom rlang eval_tidy
 #' @importFrom scam scam
@@ -256,7 +256,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
                                      buffDist, pJmp, pMin, pMax, neighbours, flammableMap = NULL,
                                      plotPath = NULL, optimizer = "bfgs") {
   #must be a file path when run in parallel as SpatRaster can't be serialized
- flammableMap <- terra::rast(flammableMap)
+ flammableMap <- terra::unwrap(flammableMap)
 
   maxBurnCells <- as.integer(round(regime$emfs_ha / cellSize)) ## will return NA if emfs is NA
   if (is.na(maxBurnCells)) {
