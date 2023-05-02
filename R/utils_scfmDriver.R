@@ -91,7 +91,7 @@ makeDesign <- function(indices, targetN, pEscape = 0.1, pmin, pmax, q = 1) {
 #'
 #' @export
 #' @importFrom data.table getDTthreads setDTthreads
-#' @importFrom terra rast
+#' @importFrom terra rast setValues
 #' @importFrom reproducible Cache
 #' @importFrom SpaDES.tools adj spread2
 executeDesign <- function(L, dT, maxCells) {
