@@ -1,6 +1,6 @@
 utils::globalVariables(c(
-  ".SD", "achievedFRI", "achievedIgnitions", "grp", "histMeanSize", "modMeanSize", "N", "PolyID",
-  "targetFRI", "targetIgnitions"
+  ".SD", "achievedFRI", "achievedIgnitions", "areaBurned", "grp", "histMeanSize",
+  "modMeanSize", "N", "PolyID", "targetFRI", "targetIgnitions"
 ))
 
 #' Create `data.table` to compare scfm predictions with historical observations
