@@ -31,7 +31,7 @@ fireRegimePolyTypes <- function() {
 #'             "BECNDT", "BECSUBZONE", or "BECZONE".
 #'
 #' @export
-#' @importFrom dplyr %>% group_by summarise ungroup
+#' @importFrom dplyr group_by summarise ungroup
 #' @importFrom raster crs
 #' @importFrom reproducible prepInputs
 #' @importFrom sf st_as_sf st_collection_extract st_union
@@ -41,12 +41,12 @@ fireRegimePolyTypes <- function() {
 #' library(sp)
 #'
 #' ## random study area in central Alberta
-#' studyArea <- SpatialPoints(data.frame(lon = -115, lat = 55), proj4string = CRS("EPSG:4326")) %>%
-#' st_as_sf() %>%
+#' studyArea <- SpatialPoints(data.frame(lon = -115, lat = 55), proj4string = CRS("EPSG:4326")) |>
+#'   st_as_sf() |>
 #'   st_transform(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
-#'                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) %>%
-#'   as_Spatial() %>%
-#'   SpaDES.tools::randomStudyArea(center = ., seed = 60, size = 1e10) %>%
+#'                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
+#'   as_Spatial() |>
+#'   SpaDES.tools::randomStudyArea(center = _, seed = 60, size = 1e10) |>
 #'   st_as_sf()
 #'
 #' \donttest{
@@ -122,7 +122,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                         tmp[[cols2keep[1]]])
   tmp$USETHIS <- as.factor(tmp$USETHIS)
 
-  tmp2 <- group_by(tmp, USETHIS) %>% summarise(geometry = sf::st_union(geometry)) %>% ungroup()
+  tmp2 <- group_by(tmp, USETHIS) |> summarise(geometry = sf::st_union(geometry)) |> ungroup()
   polys <- sf::st_collection_extract(tmp2)
   polys[["PolyID"]] <- as.integer(1:nrow(polys))
   polys[["USETHIS"]] <- NULL
