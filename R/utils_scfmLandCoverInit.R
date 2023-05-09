@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  "cellSize"
+  ":=", ".", ".N", "cell", "cellSize", "flam", "focal_sum"
 ))
 
 #' `scfmLandCoverInit`: `.makeLandscapeAttr`
@@ -9,6 +9,7 @@ utils::globalVariables(c(
 #'
 #' @keywords internal
 #'
+#' @importFrom data.table as.data.table data.table
 #' @importFrom purrr transpose
 #' @importFrom terra extract focal values res
 #' @importFrom stats na.omit
