@@ -71,7 +71,6 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
     ## grp 2: pixels from fires ignited in SAR & spread outside SAR
     ## grp 3: pixels from fires ignited outside SAR & spread in SAR
     ## grp 4: pixels from fires ignited outside SAR & spread outside SAR
-    browser()
     burnSum <- burnSummary[PolyID == x, ]
     targetIgnitions <- pIg * landscapeAttr$burnyArea
     achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 would double count ignitions
