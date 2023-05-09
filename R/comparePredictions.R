@@ -71,17 +71,19 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
     ## grp 2: pixels from fires ignited in SAR & spread outside SAR
     ## grp 3: pixels from fires ignited outside SAR & spread in SAR
     ## grp 4: pixels from fires ignited outside SAR & spread outside SAR
-
+    browser()
     burnSum <- burnSummary[PolyID == x, ]
     targetIgnitions <- pIg * landscapeAttr$burnyArea
     achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 would double count ignitions
 
     ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
-    burnSum1 <- burnSum[grp %in% c(1, 2) & N > 1, lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    burnSum1 <- burnSum1[areaBurned > landscapeAttr$cellSize, ]
     meanFireSize <- ifelse(nrow(burnSum1) == 0, 0, mean(burnSum1$areaBurned))
 
     ## Mean Annual Area Burned: total area of all burned pixels in SAR over n years of simulation
-    burnSum2 <- burnSum[grp %in% c(1, 3) & N > 1, lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    burnSum2 <- burnSum[grp %in% c(1, 3), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    burnSum2 <- burnSum1[areaBurned > landscapeAttr$cellSize, ]
     MAAB <- sum(burnSum2$areaBurned) / simLength
 
     achievedFRI <- simLength / ( sum(0, burnSum2$areaBurned) / landscapeAttr$burnyArea)

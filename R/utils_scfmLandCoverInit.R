@@ -38,7 +38,7 @@ utils::globalVariables(c(
   nNbrs <- lapply(valsByZone, function(x) {
     nNbrs <- x[, .N, .(focal_sum)] # depends on sfcmLandCoverInit
 
-    possibleNbrs <- data.table(nbr = 0:8)
+    possibleNbrs <- data.table(nbr = 0:8) #TODO: parameterize this
     nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr")]
     nNbrs <- nNbrs$N
     names(nNbrs) <- possibleNbrs$nbr
@@ -75,7 +75,7 @@ utils::globalVariables(c(
 #' @return TODO
 #'
 #' @export
-#' @importFrom raster res
+#' @importFrom terra res
 genFireMapAttr <- function(flammableMap, fireRegimePolys, neighbours) {
   if (neighbours == 8) {
     w <- matrix(c(1, 1, 1, 1, 0, 1, 1, 1, 1), nrow = 3, ncol = 3)
