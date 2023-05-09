@@ -32,6 +32,7 @@ Imports:
     ggplot2,
     graphics,
     grDevices,
+    LandR,
     methods,
     purrr,
     raster,
@@ -54,7 +55,7 @@ Suggests:
 Remotes:
     PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.core@development,
-    PredictiveEcology/LandR@development,
+    PredictiveEcology/LandR@terra-migration,
     PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
