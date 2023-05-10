@@ -173,7 +173,7 @@ comparePredictions_annualIgnitions <- function(dt) {
 
   dt <- copy(dt) #avoid adding per ha cols (or add them?)
   dt[, targetIgnitions_Mha := targetIgnitions/burnableArea_ha * 1e6]
-  dt[, achievedIgnitions_Mha := targetIgnitions/burnableArea_ha * 1e6]
+  dt[, achievedIgnitions_Mha := achievedIgnitions/burnableArea_ha * 1e6]
 
 
   ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
@@ -195,7 +195,7 @@ comparePredictions_annualEscapes <- function(dt) {
 
   dt <- copy(dt) #avoid adding per ha cols (or add them?)
   dt[, targetEscapes_Mha := targetEscapes/burnableArea_ha * 1e6]
-  dt[, achievedEscapes_Mha := targetEscapes/burnableArea_ha * 1e6]
+  dt[, achievedEscapes_Mha := achievedEscapes/burnableArea_ha * 1e6]
 
 
   ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
