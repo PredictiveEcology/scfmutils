@@ -8,8 +8,8 @@ Description: The original fire model is described by Cumming et al. (1998),
 URL: https://scfmutils.predictiveecology.org,
     https://github.com/PredictiveEcology/scfmutils,
     https://predictiveecology.github.io/scfmutils/
-Date: 2022-02-13
-Version: 0.0.7.9002
+Date: 2023-05-09
+Version: 0.0.9
 Authors@R: c(
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca",
            role = c("aut")),
@@ -24,7 +24,7 @@ Authors@R: c(
            role = "cph")
     )
 Depends:
-    R (>= 4.0)
+    R (>= 4.1)
 Imports:
     data.table,
     dplyr,
