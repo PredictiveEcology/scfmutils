@@ -60,8 +60,8 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     #median fire size is not used by scfm but is worth recording
     #regimes where mean is much greater than median will be hard to recreate
-
-    medianFireSize <- median(fireRegimePoints$SIZE_HA) #should be no need for na.rm
+    escaped <- fireRegimePoints[SIZE_HA > landscapeAttr$cellSize]
+    medianFireSize <- median(escaped$SIZE_HA) #should be no need for na.rm
 
     pSpread <- driver$pSpread
     pIg <- regime$ignitionRate
@@ -173,7 +173,7 @@ comparePredictions_annualIgnitions <- function(dt) {
 
   dt <- copy(dt) #avoid adding per ha cols (or add them?)
   dt[, targetIgnitions_Mha := targetIgnitions/burnableArea_ha * 1e6]
-  dt[, achiedIgnitions_Mha := targetIgnitions/burnableArea_ha * 1e6]
+  dt[, achievedIgnitions_Mha := targetIgnitions/burnableArea_ha * 1e6]
 
 
   ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
@@ -195,7 +195,7 @@ comparePredictions_annualEscapes <- function(dt) {
 
   dt <- copy(dt) #avoid adding per ha cols (or add them?)
   dt[, targetEscapes_Mha := targetEscapes/burnableArea_ha * 1e6]
-  dt[, achiedEscapes_Mha := targetEscapes/burnableArea_ha * 1e6]
+  dt[, achievedEscapes_Mha := targetEscapes/burnableArea_ha * 1e6]
 
 
   ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
