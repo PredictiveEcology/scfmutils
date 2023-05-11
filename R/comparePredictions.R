@@ -60,7 +60,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     #median fire size is not used by scfm but is worth recording
     #regimes where mean is much greater than median will be hard to recreate
-    escaped <- fireRegimePoints[SIZE_HA > landscapeAttr$cellSize]
+    escaped <- fireRegimePoints[fireRegimePoints$SIZE_HA > landscapeAttr$cellSize,]
     medianFireSize <- median(escaped$SIZE_HA) #should be no need for na.rm
 
     pSpread <- driver$pSpread
