@@ -226,10 +226,10 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #'
 #' Calibrate fire regime polygons ... (TODO)
 #'
-#' @param polygonType the names of polygons, i.e. PolyID
+#' @param polygonType the names of polygons, i.e. `PolyID`
 #' @param regime the regime characteristics of each polygon
 #' @param targetN the number of fires to simulate during calibration
-#' @param landAttr the landscapeAttr object with characteristics for each polygon
+#' @param landAttr the `landscapeAttr` object with characteristics for each polygon
 #' @param cellSize the cell size in metres
 #' @param fireRegimePolys fire regime polygons
 #' @param buffDist buffer distance for cells available to be burned outside of each regime polygon
@@ -237,7 +237,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @param pMin minimum spread probability
 #' @param pMax maximum allowable spread probability
 #' @param neighbours number of neighbours during spread
-#' @param flammableMap a packed \code{SpatRaster} - see \code{terra::wrap}
+#' @param flammableMap a packed `SpatRaster` - see [terra::wrap()]
 #' @param plotPath file name specifying an output directory to use for producing plots of the scam
 #'                 fit for each polygon.
 #' @param optimizer the numerical optimization method to use with scam fitting; see `?scam`.

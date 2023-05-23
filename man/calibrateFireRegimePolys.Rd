@@ -22,13 +22,13 @@ calibrateFireRegimePolys(
 )
 }
 \arguments{
-\item{polygonType}{the names of polygons, i.e. PolyID}
+\item{polygonType}{the names of polygons, i.e. \code{PolyID}}
 
 \item{regime}{the regime characteristics of each polygon}
 
 \item{targetN}{the number of fires to simulate during calibration}
 
-\item{landAttr}{the landscapeAttr object with characteristics for each polygon}
+\item{landAttr}{the \code{landscapeAttr} object with characteristics for each polygon}
 
 \item{cellSize}{the cell size in metres}
 
@@ -44,7 +44,7 @@ calibrateFireRegimePolys(
 
 \item{neighbours}{number of neighbours during spread}
 
-\item{flammableMap}{a packed \code{SpatRaster} - see \code{terra::wrap}}
+\item{flammableMap}{a packed \code{SpatRaster} - see \code{\link[terra:wrap]{terra::wrap()}}}
 
 \item{plotPath}{file name specifying an output directory to use for producing plots of the scam
 fit for each polygon.}
