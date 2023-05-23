@@ -109,6 +109,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
                        "targetEscapes" = targetEscapes,
                        "achievedEscapes" = achievedEscapes,
                        "pEscape" = regime$pEscape, #escape prob (no. fires > cellSize / no. fires)
+                       "p0" = driver$p0,  #p0 and pEscape may indicate something incorrect
                        "pSpread" = pSpread, ## spread probability estimated from the SCAM model
                        "pIgnition" = pIg) ## ignition probability of a single pixel
     return(pred)
