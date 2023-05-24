@@ -5,6 +5,8 @@
 \alias{comparePredictions_meanFireSize}
 \alias{comparePredictions_fireReturnInterval}
 \alias{comparePredictions_annualIgnitions}
+\alias{comparePredictions_annualEscapes}
+\alias{comparePredictions_fireDistribution}
 \title{Create \code{data.table} to compare scfm predictions with historical observations}
 \usage{
 comparePredictions_summaryDT(
@@ -21,6 +23,10 @@ comparePredictions_meanFireSize(dt)
 comparePredictions_fireReturnInterval(dt, times)
 
 comparePredictions_annualIgnitions(dt)
+
+comparePredictions_annualEscapes(dt)
+
+comparePredictions_fireDistribution(dt)
 }
 \arguments{
 \item{scfmDriverPars}{list of burn parameters for each polygon, produced by \code{scfmDriverPars} module}
