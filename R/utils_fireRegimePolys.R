@@ -37,18 +37,14 @@ fireRegimePolyTypes <- function() {
 #' @importFrom sf st_as_sf st_collection_extract st_union
 #'
 #' @examples
-#' library(sf)
-#' library(sp)
+#' library(terra)
 #' library(SpaDES.tools)
 #'
 #' ## random study area in central Alberta
-#' studyArea <- SpatialPoints(data.frame(lon = -115, lat = 55), proj4string = CRS("EPSG:4326")) |>
-#'   st_as_sf() |>
-#'   st_transform(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
-#'                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
-#'   as_Spatial() |>
-#'   randomStudyArea(center = _, seed = 60, size = 1e10) |>
-#'   st_as_sf()
+#' studyArea <- vect(cbind(-115, 55), crs = "epsg:4326") |>
+#'   project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
+#'                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
+#'   randomStudyArea(seed = 60, size = 1e10)
 #'
 #' \donttest{
 #' frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyArea, type = "ECOREGION")
