@@ -104,85 +104,25 @@ If <code>url</code> to BEC shapefile is provided, can also be one of:
 <span class="r-in"><span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/coerce-methods.html" class="external-link">as_Spatial</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">SpaDES.tools</span><span class="fu">::</span><span class="fu"><a href="https://spades-tools.predictiveecology.org/reference/randomStudyArea.html" class="external-link">randomStudyArea</a></span><span class="op">(</span>center <span class="op">=</span> <span class="va">.</span>, seed <span class="op">=</span> <span class="fl">60</span>, size <span class="op">=</span> <span class="fl">1e10</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'rndmPolygonSpatialPoints' is deprecated.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use 'User should convert to using SpatVector rather that SpatialPoints' instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> See help("Deprecated")</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in (function (classes, fdef, mtable) {    methods &lt;- .findInheritedMethods(classes, fdef, mtable)    if (length(methods) == 1L)         return(methods[[1L]])    else if (length(methods) == 0L) {        cnames &lt;- paste0("\"", vapply(classes, as.character,             ""), "\"", collapse = ", ")        stop(gettextf("unable to find an inherited method for function %s for signature %s",             sQuote(fdef@generic), sQuote(cnames)), domain = NA)    }    else stop("Internal error in finding inherited methods; didn't return a unique method",         domain = NA)})(list(structure("SpatialPolygons", package = "sp"), "data.frame"),     new("standardGeneric", .Data = function (x, value)     standardGeneric("values&lt;-"), generic = structure("values&lt;-", package = "terra"),         package = "terra", group = list(), valueClass = character(0),         signature = c("x", "value"), default = NULL, skeleton = (function (x,             value)         stop(gettextf("invalid call in method dispatch to '%s' (no default method)",             "values&lt;-"), domain = NA))(x, value)), &lt;environment&gt;):</span> unable to find an inherited method for function ‘values&lt;-’ for signature ‘"SpatialPolygons", "data.frame"’</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">frpEcoregion</span> <span class="op">&lt;-</span> <span class="fu">prepInputsFireRegimePolys</span><span class="op">(</span>studyArea <span class="op">=</span> <span class="va">studyArea</span>, type <span class="op">=</span> <span class="st">"ECOREGION"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Running preProcess</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Preparing: </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Checking local files...</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Finished checking local files.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">...downloading...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in downloadFile(archive = if (isTRUE(is.na(archive))) NULL else archive,     targetFile = targetFile, neededFiles = neededFiles, destinationPath = destinationPath,     quick = quick, checkSums = checkSums, dlFun = dlFunCaptured,     url = url, checksumFile = asPath(checkSumFilePath), needChecksums = needChecksums,     overwrite = overwrite, purge = purge, verbose = verbose,     .tempPath = .tempPath, ...):</span> Error in packageVersion("googledrive") : </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Download of https://sis.agr.gc.ca/cansis/nsdb/ecostrat/region/ecoregion_shp.zip failed. This may be a permissions issue. Please check the url and permissions are correct.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> If the url is correct, it is possible that manually downloading it will work. To try this, with your browser, go to</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> https://sis.agr.gc.ca/cansis/nsdb/ecostrat/region/ecoregion_shp.zip,</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>  ... then download it manually, give it this name: '/tmp/RtmpXeMS35/ecoregion_shp.zip', and place file here: /tmp/RtmpXeMS35.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> -------------------</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> If manual download was successful, you will likely also need to run Checksums manually after you download the file with this command: reproducible:::appendChecksumsTable(checkSumFilePath = '/tmp/RtmpXeMS35/CHECKSUMS.txt', filesToChecksum = '', destinationPath = '/tmp/RtmpXeMS35', append = TRUE)</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'studyArea' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">frpEcoregion</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'frpEcoregion' not found</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">frpFRT</span> <span class="op">&lt;-</span> <span class="fu">prepInputsFireRegimePolys</span><span class="op">(</span>studyArea <span class="op">=</span> <span class="va">studyArea</span>, type <span class="op">=</span> <span class="st">"FRT"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Running preProcess</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Preparing: </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Checking local files...</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Finished checking local files.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">alsoExtract is unspecified; assuming that all files must be extracted</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">No targetFile supplied. Extracting all files from archive</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">...downloading...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in downloadFile(archive = if (isTRUE(is.na(archive))) NULL else archive,     targetFile = targetFile, neededFiles = neededFiles, destinationPath = destinationPath,     quick = quick, checkSums = checkSums, dlFun = dlFunCaptured,     url = url, checksumFile = asPath(checkSumFilePath), needChecksums = needChecksums,     overwrite = overwrite, purge = purge, verbose = verbose,     .tempPath = .tempPath, ...):</span> Error in packageVersion("googledrive") : </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Download of https://zenodo.org/record/4458156/files/FRT.zip failed. This may be a permissions issue. Please check the url and permissions are correct.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> If the url is correct, it is possible that manually downloading it will work. To try this, with your browser, go to</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> https://zenodo.org/record/4458156/files/FRT.zip,</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>  ... then download it manually, give it this name: '/tmp/RtmpXeMS35/FRT.zip', and place file here: /tmp/RtmpXeMS35.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> -------------------</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> If manual download was successful, you will likely also need to run Checksums manually after you download the file with this command: reproducible:::appendChecksumsTable(checkSumFilePath = '/tmp/RtmpXeMS35/CHECKSUMS.txt', filesToChecksum = '', destinationPath = '/tmp/RtmpXeMS35', append = TRUE)</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'studyArea' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">frpFRT</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'frpFRT' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">frpFRU</span> <span class="op">&lt;-</span> <span class="fu">prepInputsFireRegimePolys</span><span class="op">(</span>studyArea <span class="op">=</span> <span class="va">studyArea</span>, type <span class="op">=</span> <span class="st">"FRU"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Running preProcess</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Preparing: </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Checking local files...</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Finished checking local files.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">alsoExtract is unspecified; assuming that all files must be extracted</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">No targetFile supplied. Extracting all files from archive</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">...downloading...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Error in packageVersion("googledrive") : </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in downloadFile(archive = if (isTRUE(is.na(archive))) NULL else archive,     targetFile = targetFile, neededFiles = neededFiles, destinationPath = destinationPath,     quick = quick, checkSums = checkSums, dlFun = dlFunCaptured,     url = url, checksumFile = asPath(checkSumFilePath), needChecksums = needChecksums,     overwrite = overwrite, purge = purge, verbose = verbose,     .tempPath = .tempPath, ...):</span> Error in packageVersion("googledrive") : </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   there is no package called ‘googledrive’</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Download of https://zenodo.org/record/4458156/files/FRU.zip failed. This may be a permissions issue. Please check the url and permissions are correct.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> If the url is correct, it is possible that manually downloading it will work. To try this, with your browser, go to</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> https://zenodo.org/record/4458156/files/FRU.zip,</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>  ... then download it manually, give it this name: '/tmp/RtmpXeMS35/FRU.zip', and place file here: /tmp/RtmpXeMS35.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> -------------------</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> If manual download was successful, you will likely also need to run Checksums manually after you download the file with this command: reproducible:::appendChecksumsTable(checkSumFilePath = '/tmp/RtmpXeMS35/CHECKSUMS.txt', filesToChecksum = '', destinationPath = '/tmp/RtmpXeMS35', append = TRUE)</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'studyArea' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">frpFRU</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'frpFRU' not found</span>
 </code></pre></div>
