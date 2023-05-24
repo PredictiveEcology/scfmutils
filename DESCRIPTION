@@ -40,7 +40,7 @@ Imports:
     scam,
     sf,
     SpaDES.core (>= 1.0.11),
-    SpaDES.tools (>= 1.0.3),
+    SpaDES.tools (>= 2.0.0),
     stats,
     terra,
     tools
@@ -55,7 +55,7 @@ Remotes:
     PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.core@development,
     PredictiveEcology/LandR@terra-migration,
-    PredictiveEcology/SpaDES.tools@terra-migration
+    PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL (>= 3)
