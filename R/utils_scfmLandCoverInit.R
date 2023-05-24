@@ -39,7 +39,7 @@ utils::globalVariables(c(
   nNbrs <- lapply(valsByZone, function(x) {
     nNbrs <- x[, .N, .(focal_sum)] # depends on sfcmLandCoverInit
 
-    possibleNbrs <- data.table(nbr = 0:8) #TODO: parameterize this
+    possibleNbrs <- data.table(nbr = 0:8) ## TODO: parameterize this
     nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr")]
     nNbrs <- nNbrs$N
     names(nNbrs) <- possibleNbrs$nbr
@@ -50,7 +50,6 @@ utils::globalVariables(c(
   #find total flammable pixels in cell
   flamByPoly <- valsByPoly[, .(flam = sum(flam, na.rm = TRUE)), PolyID]
   nFlammable <- as.list(flamByPoly$flam)
-
 
   landscapeAttr <- purrr::transpose(list(
     cellSize = as.list(rep(cellSize, times = length(nNbrs))),

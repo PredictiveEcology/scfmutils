@@ -45,6 +45,7 @@ Imports:
     terra,
     tools
 Suggests:
+    googledrive,
     gridExtra,
     knitr,
     rmarkdown,

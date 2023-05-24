@@ -1,6 +1,8 @@
 utils::globalVariables(c(
-  ".SD", "achievedFRI", "achievedIgnitions", "areaBurned", "grp", "histMeanSize",
-  "modMeanSize", "N", "PolyID", "targetFRI", "targetIgnitions"
+  ".SD", "achievedEscapes", "achievedEscapes_Mha", "achievedFRI", "achievedIgnitions",
+  "achievedIgnitions_Mha", "areaBurned", "burnableArea_ha",
+  "grp", "histMeanSize", "histMedianSize", "modMeanSize", "N", "PolyID",
+  "targetEscapes", "targetEscapes_Mha", "targetFRI", "targetIgnitions", "targetIgnitions_Mha"
 ))
 
 #' Create `data.table` to compare scfm predictions with historical observations
@@ -36,6 +38,7 @@ utils::globalVariables(c(
 #' @export
 #' @importFrom data.table rbindlist copy
 #' @importFrom SpaDES.core times
+#' @importFrom stats median
 #' @rdname comparePredictions
 comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
                                          scfmRegimePars = NULL,
@@ -82,7 +85,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     #escapes
     targetEscapes <- regime$pEscape * targetIgnitions
-    achievedEscapes <- nrow(burnSum[grp %in% 1 & N > 1])/ simLength
+    achievedEscapes <- nrow(burnSum[grp %in% 1 & N > 1]) / simLength
 
     ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
     burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
