@@ -45,6 +45,7 @@ Imports:
     tools
 Suggests:
     covr,
+    googledrive,
     gridExtra,
     knitr,
     rmarkdown,
