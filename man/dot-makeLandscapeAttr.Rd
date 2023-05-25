@@ -4,7 +4,7 @@
 \alias{.makeLandscapeAttr}
 \title{\code{scfmLandCoverInit}: \code{.makeLandscapeAttr}}
 \usage{
-.makeLandscapeAttr(flammableMap, weight, fireRegimePolys)
+.makeLandscapeAttr(flammableMap, weight, fireRegimePolys, neighbours)
 }
 \description{
 Calculate the cell size, total area, and number of flammable cells, etc.

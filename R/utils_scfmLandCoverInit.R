@@ -13,7 +13,7 @@ utils::globalVariables(c(
 #' @importFrom purrr transpose
 #' @importFrom terra extract focal values res
 #' @importFrom stats na.omit
-.makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys) {
+.makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys, neighbours) {
 
   cellSize <- prod(res(flammableMap)) / 1e4 # in ha
   neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
@@ -22,6 +22,7 @@ utils::globalVariables(c(
   valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE) ## TODO: use terra
   valsByPoly <- as.data.table(valsByPoly)
   valsByPoly[, flam := values(flammableMap, mat = FALSE)[cell]]
+  valsByPoly <- valsByPoly[flam == 1]
 
   #get the FRP ID
   tempDT <- data.table(PolyID = fireRegimePolys$PolyID, ID = 1:nrow(fireRegimePolys))
@@ -39,9 +40,10 @@ utils::globalVariables(c(
   nNbrs <- lapply(valsByZone, function(x) {
     nNbrs <- x[, .N, .(focal_sum)] # depends on sfcmLandCoverInit
 
-    possibleNbrs <- data.table(nbr = 0:8) ## TODO: parameterize this
+    possibleNbrs <- data.table(nbr = 0:neighbours)
     nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr")]
     nNbrs <- nNbrs$N
+    nNbrs[is.na(nNbrs)] <- 0
     names(nNbrs) <- possibleNbrs$nbr
     return(nNbrs)
   })
@@ -85,7 +87,7 @@ genFireMapAttr <- function(flammableMap, fireRegimePolys, neighbours) {
     stop("illegal neighbours specification")
   }
 
-  landscapeAttr <- .makeLandscapeAttr(flammableMap, w, fireRegimePolys)
+  landscapeAttr <- .makeLandscapeAttr(flammableMap, w, fireRegimePolys, neighbours = neighbours)
 
   return(invisible(landscapeAttr))
 }
