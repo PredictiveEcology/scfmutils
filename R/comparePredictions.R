@@ -1,6 +1,8 @@
 utils::globalVariables(c(
-  ".SD", "achievedFRI", "achievedIgnitions", "areaBurned", "grp", "histMeanSize",
-  "modMeanSize", "N", "PolyID", "targetFRI", "targetIgnitions"
+  ".SD", "achievedEscapes", "achievedEscapes_Mha", "achievedFRI", "achievedIgnitions",
+  "achievedIgnitions_Mha", "areaBurned", "burnableArea_ha",
+  "grp", "histMeanSize", "histMedianSize", "modMeanSize", "N", "PolyID",
+  "targetEscapes", "targetEscapes_Mha", "targetFRI", "targetIgnitions", "targetIgnitions_Mha"
 ))
 
 #' Create `data.table` to compare scfm predictions with historical observations
@@ -34,8 +36,9 @@ utils::globalVariables(c(
 #'
 #' @author Ian Eddy
 #' @export
-#' @importFrom data.table rbindlist
+#' @importFrom data.table rbindlist copy
 #' @importFrom SpaDES.core times
+#' @importFrom stats median
 #' @rdname comparePredictions
 comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
                                          scfmRegimePars = NULL,
@@ -58,6 +61,11 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
     ## This is a long way of saying 'sum of fires / (flammable landscape * fire epoch)'.
     ## hist_mfs will be NaN if there were no fires larger than one pixel
 
+    #median fire size is not used by scfm but is worth recording
+    #regimes where mean is much greater than median will be hard to recreate
+    escaped <- fireRegimePoints[fireRegimePoints$SIZE_HA > landscapeAttr$cellSize,]
+    medianFireSize <- median(escaped$SIZE_HA) #should be no need for na.rm
+
     pSpread <- driver$pSpread
     pIg <- regime$ignitionRate
 
@@ -71,10 +79,13 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
     ## grp 2: pixels from fires ignited in SAR & spread outside SAR
     ## grp 3: pixels from fires ignited outside SAR & spread in SAR
     ## grp 4: pixels from fires ignited outside SAR & spread outside SAR
-
     burnSum <- burnSummary[PolyID == x, ]
     targetIgnitions <- pIg * landscapeAttr$burnyArea
     achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 would double count ignitions
+
+    #escapes
+    targetEscapes <- regime$pEscape * targetIgnitions
+    achievedEscapes <- nrow(burnSum[grp %in% 1 & N > 1]) / simLength
 
     ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
     burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
@@ -91,11 +102,17 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     pred <- data.frame("PolyID" = x,
                        "histMeanSize" = regime$xBar, ## predicted (empirical) mean size of fires
+                       "histMedianSize" = medianFireSize,
                        "modMeanSize" = meanFireSize,
                        "achievedFRI" = achievedFRI,
                        "targetFRI" = targetFRI,
+                       "burnableArea_ha" = landscapeAttr$burnyArea,
                        "targetIgnitions" = targetIgnitions,
                        "achievedIgnitions" = achievedIgnitions,
+                       "targetEscapes" = targetEscapes,
+                       "achievedEscapes" = achievedEscapes,
+                       "pEscape" = regime$pEscape, #escape prob (no. fires > cellSize / no. fires)
+                       "p0" = driver$p0,  #p0 and pEscape may indicate something incorrect
                        "pSpread" = pSpread, ## spread probability estimated from the SCAM model
                        "pIgnition" = pIg) ## ignition probability of a single pixel
     return(pred)
@@ -158,9 +175,53 @@ comparePredictions_annualIgnitions <- function(dt) {
     stop("all arguments must be provided and cannot be NULL.")
   }
 
-  ggplot(dt, aes(x = targetIgnitions, y = achievedIgnitions)) +
+  dt <- copy(dt) #avoid adding per ha cols (or add them?)
+  dt[, targetIgnitions_Mha := targetIgnitions/burnableArea_ha * 1e6]
+  dt[, achievedIgnitions_Mha := achievedIgnitions/burnableArea_ha * 1e6]
+
+
+  ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
     geom_point() +
-    labs(y = "simulation annual ignitions", x = "estimated annual ignitions") +
+    labs(y = "simulation annual ignitions (per Mha)", x = "estimated annual ignitions (per Mha)") +
+    theme_bw() +
+    geom_abline(slope = 1) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(limits = c(0, NA)) +
+    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+}
+
+#' @export
+#' @rdname comparePredictions
+comparePredictions_annualEscapes <- function(dt) {
+  if (any(is.null(dt))) {
+    stop("all arguments must be provided and cannot be NULL.")
+  }
+
+  dt <- copy(dt) #avoid adding per ha cols (or add them?)
+  dt[, targetEscapes_Mha := targetEscapes/burnableArea_ha * 1e6]
+  dt[, achievedEscapes_Mha := achievedEscapes/burnableArea_ha * 1e6]
+
+
+  ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
+    geom_point() +
+    labs(y = "simulation annual escapes (per Mha)", x = "estimated annual escapes (per Mha)") +
+    theme_bw() +
+    geom_abline(slope = 1) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(limits = c(0, NA)) +
+    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+}
+
+#' @export
+#' @rdname comparePredictions
+comparePredictions_fireDistribution <- function(dt){
+  if (any(is.null(dt))) {
+    stop("all arguments must be provided and cannot be NULL.")
+  }
+
+  ggplot(dt, aes(x = histMedianSize, y = histMeanSize)) +
+    geom_point() +
+    labs(y = "estimated mean fire size (ha)", x = "estimated median fire size (ha)") +
     theme_bw() +
     geom_abline(slope = 1) +
     scale_y_continuous(limits = c(0, NA)) +
