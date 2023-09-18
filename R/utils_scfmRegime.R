@@ -29,8 +29,7 @@ calcZonalRegimePars <- function(polygonID, firePolys,
                                 targetBurnRate = NULL,
                                 targetMaxFireSize = NULL) {
 
-  idx <- firePolys$PolyID == polygonID
-  tmpA <- firePoints[firePoints$PolyID == as.numeric(polygonID),]
+  tmpA <- firePoints[firePoints$PolyID == as.numeric(polygonID), ]
   landAttr <- landscapeAttr[[polygonID]]
   cellSize = landAttr[["cellSize"]]
   nFires <- dim(tmpA)[1]
@@ -134,8 +133,8 @@ calcZonalRegimePars <- function(polygonID, firePolys,
 
   ## max fire size is returned twice - I think this is a backwards compatibility decision
   return(list(
-    ignitionRate = rate, #per ha per yr
-    pEscape = pEscape,
+    ignitionRate = rate,   ## per ha per yr
+    pEscape = pEscape,     ## escape probability
     xBar = xBar,           ## mean fire size
     lxBar = lxBar,         ## mean log(fire size)
     xMax = xMax,           ## maximum observed size
