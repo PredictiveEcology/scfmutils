@@ -130,8 +130,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else if (grepl("^BEC.*ZONE", type)) {
     cols2keep <- c("ZONE", "SUBZONE")
   } else if (type == "BECNDT") {
-    cols2keep <- names(tmp)[names(tmp) %in%
-                              c("NTRL_DSTRD", "NTRLDSTRBN", "NATURAL_DISTURBANCE_TYPE_CODE")]
+    cols2keep <- names(tmp)[names(tmp) %in% "NATURAL_DISTURBANCE_TYPE_CODE"]
   } else if (type == "FRT") {
     cols2keep <- "Cluster"
   } else if (type == "FRU") {
