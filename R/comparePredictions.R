@@ -124,7 +124,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 #'
 #' @export
 #' @importFrom ggplot2 aes geom_abline geom_point geom_text ggplot labs
-#' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_bw
+#' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_bw xlab ylab
 #' @rdname comparePredictions
 comparePredictions_meanFireSize <- function(dt) {
   if (any(is.null(dt))) {
