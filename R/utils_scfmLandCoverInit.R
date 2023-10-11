@@ -9,7 +9,8 @@ utils::globalVariables(c(
 #'
 #' @keywords internal
 #'
-#' @importFrom data.table := as.data.table data.table
+#' @importFrom data.table := as.data.table data.table dcast
+#' @importFrom dplyr left_join
 #' @importFrom purrr transpose
 #' @importFrom terra extract focal values res
 #' @importFrom stats na.omit
@@ -38,34 +39,29 @@ utils::globalVariables(c(
 
   #Derive frequency tables of number of flammable cells, per polygon type, currently ECOREGION
   nNbrs <- lapply(valsByZone, function(x) {
-    nNbrs <- x[, .N, .(focal_sum)] # depends on sfcmLandCoverInit
+    nNbrs <- x[, .N, .(focal_sum, PolyID)] # depends on sfcmLandCoverInit
 
     possibleNbrs <- data.table(nbr = 0:neighbours)
     nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr")]
-    nNbrs <- nNbrs$N
-    nNbrs[is.na(nNbrs)] <- 0
-    names(nNbrs) <- possibleNbrs$nbr
+    nNbrs[, focal_sum := paste0("nNbr_", focal_sum)]
+    nNbrs[is.na(N), N := 0]
+    nNbrs <- dcast(nNbrs, formula = PolyID ~ focal_sum, value.var = "N")
+
     return(nNbrs)
   })
 
-
+  nNbrs <- rbindlist(nNbrs)
   #find total flammable pixels in cell
   flamByPoly <- valsByPoly[, .(flam = sum(flam, na.rm = TRUE)), PolyID]
-  nFlammable <- as.list(flamByPoly$flam)
 
-  landscapeAttr <- purrr::transpose(list(
-    cellSize = as.list(rep(cellSize, times = length(nNbrs))),
-    nFlammable = nFlammable,
-    nNbrs = nNbrs,
-    cellsByZone = lapply(valsByZone, function(x){x$cell})
-  ))
+  #assign nFlammable, cellSize, burnyArea, and nBrs to fireRegimePolys
+  fireRegimePolys$nFlammable <- flamByPoly$flam
+  fireRegimePolys$cellSize <- cellSize
+  fireRegimePolys$burnArea <- cellSize * fireRegimePolys$nFlammable
 
-  landscapeAttr <- lapply(landscapeAttr, function(x) {
-    append(x, list(burnyArea = x$cellSize * x$nFlammable))
-  })
-  names(landscapeAttr) <- names(valsByZone)
+  fireRegimePolys <- left_join(fireRegimePolys, nNbrs, by = "PolyID")
 
-  return(landscapeAttr)
+  return(fireRegimePolys)
 }
 
 #' `scfmLandCoverInit`: `genFireMapAttr`

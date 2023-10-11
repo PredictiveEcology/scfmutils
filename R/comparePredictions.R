@@ -133,7 +133,7 @@ comparePredictions_meanFireSize <- function(dt) {
 
   ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
     geom_point(aes(histMeanSize, modMeanSize)) +
-    labs(x = "historical mean fire size", y = "modeled mean fire size") +
+    labs(x = "historical mean fire size (ha)", y = "modeled mean fire size (ha)") +
     theme_bw() +
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
