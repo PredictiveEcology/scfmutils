@@ -21,7 +21,6 @@
 #'
 #' @export
 calcZonalRegimePars <- function(polygonID, firePolys,
-                                landscapeAttr,
                                 firePoints,
                                 epochLength,
                                 maxSizeFactor,
@@ -29,20 +28,22 @@ calcZonalRegimePars <- function(polygonID, firePolys,
                                 targetBurnRate = NULL,
                                 targetMaxFireSize = NULL) {
 
-  idx <- firePolys$PolyID == polygonID
-  tmpA <- firePoints[firePoints$PolyID == as.numeric(polygonID),]
-  landAttr <- landscapeAttr[[polygonID]]
+  firePoly <- firePolys[firePolys$PolyID == polygonID,]
+  landAttr <- as.data.table(firePoly)
+  landAttr <- unique(landAttr[, .SD, .SDcol = setdiff(colnames(firePoly), "geometry")])
+  polyPoints <- firePoints[firePoints$PolyID == as.numeric(polygonID),]
+
   cellSize = landAttr[["cellSize"]]
-  nFires <- dim(tmpA)[1]
+  nFires <- dim(polyPoints)[1]
   if (nFires == 0) {
-    return(NULL)
+    return(firePoly) #confirm whether NULL values must be added for rbind to work
   }
-  rate <- nFires / (epochLength * landAttr$burnyArea)   # fires per ha per yr
+  ignitionRate <- nFires / (epochLength * landAttr$burnyArea)   # fires per ha per yr
   pEscape <- 0
   xBar <- 0 # mean fire size
   xMax <- 0
   lxBar <- NA
-  maxFireSize <- cellSize   #note that maxFireSize has unit of ha NOT cells!!!
+  emhfs_ha <- cellSize   #note that maxFireSize has unit of ha NOT cells!!!
   xVec <- numeric(0)
 
   ## check for user supplied defaults
@@ -51,7 +52,7 @@ calcZonalRegimePars <- function(polygonID, firePolys,
 
   if (nFires > 0) {
     ## calculate escaped fires; careful to subtract cellSize where appropriate
-    xVec <- tmpA[[fireSizeColumnName]][tmpA[[fireSizeColumnName]] > cellSize]
+    xVec <- polyPoints[[fireSizeColumnName]][polyPoints[[fireSizeColumnName]] > cellSize]
     if (length(xVec) > 0) {
       pEscape <- length(xVec) / nFires
       xBar <- mean(xVec)
@@ -72,15 +73,15 @@ calcZonalRegimePars <- function(polygonID, firePolys,
             polygonID
           )
         )
-        maxFireSize <- xMax * maxSizeFactor  #just to be safe, re-specify here
+        emfs_ha <- xMax * maxSizeFactor  #just to be safe, re-specify here
       } else {
-        maxFireSize <- exp(That) * cellSize
-        if (!(maxFireSize > xMax)) {
+        emfs_ha <- exp(That) * cellSize
+        if (!(emfs_ha > xMax)) {
           warning(
             sprintf("Dodgy maxFireSize estimate in zone %s.\n\tUsing sample maximum fire size.",
                     polygonID)
           )
-          maxFireSize <- xMax * maxSizeFactor
+          emhfs_ha <- xMax * maxSizeFactor
         }
         #missing BEACONS CBFA truncated at 2*xMax. Their reasons don't apply here.
       }
@@ -97,12 +98,12 @@ calcZonalRegimePars <- function(polygonID, firePolys,
   ## need to add a name or code for basic verification by Driver module, and time field
   ## to allow for dynamic regeneration of disturbanceDriver pars.
   # browser()
-  if (maxFireSize < 1) {
+  if (emhfs_ha < 1) {
     warning("this can't happen") ## TODO: improve messaging for users
-    maxFireSize = cellSize
+    emhfs_ha = cellSize
   }
 
-  empiricalBurnRate <- sum(tmpA[[fireSizeColumnName]]) / (epochLength * landAttr$burnyArea)
+  empiricalBurnRate <- sum(polyPoints[[fireSizeColumnName]]) / (epochLength * landAttr$burnyArea)
 
   if (is.na(targetBurnRate) | is.null(targetBurnRate)) {
     ratio <- 1
@@ -115,8 +116,8 @@ calcZonalRegimePars <- function(polygonID, firePolys,
                                        empiricalBurnRate = empiricalBurnRate,
                                        pEscape = pEscape,
                                        xBar = xBar,
-                                       rate = rate)
-      rate <- newFireValues$rate
+                                       rate = ignitionRate)
+      ignitionRate <- newFireValues$rate
       pEscape <- newFireValues$pEscape
       xBar <- newFireValues$xBar
     } else {
@@ -127,19 +128,16 @@ calcZonalRegimePars <- function(polygonID, firePolys,
 
   ## override maximum fire size if user supplied
   if (!is.na(targetMaxFireSize) | is.null(targetMaxFireSize)) {
-    maxFireSize <- targetMaxFireSize
+    emfs_ha <- targetMaxFireSize
     xMax <- targetMaxFireSize
     ## TODO: add check that max is larger than mean, else stop
   }
 
+
+  paramData <- as.data.table(cbind(ignitionRate, pEscape, xBar, lxBar, xMax, emfs_ha, empiricalBurnRate))
+  paramData$PolyID <- polygonID
+  # rate - per ha/per year ; pEscape; xBar - mean fire size; lxBar - mean log;
+  # xMax - maximum observed size; #emfs_ha - Estiamted maximum Fire Size in ha
   ## max fire size is returned twice - I think this is a backwards compatibility decision
-  return(list(
-    ignitionRate = rate, #per ha per yr
-    pEscape = pEscape,
-    xBar = xBar,           ## mean fire size
-    lxBar = lxBar,         ## mean log(fire size)
-    xMax = xMax,           ## maximum observed size
-    emfs_ha = maxFireSize, ## Estimated Maximum Fire Size in ha
-    empiricalBurnRate = empiricalBurnRate
-  ))
+  return(paramData)
 }
