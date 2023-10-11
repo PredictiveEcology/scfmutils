@@ -57,7 +57,7 @@ utils::globalVariables(c(
   #assign nFlammable, cellSize, burnyArea, and nBrs to fireRegimePolys
   fireRegimePolys$nFlammable <- flamByPoly$flam
   fireRegimePolys$cellSize <- cellSize
-  fireRegimePolys$burnArea <- cellSize * fireRegimePolys$nFlammable
+  fireRegimePolys$burnyArea <- cellSize * fireRegimePolys$nFlammable
 
   fireRegimePolys <- left_join(fireRegimePolys, nNbrs, by = "PolyID")
 
