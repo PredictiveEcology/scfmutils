@@ -6,16 +6,12 @@
 \usage{
 calibrateFireRegimePolys(
   polygonType,
-  regime,
   targetN,
-  landAttr,
-  cellSize,
   fireRegimePolys,
   buffDist,
   pJmp,
   pMin,
   pMax,
-  neighbours,
   flammableMap = NULL,
   plotPath = NULL,
   optimizer = "bfgs"
@@ -24,13 +20,7 @@ calibrateFireRegimePolys(
 \arguments{
 \item{polygonType}{the names of polygons, i.e. \code{PolyID}}
 
-\item{regime}{the regime characteristics of each polygon}
-
 \item{targetN}{the number of fires to simulate during calibration}
-
-\item{landAttr}{the \code{landscapeAttr} object with characteristics for each polygon}
-
-\item{cellSize}{the cell size in metres}
 
 \item{fireRegimePolys}{fire regime polygons}
 
@@ -41,8 +31,6 @@ calibrateFireRegimePolys(
 \item{pMin}{minimum spread probability}
 
 \item{pMax}{maximum allowable spread probability}
-
-\item{neighbours}{number of neighbours during spread}
 
 \item{flammableMap}{a packed \code{SpatRaster} - see \code{\link[terra:wrap]{terra::wrap()}}}
 

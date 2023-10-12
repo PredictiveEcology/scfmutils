@@ -7,7 +7,6 @@
 calcZonalRegimePars(
   polygonID,
   firePolys,
-  landscapeAttr,
   firePoints,
   epochLength,
   maxSizeFactor,
@@ -21,8 +20,6 @@ calcZonalRegimePars(
 
 \item{firePolys}{TODO}
 
-\item{landscapeAttr}{TODO}
-
 \item{firePoints}{TODO}
 
 \item{epochLength}{TODO}
@@ -34,6 +31,8 @@ calcZonalRegimePars(
 \item{targetBurnRate}{TODO}
 
 \item{targetMaxFireSize}{TODO}
+
+\item{landscapeAttr}{TODO}
 }
 \value{
 list containing the following elements and their values:
