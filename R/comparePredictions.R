@@ -61,8 +61,8 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
     ## This is a long way of saying 'sum of fires / (flammable landscape * fire epoch)'.
     ## hist_mfs will be NaN if there were no fires larger than one pixel
 
-    #median fire size is not used by scfm but is worth recording
-    #regimes where mean is much greater than median will be hard to recreate
+    ## median fire size is not used by scfm but is worth recording
+    ## regimes where mean is much greater than median will be hard to recreate
     escaped <- fireRegimePoints[fireRegimePoints$SIZE_HA > landscapeAttr$cellSize,]
     medianFireSize <- median(escaped$SIZE_HA) #should be no need for na.rm
 
@@ -111,8 +111,8 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
                        "achievedIgnitions" = achievedIgnitions,
                        "targetEscapes" = targetEscapes,
                        "achievedEscapes" = achievedEscapes,
-                       "pEscape" = regime$pEscape, #escape prob (no. fires > cellSize / no. fires)
-                       "p0" = driver$p0,  #p0 and pEscape may indicate something incorrect
+                       "pEscape" = regime$pEscape, ## escape prob (no. fires > cellSize / no. fires)
+                       "p0" = driver$p0,  ## p0 and pEscape may indicate something incorrect
                        "pSpread" = pSpread, ## spread probability estimated from the SCAM model
                        "pIgnition" = pIg) ## ignition probability of a single pixel
     return(pred)
@@ -124,7 +124,7 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 #'
 #' @export
 #' @importFrom ggplot2 aes geom_abline geom_point geom_text ggplot labs
-#' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_bw
+#' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_bw xlab ylab
 #' @rdname comparePredictions
 comparePredictions_meanFireSize <- function(dt) {
   if (any(is.null(dt))) {
@@ -214,14 +214,15 @@ comparePredictions_annualEscapes <- function(dt) {
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_fireDistribution <- function(dt){
+comparePredictions_fireDistribution <- function(dt) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
 
   ggplot(dt, aes(x = histMedianSize, y = histMeanSize)) +
     geom_point() +
-    labs(y = "estimated mean fire size (ha)", x = "estimated median fire size (ha)") +
+    xlab("estimated median fire size (ha)") +
+    ylab("estimated mean fire size (ha)") +
     theme_bw() +
     geom_abline(slope = 1) +
     scale_y_continuous(limits = c(0, NA)) +

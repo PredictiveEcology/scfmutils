@@ -41,19 +41,29 @@ library(terra)
 library(SpaDES.tools)
 
 ## random study area in central Alberta
-studyArea <- vect(cbind(-115, 55), crs = "epsg:4326") |>
+studyAreaAB <- vect(cbind(-115, 55), crs = "epsg:4326") |>
+  project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
+                "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
+  randomStudyArea(seed = 60, size = 1e10)
+
+studyAreaBC <- vect(cbind(-122.14, 52.14), crs = "epsg:4326") |>
   project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
   randomStudyArea(seed = 60, size = 1e10)
 
 \donttest{
-frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyArea, type = "ECOREGION")
+frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "ECOREGION")
 plot(frpEcoregion)
 }
 
-frpFRT <- prepInputsFireRegimePolys(studyArea = studyArea, type = "FRT")
+\donttest{
+frpBECNDT <- prepInputsFireRegimePolys(studyArea = studyAreaBC, type = "BECNDT")
+plot(frpBECNDT)
+}
+
+frpFRT <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRT")
 plot(frpFRT)
 
-frpFRU <- prepInputsFireRegimePolys(studyArea = studyArea, type = "FRU")
+frpFRU <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRU")
 plot(frpFRU)
 }

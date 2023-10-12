@@ -33,7 +33,7 @@ fireRegimePolyTypes <- function() {
 #' @export
 #' @importFrom dplyr group_by summarise ungroup
 #' @importFrom raster crs
-#' @importFrom reproducible prepInputs
+#' @importFrom reproducible Cache postProcessTo prepInputs
 #' @importFrom sf st_as_sf st_collection_extract st_union
 #'
 #' @examples
@@ -41,32 +41,63 @@ fireRegimePolyTypes <- function() {
 #' library(SpaDES.tools)
 #'
 #' ## random study area in central Alberta
-#' studyArea <- vect(cbind(-115, 55), crs = "epsg:4326") |>
+#' studyAreaAB <- vect(cbind(-115, 55), crs = "epsg:4326") |>
+#'   project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
+#'                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
+#'   randomStudyArea(seed = 60, size = 1e10)
+#'
+#' studyAreaBC <- vect(cbind(-122.14, 52.14), crs = "epsg:4326") |>
 #'   project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
 #'                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
 #'   randomStudyArea(seed = 60, size = 1e10)
 #'
 #' \donttest{
-#' frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyArea, type = "ECOREGION")
+#' frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "ECOREGION")
 #' plot(frpEcoregion)
 #' }
 #'
-#' frpFRT <- prepInputsFireRegimePolys(studyArea = studyArea, type = "FRT")
+#' \donttest{
+#' frpBECNDT <- prepInputsFireRegimePolys(studyArea = studyAreaBC, type = "BECNDT")
+#' plot(frpBECNDT)
+#' }
+#'
+#' frpFRT <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRT")
 #' plot(frpFRT)
 #'
-#' frpFRU <- prepInputsFireRegimePolys(studyArea = studyArea, type = "FRU")
+#' frpFRU <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRU")
 #' plot(frpFRU)
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                                       studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION") {
   type <- toupper(type)
   allowedTypes <- fireRegimePolyTypes()
-
   stopifnot(type %in% allowedTypes)
+
+  if (!is.null(studyArea) && !is(studyArea, "SpatialPolygons")) {
+    studyArea <- sf::st_as_sf(studyArea)
+  }
 
   if (is.null(url)) {
     if (grepl("BEC", type)) {
-      ## no public url available? user must pass their own, e.g. google drive link
-      stop("url must be provided when using type 'BECNDT', 'BECSUBZONE' or 'BECZONE'.")
+      if (requireNamespace("bcdata", quietly = TRUE)) {
+        bcidList <- list(
+          becndt = "61044e1a-cd80-4ed6-9f95-907262b9910f",
+          becsubzone = "f358a53b-ffde-4830-a325-a5a03ff672c3",
+          beczone = "f358a53b-ffde-4830-a325-a5a03ff672c3"
+        )
+        bcid <- bcidList[[tolower(type)]]
+
+        tmp <- Cache({
+          bcdata::bcdc_get_data(bcid) |>
+            sf::st_cast("MULTIPOLYGON")
+        })
+
+        ## workaround issues with postProcess() using studyArea / rasterToMatch:
+        if (!is.null(rasterToMatch)) {
+          tmp <- postProcessTo(tmp, to = rasterToMatch)
+        } else if (is.null(rasterToMatch) && !is.null(studyArea)) {
+          tmp <- postProcessTo(tmp, to = studyArea)
+        }
+      }
     } else {
       urlList <- list(
         ecodistrict = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
@@ -77,25 +108,21 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
         fru = "https://zenodo.org/record/4458156/files/FRU.zip"
       )
       url <- urlList[[tolower(type)]]
+
+      tmp <- prepInputs(url = url,
+                        destinationPath = destinationPath,
+                        studyArea = studyArea,
+                        rasterToMatch = rasterToMatch,
+                        fun = "sf::st_read",
+                        overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
+
+      ## workaround issues with prepInputs() not reprojecting:
+      if (!is.null(rasterToMatch)) {
+        tmp <- sf::st_transform(tmp, raster::crs(rasterToMatch))
+      } else if (is.null(rasterToMatch) && !is.null(studyArea)) {
+        tmp <- sf::st_transform(tmp, sf::st_crs(studyArea))
+      }
     }
-  }
-
-  if (!is.null(studyArea) && is(studyArea, "SpatialPolygons")) {
-    studyArea <- sf::st_as_sf(studyArea)
-  }
-
-  tmp <- prepInputs(url = url,
-                    destinationPath = destinationPath,
-                    studyArea = studyArea,
-                    rasterToMatch = rasterToMatch,
-                    fun = "sf::st_read",
-                    overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
-
-  ## workaround issues with prepInputs() not reprojecting:
-  if (!is.null(rasterToMatch)) {
-    tmp <- sf::st_transform(tmp, raster::crs(rasterToMatch))
-  } else if (is.null(rasterToMatch) && !is.null(studyArea)) {
-    tmp <- sf::st_transform(tmp, sf::st_crs(studyArea))
   }
 
   if (grepl("^ECO", type)) {
@@ -103,7 +130,8 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else if (grepl("^BEC.*ZONE", type)) {
     cols2keep <- c("ZONE", "SUBZONE")
   } else if (type == "BECNDT") {
-    cols2keep <- names(tmp)[names(tmp) %in% c("NTRL_DSTRD", "NTRLDSTRBN")]
+    cols2keep <- names(tmp)[names(tmp) %in%
+                              c("NTRL_DSTRD", "NTRLDSTRBN", "NATURAL_DISTURBANCE_TYPE_CODE")]
   } else if (type == "FRT") {
     cols2keep <- "Cluster"
   } else if (type == "FRU") {
