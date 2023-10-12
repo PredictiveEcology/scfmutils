@@ -250,7 +250,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @importFrom data.table melt.data.table
 calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
                                      buffDist, pJmp, pMin, pMax, flammableMap = NULL,
-                                     plotPath = NULL, optimizer = "bfgs") {
+                                     plotPath = NULL, outputPath = NULL, optimizer = "bfgs") {
   #must be a file path when run in parallel as SpatRaster can't be serialized
   flammableMap <- terra::unwrap(flammableMap)
   fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == polygonType,]
@@ -356,7 +356,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
   neighbours <- length(nNbrs) - 1 #because 0 is counted
 
   hatPE <- frp$pEscape
-  browser()
+
   if (hatPE == 0) {
     # no fires in polygon zone escaped
     p0 <- 0
@@ -384,15 +384,21 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
   ## for Poisson rate << 1, the expected values are the same, partially accounting
   ## for multiple arrivals within years. Formerly, I used a poorer approximation
   ## where 1-p = P[x==0 | lambda=rate] (Armstrong and Cumming 2003).
-  driverResult <- list(
+
+  outputPath <- checkPath(outputPath, create = TRUE)
+  calibResults <- list(model = calibModel, Res = Res)
+  calibFile <- file.path(outputPath, paste0("Poly", polygonType, "_calibResults.rds"))
+  saveRDS(calibResults, file = calibFile)
+
+  driverResult <- data.table(
     PolyID = polygonType,
     pSpread = pJmp,
     p0 = p0,
     naiveP0 = hatP0(frp$pEscape, 8),
     pIgnition = pIgnition,
-    maxBurnCells = maxBurnCells,
+    maxBurnCells = maxBurnCells
     # calibModel = calibModel,
-    uniroot.Res = Res
+    # uniroot.Res = Res
   )
   return(driverResult)
 }
