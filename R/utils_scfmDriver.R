@@ -227,9 +227,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' Calibrate fire regime polygons ... (TODO)
 #'
 #' @param polygonType the names of polygons, i.e. `PolyID`
-#' @param regime the regime characteristics of each polygon
 #' @param targetN the number of fires to simulate during calibration
-#' @param landAttr the `landscapeAttr` object with characteristics for each polygon
 #' @param cellSize the cell size in metres
 #' @param fireRegimePolys fire regime polygons
 #' @param buffDist buffer distance for cells available to be burned outside of each regime polygon
@@ -251,19 +249,22 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @importFrom rlang eval_tidy
 #' @importFrom scam scam
 #' @importFrom stats as.formula optimise uniroot
-calibrateFireRegimePolys <- function(polygonType, regime,
-                                     targetN,  landAttr, cellSize, fireRegimePolys,
+calibrateFireRegimePolys <- function(polygonType, targetN,  cellSize, fireRegimePolys,
                                      buffDist, pJmp, pMin, pMax, neighbours, flammableMap = NULL,
                                      plotPath = NULL, optimizer = "bfgs") {
   #must be a file path when run in parallel as SpatRaster can't be serialized
- flammableMap <- terra::unwrap(flammableMap)
+  flammableMap <- terra::unwrap(flammableMap)
+  fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == polygonType,]
 
-  maxBurnCells <- as.integer(round(regime$emfs_ha / cellSize)) ## will return NA if emfs is NA
+  frp <- as.data.table(frp)#drop geometry
+  frp <- unique(frp[, geometry := NULL])
+
+  maxBurnCells <- as.integer(round(frp$emfs_ha / cellSize)) ## will return NA if emfs is NA
   if (is.na(maxBurnCells)) {
     warning("maxBurnCells cannot be NA... there is a problem with scfmRegime")
     maxBurnCells = 1
   }
-  landAttr <- landAttr[[polygonType]] ## landAttr may not be equal length as regime due to invalid polygons
+
   message("generating buffered landscapes...")
   ## this function returns too much data to be worth caching (4 rasters per poly)
   if (is(fireRegimePolys, "quosure")) {
@@ -271,7 +272,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   }
 
   message("running genSimLand() ...")
-  calibLand <- genSimLand(fireRegimePolys[fireRegimePolys$PolyID == polygonType, ],
+  calibLand <- genSimLand(fireRegimePoly,
                           buffDist = buffDist, flammableMap = flammableMap)
 
   ## Need a vector of igniteable cells
@@ -295,7 +296,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
               pmin = pMin, pmax = pMax,
               #TODO: change pEscape to use p0 which is calculated afterward (independently),
               #but naievely inside makeDesign (it assumes 8 neighbours)
-              pEscape = ifelse(regime$pEscape == 0, 0.1, regime$pEscape),
+              pEscape = ifelse(frp$pEscape == 0, 0.1, frp$pEscape),
               L = calibLand$flammableMap,
               maxCells = maxBurnCells,
               userTags = c("scfmDriver", "executeDesign", polygonType),
@@ -326,7 +327,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
     plot(calibModel, main = paste("polygon", polygonType))
     dev.off()
   }
-  xBar <- regime$xBar / cellSize
+  xBar <- frp$xBar / cellSize
 
   if (xBar > 0) {
     ## now for the inverse step.
@@ -348,9 +349,12 @@ calibrateFireRegimePolys <- function(polygonType, regime,
     Res <- "No Uniroot result"
   }
   ## check convergence, and out of bounds errors etc
-  w <- landAttr$nNbrs
-  w <- w / sum(w)
-  hatPE <- regime$pEscape
+
+  nNbrs <- melt.data.table(frp, id.vars = "PolyID", measure.vars = patterns("nNbr"),
+                           variable.name = "nNbr", value.name = "count")
+  nNbrs <- nNbrs$count/sum(nNbrs$count)
+  # w <- w / sum(w) #TODO: remove this line when its confirmed working (chagned nNbrs)
+  hatPE <- frp$pEscape
   if (hatPE == 0) {
     # no fires in polygon zone escaped
     p0 <- 0
@@ -361,7 +365,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
     message("running optimise() to determine p0...")
     res <- optimise(escapeProbDelta,
                     interval = c(hatP0(hatPE, neighbours),
-                                 hatP0(hatPE, floor(sum(w * 0:8)))),
+                                 hatP0(hatPE, floor(sum(w * 0:8)))), #TODO: this assumes 8 neighbour
                     tol = 1e-4,
                     w = w,
                     hatPE = hatPE)
@@ -371,7 +375,7 @@ calibrateFireRegimePolys <- function(polygonType, regime,
     ## monotone.
   }
   ## don't forget to scale by number of years, as well, if your timestep is ever != 1yr
-  rate <- regime$ignitionRate * cellSize
+  rate <- fireRegimePoly$ignitionRate * cellSize
   ## fireRegimeModel and this module must agree on an annual time step. How to test / enforce?
   pIgnition <- rate
   ## approximate Poisson arrivals as a Bernoulli process at cell level.
@@ -379,9 +383,10 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   ## for multiple arrivals within years. Formerly, I used a poorer approximation
   ## where 1-p = P[x==0 | lambda=rate] (Armstrong and Cumming 2003).
   driverResult <- list(
+    PolyID = polygonType,
     pSpread = pJmp,
     p0 = p0,
-    naiveP0 = hatP0(regime$pEscape, 8),
+    naiveP0 = hatP0(frp$pEscape, 8),
     pIgnition = pIgnition,
     maxBurnCells = maxBurnCells,
     # calibModel = calibModel,
