@@ -10,11 +10,9 @@
 \title{Create \code{data.table} to compare scfm predictions with historical observations}
 \usage{
 comparePredictions_summaryDT(
-  scfmDriverPars = NULL,
-  scfmRegimePars = NULL,
-  landscapeAttr = NULL,
   fireRegimePoints = NULL,
   burnSummary = NULL,
+  fireRegimePolys = NULL,
   times = NULL
 )
 
@@ -29,15 +27,11 @@ comparePredictions_annualEscapes(dt)
 comparePredictions_fireDistribution(dt)
 }
 \arguments{
-\item{scfmDriverPars}{list of burn parameters for each polygon, produced by \code{scfmDriverPars} module}
-
-\item{scfmRegimePars}{list of fire regime parameters, produced by \code{scfmRegime} module}
-
-\item{landscapeAttr}{list of landscape attributes for each polygon, produced by \code{scfmLandcoverInit} module}
-
-\item{fireRegimePoints}{\code{SpatialPointsDataFrame}, produced by \code{scfmRegime} module}
+\item{fireRegimePoints}{\code{sf} object produced \code{scfmRegime} module}
 
 \item{burnSummary}{\code{data.table}, produced by \code{scfmSpread} module}
+
+\item{fireRegimePolys}{\code{sf} object modified by \code{scfm} modules}
 
 \item{times}{list of simulation start and end times (i.e., output from \code{times(sim)})}
 
@@ -53,11 +47,10 @@ Create \code{data.table} to compare scfm predictions with historical observation
 \examples{
 \dontrun{
 ## assumes user has run scfm to produce the simList `mySimOut`
-dt <- comparePredictions_summaryDT(scfmDriverPars = mySimOut$scfmDriverPars,
-                                   scfmRegimePars = mySimOut$scfmRegimePars,
-                                   landscapeAttr = mySimOut$landscapeAttr,
-                                   fireRegimePoints = mySimOut$fireRegimePoints,
-                                   burnSummary = mySimOut$burnSummary)
+dt <- comparePredictions_summaryDT(fireRegimePoints = mySimOut$fireRegimePoints,
+                                   burnSummary = mySimOut$burnSummary,
+                                   fireRegimePolys = mySimOut$fireRegimePolys,
+                                   times = times(mySimOut))
 
 gg_mfs <- comparePredictions_meanFireSize(dt)
 gg_fri <- comparePredictions_fireReturnInterval(dt)

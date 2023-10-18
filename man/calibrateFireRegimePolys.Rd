@@ -14,6 +14,7 @@ calibrateFireRegimePolys(
   pMax,
   flammableMap = NULL,
   plotPath = NULL,
+  outputPath = NULL,
   optimizer = "bfgs"
 )
 }

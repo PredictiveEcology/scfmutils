@@ -1,6 +1,6 @@
 utils::globalVariables(c(
   ".SD", "achievedEscapes", "achievedEscapes_Mha", "achievedFRI", "achievedIgnitions",
-  "achievedIgnitions_Mha", "areaBurned", "burnableArea_ha",
+  "achievedIgnitions_Mha", "areaBurned", "burnableArea_ha", "pSpread", "burnyArea",
   "grp", "histMeanSize", "histMedianSize", "modMeanSize", "N", "PolyID",
   "targetEscapes", "targetEscapes_Mha", "targetFRI", "targetIgnitions", "targetIgnitions_Mha"
 ))
@@ -8,10 +8,8 @@ utils::globalVariables(c(
 #' Create `data.table` to compare scfm predictions with historical observations
 #'
 #' @param burnSummary `data.table`, produced by `scfmSpread` module
-#' @param fireRegimePoints `SpatialPointsDataFrame`, produced by `scfmRegime` module
-#' @param landscapeAttr list of landscape attributes for each polygon, produced by `scfmLandcoverInit` module
-#' @param scfmDriverPars list of burn parameters for each polygon, produced by `scfmDriverPars` module
-#' @param scfmRegimePars list of fire regime parameters, produced by `scfmRegime` module
+#' @param fireRegimePoints `sf` object produced `scfmRegime` module
+#' @param fireRegimePolys `sf` object modified by `scfm` modules
 #' @param times list of simulation start and end times (i.e., output from `times(sim)`)
 #'
 #' @return `comparePredictions_summaryDT` returns a `data.table` object;
@@ -20,11 +18,10 @@ utils::globalVariables(c(
 #' @examples
 #' \dontrun{
 #' ## assumes user has run scfm to produce the simList `mySimOut`
-#' dt <- comparePredictions_summaryDT(scfmDriverPars = mySimOut$scfmDriverPars,
-#'                                    scfmRegimePars = mySimOut$scfmRegimePars,
-#'                                    landscapeAttr = mySimOut$landscapeAttr,
-#'                                    fireRegimePoints = mySimOut$fireRegimePoints,
-#'                                    burnSummary = mySimOut$burnSummary)
+#' dt <- comparePredictions_summaryDT(fireRegimePoints = mySimOut$fireRegimePoints,
+#'                                    burnSummary = mySimOut$burnSummary,
+#'                                    fireRegimePolys = mySimOut$fireRegimePolys,
+#'                                    times = times(mySimOut))
 #'
 #' gg_mfs <- comparePredictions_meanFireSize(dt)
 #' gg_fri <- comparePredictions_fireReturnInterval(dt)
@@ -40,22 +37,22 @@ utils::globalVariables(c(
 #' @importFrom SpaDES.core times
 #' @importFrom stats median
 #' @rdname comparePredictions
-comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
-                                         scfmRegimePars = NULL,
-                                         landscapeAttr = NULL,
-                                         fireRegimePoints = NULL,
+comparePredictions_summaryDT <- function(fireRegimePoints = NULL,
                                          burnSummary = NULL,
+                                         fireRegimePolys = NULL,
                                          times = NULL) {
-  if (any(is.null(scfmDriverPars), is.null(scfmRegimePars), is.null(landscapeAttr),
-          is.null(fireRegimePoints), is.null(burnSummary), is.null(times))) {
-    stop("all arguments must be provided and cannot be NULL.")
+
+  if (any(is.null(fireRegimePolys$pSpread), is.null(fireRegimePolys$xBar),
+          is.null(fireRegimePolys$burnyArea), is.null(fireRegimePoints),
+          is.null(burnSummary), is.null(times))) {
+    stop("fireRegimePolys is missing columns or insufficient args provided")
   }
 
-  out <- lapply(names(scfmDriverPars), function(x) {
-    regime <- scfmRegimePars[[x]]
+  fireIDs <- unique(fireRegimePolys$PolyID)
+  out <- lapply(fireIDs, function(x) {
+    fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == x,]
+
     simLength <- times$end - times$start + 1
-    driver <- scfmDriverPars[[x]]
-    landscapeAttr <- landscapeAttr[[x]]
     fireRegimePoints <- fireRegimePoints[fireRegimePoints$PolyID == as.numeric(x), ]
 
     ## This is a long way of saying 'sum of fires / (flammable landscape * fire epoch)'.
@@ -63,11 +60,11 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
 
     ## median fire size is not used by scfm but is worth recording
     ## regimes where mean is much greater than median will be hard to recreate
-    escaped <- fireRegimePoints[fireRegimePoints$SIZE_HA > landscapeAttr$cellSize,]
+    escaped <- fireRegimePoints[fireRegimePoints$SIZE_HA > fireRegimePoly$cellSize,]
     medianFireSize <- median(escaped$SIZE_HA) #should be no need for na.rm
 
-    pSpread <- driver$pSpread
-    pIg <- regime$ignitionRate
+    pSpread <- fireRegimePoly$pSpread
+    pIg <- fireRegimePoly$ignitionRate
 
     if (!"grp" %in% names(burnSummary)) {
       stop("burnSummary data.table does not have a 'grp' column.\n",
@@ -80,39 +77,39 @@ comparePredictions_summaryDT <- function(scfmDriverPars = NULL,
     ## grp 3: pixels from fires ignited outside SAR & spread in SAR
     ## grp 4: pixels from fires ignited outside SAR & spread outside SAR
     burnSum <- burnSummary[PolyID == x, ]
-    targetIgnitions <- pIg * landscapeAttr$burnyArea
+    targetIgnitions <- pIg * fireRegimePoly$burnyArea
     achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 would double count ignitions
 
     #escapes
-    targetEscapes <- regime$pEscape * targetIgnitions
+    targetEscapes <- fireRegimePoly$pEscape * targetIgnitions
     achievedEscapes <- nrow(burnSum[grp %in% 1 & N > 1]) / simLength
 
     ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
     burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
-    burnSum1 <- burnSum1[areaBurned > landscapeAttr$cellSize, ]
+    burnSum1 <- burnSum1[areaBurned > fireRegimePoly$cellSize, ]
     meanFireSize <- ifelse(nrow(burnSum1) == 0, 0, mean(burnSum1$areaBurned))
 
     ## Mean Annual Area Burned: total area of all burned pixels in SAR over n years of simulation
     burnSum2 <- burnSum[grp %in% c(1, 3), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
-    burnSum2 <- burnSum1[areaBurned > landscapeAttr$cellSize, ]
+    burnSum2 <- burnSum1[areaBurned > fireRegimePoly$cellSize, ]
     MAAB <- sum(burnSum2$areaBurned) / simLength
 
-    achievedFRI <- simLength / ( sum(0, burnSum2$areaBurned) / landscapeAttr$burnyArea)
-    targetFRI  <- 1 / regime$empiricalBurnRate
+    achievedFRI <- simLength / ( sum(0, burnSum2$areaBurned) / fireRegimePoly$burnyArea)
+    targetFRI  <- 1 / fireRegimePoly$empiricalBurnRate
 
     pred <- data.frame("PolyID" = x,
-                       "histMeanSize" = regime$xBar, ## predicted (empirical) mean size of fires
+                       "histMeanSize" = fireRegimePoly$xBar, ## predicted (empirical) mean size of fires
                        "histMedianSize" = medianFireSize,
                        "modMeanSize" = meanFireSize,
                        "achievedFRI" = achievedFRI,
                        "targetFRI" = targetFRI,
-                       "burnableArea_ha" = landscapeAttr$burnyArea,
+                       "burnableArea_ha" = fireRegimePoly$burnyArea,
                        "targetIgnitions" = targetIgnitions,
                        "achievedIgnitions" = achievedIgnitions,
                        "targetEscapes" = targetEscapes,
                        "achievedEscapes" = achievedEscapes,
-                       "pEscape" = regime$pEscape, ## escape prob (no. fires > cellSize / no. fires)
-                       "p0" = driver$p0,  ## p0 and pEscape may indicate something incorrect
+                       "pEscape" = fireRegimePoly$pEscape, ## escape prob (no. fires > cellSize / no. fires)
+                       "p0" = fireRegimePoly$p0,  ## p0 and pEscape may indicate something incorrect
                        "pSpread" = pSpread, ## spread probability estimated from the SCAM model
                        "pIgnition" = pIg) ## ignition probability of a single pixel
     return(pred)
