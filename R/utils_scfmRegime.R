@@ -81,7 +81,7 @@ calcZonalRegimePars <- function(polygonID, firePolys,
             sprintf("Dodgy maxFireSize estimate in zone %s.\n\tUsing sample maximum fire size.",
                     polygonID)
           )
-          emhfs_ha <- xMax * maxSizeFactor
+          emfs_ha <- xMax * maxSizeFactor
         }
         #missing BEACONS CBFA truncated at 2*xMax. Their reasons don't apply here.
       }
@@ -98,9 +98,9 @@ calcZonalRegimePars <- function(polygonID, firePolys,
   ## need to add a name or code for basic verification by Driver module, and time field
   ## to allow for dynamic regeneration of disturbanceDriver pars.
   # browser()
-  if (emhfs_ha < 1) {
+  if (emfs_ha < 1) {
     warning("this can't happen") ## TODO: improve messaging for users
-    emhfs_ha = cellSize
+    emfs_ha = cellSize
   }
 
   empiricalBurnRate <- sum(polyPoints[[fireSizeColumnName]]) / (epochLength * landAttr$burnyArea)
