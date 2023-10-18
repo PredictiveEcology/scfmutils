@@ -43,7 +43,7 @@ calcZonalRegimePars <- function(polygonID, firePolys,
   xBar <- 0 # mean fire size
   xMax <- 0
   lxBar <- NA
-  emhfs_ha <- cellSize   #note that maxFireSize has unit of ha NOT cells!!!
+  emfs_ha <- cellSize   #note that maxFireSize has unit of ha NOT cells!!!
   xVec <- numeric(0)
 
   ## check for user supplied defaults
