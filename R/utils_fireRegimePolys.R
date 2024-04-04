@@ -183,7 +183,7 @@ checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableM
   fireRegimePolys$trueArea <- round(st_area(fireRegimePolys), digits = 0)
 
   if (any(as.numeric(fireRegimePolys$trueArea) < sliverThresh)) {
-    message("sliver polygon(s) detected. Merging to their nearest valid neighbour")
+    message("sliver polygon(s) detected. Merging to their nearest valid neighbour.")
     fireRegimePolys <- Cache(deSliver, fireRegimePolys, threshold = sliverThresh, userTags = cacheTag)
   }
 
@@ -211,7 +211,7 @@ deSliver <- function(x, threshold) {
   xSlivers <- x[x$tempArea < threshold, ]
   xNotSlivers <- x[x$tempArea >= threshold, ]
   if (nrow(xNotSlivers) < 1) {
-    stop("Threshold exceeds the area of every polygon. Please select a smaller number")
+    stop("Threshold exceeds the area of every polygon. Please select a smaller number.")
   }
 
   ## split slivers from multipolygon, or nearest feature may be incorrect
