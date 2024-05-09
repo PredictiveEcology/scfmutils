@@ -246,11 +246,11 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #'
 #' @export
 #' @importFrom grDevices dev.off png
-#' @importFrom terra ncell unwrap
 #' @importFrom reproducible Cache checkPath
 #' @importFrom rlang eval_tidy
 #' @importFrom scam scam
 #' @importFrom stats as.formula optimise uniroot
+#' @importFrom terra ncell unwrap
 calibrateFireRegimePolys <- function(polygonType, regime,
                                      targetN,  landAttr, cellSize, fireRegimePolys,
                                      buffDist, pJmp, pMin, pMax, neighbours, flammableMap = NULL,
@@ -293,8 +293,8 @@ calibrateFireRegimePolys <- function(polygonType, regime,
               indices = index,
               targetN = targetN,
               pmin = pMin, pmax = pMax,
-              #TODO: change pEscape to use p0 which is calculated afterward (independently),
-              #but naievely inside makeDesign (it assumes 8 neighbours)
+              ## TODO: change pEscape to use p0 which is calculated afterward (independently),
+              ## but naively inside makeDesign (it assumes 8 neighbours)
               pEscape = ifelse(regime$pEscape == 0, 0.1, regime$pEscape),
               L = calibLand$flammableMap,
               maxCells = maxBurnCells,
