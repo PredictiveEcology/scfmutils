@@ -321,10 +321,12 @@ calibrateFireRegimePolys <- function(polygonType, regime,
   } else {
     message("|_ success!")
     plotPath <- checkPath(plotPath, create = TRUE)
-    png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
-        height = 600, width = 800)
-    plot(calibModel, main = paste("polygon", polygonType))
-    dev.off()
+    tryCatch({
+      png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
+          height = 600, width = 800)
+      plot(calibModel, main = paste("polygon", polygonType))
+      dev.off()
+    }, function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
   }
   xBar <- regime$xBar / cellSize
 
