@@ -326,7 +326,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
           height = 600, width = 800)
       plot(calibModel, main = paste("polygon", polygonType))
       dev.off()
-    }, function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
+    }, error = function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
   }
   xBar <- frp$xBar / frp$cellSize
 
