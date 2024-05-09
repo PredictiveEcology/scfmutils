@@ -241,13 +241,13 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @return TODO
 #'
 #' @export
+#' @importFrom data.table melt.data.table
 #' @importFrom grDevices dev.off png
-#' @importFrom terra ncell unwrap
 #' @importFrom reproducible Cache checkPath
 #' @importFrom rlang eval_tidy
 #' @importFrom scam scam
 #' @importFrom stats as.formula optimise uniroot
-#' @importFrom data.table melt.data.table
+#' @importFrom terra ncell unwrap
 calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
                                      buffDist, pJmp, pMin, pMax, flammableMap = NULL,
                                      plotPath = NULL, outputPath = NULL, optimizer = "bfgs") {
@@ -293,9 +293,9 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
               indices = index,
               targetN = targetN,
               pmin = pMin, pmax = pMax,
-              #TODO: change pEscape to use p0 which is calculated afterward (independently),
-              #but naievely inside makeDesign (it assumes 8 neighbours)
-              pEscape = ifelse(frp$pEscape == 0, 0.1, frp$pEscape),
+              ## TODO: change pEscape to use p0 which is calculated afterward (independently),
+              ## but naively inside makeDesign (it assumes 8 neighbours)
+              pEscape = ifelse(regime$pEscape == 0, 0.1, regime$pEscape),
               L = calibLand$flammableMap,
               maxCells = maxBurnCells,
               userTags = c("scfmDriver", "executeDesign", polygonType),
@@ -321,10 +321,12 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
   } else {
     message("|_ success!")
     plotPath <- checkPath(plotPath, create = TRUE)
-    png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
-        height = 600, width = 800)
-    plot(calibModel, main = paste("polygon", polygonType))
-    dev.off()
+    tryCatch({
+      png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
+          height = 600, width = 800)
+      plot(calibModel, main = paste("polygon", polygonType))
+      dev.off()
+    }, function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
   }
   xBar <- frp$xBar / frp$cellSize
 

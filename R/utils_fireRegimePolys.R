@@ -130,8 +130,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else if (grepl("^BEC.*ZONE", type)) {
     cols2keep <- c("ZONE", "SUBZONE")
   } else if (type == "BECNDT") {
-    cols2keep <- names(tmp)[names(tmp) %in%
-                              c("NTRL_DSTRD", "NTRLDSTRBN", "NATURAL_DISTURBANCE_TYPE_CODE")]
+    cols2keep <- names(tmp)[names(tmp) %in% "NATURAL_DISTURBANCE_TYPE_CODE"]
   } else if (type == "FRT") {
     cols2keep <- "Cluster"
   } else if (type == "FRU") {
@@ -167,12 +166,13 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 #' @return a cleaned up `fireRegimePolys` object
 #'
 #' @export
-#' @importFrom LandR .compareCRS
 #' @importFrom reproducible Cache
-#' @importFrom sf st_area st_is_longlat
+#' @importFrom sf st_area st_crs st_is_longlat
 checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableMap, sliverThresh, cacheTag) {
-  .compareCRS(rasterToMatch, flammableMap) ## TODO: is there a better check?
-  .compareCRS(rasterToMatch, fireRegimePolys)
+  stopifnot(
+    st_crs(rasterToMatch) == st_crs(flammableMap), ## TODO: is there a better check?
+    st_crs(rasterToMatch) == st_crs(fireRegimePolys) ## TODO: is there a better check?
+  )
 
   if (is.null(fireRegimePolys[["PolyID"]])) {
     stop("please supply fireRegimePolys with a PolyID")
@@ -184,7 +184,7 @@ checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableM
   fireRegimePolys$trueArea <- round(st_area(fireRegimePolys), digits = 0)
 
   if (any(as.numeric(fireRegimePolys$trueArea) < sliverThresh)) {
-    message("sliver polygon(s) detected. Merging to their nearest valid neighbour")
+    message("sliver polygon(s) detected. Merging to their nearest valid neighbour.")
     fireRegimePolys <- Cache(deSliver, fireRegimePolys, threshold = sliverThresh, userTags = cacheTag)
   }
 
@@ -212,7 +212,7 @@ deSliver <- function(x, threshold) {
   xSlivers <- x[x$tempArea < threshold, ]
   xNotSlivers <- x[x$tempArea >= threshold, ]
   if (nrow(xNotSlivers) < 1) {
-    stop("Threshold exceeds the area of every polygon. Please select a smaller number")
+    stop("Threshold exceeds the area of every polygon. Please select a smaller number.")
   }
 
   ## split slivers from multipolygon, or nearest feature may be incorrect
