@@ -123,6 +123,20 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
         tmp <- sf::st_transform(tmp, sf::st_crs(studyArea))
       }
     }
+  } else {
+    tmp <- prepInputs(url = url,
+                      destinationPath = destinationPath,
+                      studyArea = studyArea,
+                      rasterToMatch = rasterToMatch,
+                      fun = "sf::st_read",
+                      overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
+
+    ## workaround issues with prepInputs() not reprojecting:
+    if (!is.null(rasterToMatch)) {
+      tmp <- sf::st_transform(tmp, raster::crs(rasterToMatch))
+    } else if (is.null(rasterToMatch) && !is.null(studyArea)) {
+      tmp <- sf::st_transform(tmp, sf::st_crs(studyArea))
+    }
   }
 
   if (grepl("^ECO", type)) {
