@@ -42,7 +42,9 @@ Imports:
     SpaDES.tools (>= 2.0.0),
     stats,
     terra,
-    tools
+    tidyterra,
+    tools,
+    viridis
 Suggests:
     bcdata,
     googledrive,
