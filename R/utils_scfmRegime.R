@@ -2,7 +2,6 @@
 #'
 #' @param polygonID TODO
 #' @param firePolys TODO
-#' @param landscapeAttr TODO
 #' @param firePoints TODO
 #' @param epochLength TODO
 #' @param maxSizeFactor TODO
@@ -20,13 +19,8 @@
 #'  `empiricalBurnRate` (empircal burn rate)
 #'
 #' @export
-calcZonalRegimePars <- function(polygonID, firePolys,
-                                firePoints,
-                                epochLength,
-                                maxSizeFactor,
-                                fireSizeColumnName,
-                                targetBurnRate = NULL,
-                                targetMaxFireSize = NULL) {
+calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, maxSizeFactor,
+                                fireSizeColumnName, targetBurnRate = NULL, targetMaxFireSize = NULL) {
 
   firePoly <- firePolys[firePolys$PolyID == polygonID,]
   landAttr <- as.data.table(firePoly)
@@ -36,14 +30,14 @@ calcZonalRegimePars <- function(polygonID, firePolys,
   cellSize = landAttr[["cellSize"]]
   nFires <- dim(polyPoints)[1]
   if (nFires == 0) {
-    return(firePoly) #confirm whether NULL values must be added for rbind to work
+    return(firePoly) ## confirm whether NULL values must be added for rbind to work
   }
-  ignitionRate <- nFires / (epochLength * landAttr$burnyArea)   # fires per ha per yr
+  ignitionRate <- nFires / (epochLength * landAttr$burnyArea) ## fires per ha per yr
   pEscape <- 0
-  xBar <- 0 # mean fire size
+  xBar <- 0 ## mean fire size
   xMax <- 0
   lxBar <- NA
-  emfs_ha <- cellSize   #note that maxFireSize has unit of ha NOT cells!!!
+  emfs_ha <- cellSize ## note that maxFireSize has unit of ha NOT cells!!!
   xVec <- numeric(0)
 
   ## check for user supplied defaults
@@ -83,11 +77,11 @@ calcZonalRegimePars <- function(polygonID, firePolys,
           )
           emfs_ha <- xMax * maxSizeFactor
         }
-        #missing BEACONS CBFA truncated at 2*xMax. Their reasons don't apply here.
+        ## missing BEACONS CBFA truncated at 2*xMax. Their reasons don't apply here.
       }
     } else {
-      # there should be a way to pass non-zero defaults but I'm not sure whether we would specify by polygon
-      # and if so, how, given the initial polygons may be modified during sliver removal
+      ## there should be a way to pass non-zero defaults but I'm not sure whether we would specify by polygon
+      ## and if so, how, given the initial polygons may be modified during sliver removal
       message(paste("no fires larger than cellsize in ", polygonID, "."))
     }
   } else {
@@ -97,7 +91,6 @@ calcZonalRegimePars <- function(polygonID, firePolys,
   ## verify estimation results are reasonable. That=-1 indicates convergence failure.
   ## need to add a name or code for basic verification by Driver module, and time field
   ## to allow for dynamic regeneration of disturbanceDriver pars.
-  # browser()
   if (emfs_ha < 1) {
     warning("this can't happen") ## TODO: improve messaging for users
     emfs_ha = cellSize
@@ -136,8 +129,8 @@ calcZonalRegimePars <- function(polygonID, firePolys,
 
   paramData <- as.data.table(cbind(ignitionRate, pEscape, xBar, lxBar, xMax, emfs_ha, empiricalBurnRate))
   paramData$PolyID <- polygonID
-  # rate - per ha/per year ; pEscape; xBar - mean fire size; lxBar - mean log;
-  # xMax - maximum observed size; #emfs_ha - Estiamted maximum Fire Size in ha
+  ## rate - per ha/per year ; pEscape; xBar - mean fire size; lxBar - mean log;
+  ## xMax - maximum observed size; #emfs_ha - Estiamted maximum Fire Size in ha
   ## max fire size is returned twice - I think this is a backwards compatibility decision
   return(paramData)
 }

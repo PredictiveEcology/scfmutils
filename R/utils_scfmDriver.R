@@ -230,13 +230,14 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @param targetN the number of fires to simulate during calibration
 #' @param fireRegimePolys fire regime polygons
 #' @param buffDist buffer distance for cells available to be burned outside of each regime polygon
-#' @param pJmp default spread probability for degenerate polygons
-#' @param pMin minimum spread probability
-#' @param pMax maximum allowable spread probability
-#' @param flammableMap a packed `SpatRaster` - see [terra::wrap()]
-#' @param plotPath file name specifying an output directory to use for producing plots of the scam
-#'                 fit for each polygon.
-#' @param optimizer the numerical optimization method to use with scam fitting; see `?scam`.
+#' @param pJmp numeric. default spread probability for degenerate polygons
+#' @param pMin numeric. minimum spread probability
+#' @param pMax numeric. maximum allowable spread probability
+#' @param flammableMap a packed `SpatRaster` (see [terra::wrap()])
+#' @param plotPath character. file name specifying an output directory to use for producing plots
+#'                  of the scam fit for each polygon.
+#' @param outputPath character. path to output directory.
+#' @param optimizer character. the numerical optimization method to use with scam fitting; see `?scam`.
 #'
 #' @return TODO
 #'

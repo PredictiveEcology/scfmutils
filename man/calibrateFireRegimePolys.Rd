@@ -27,18 +27,20 @@ calibrateFireRegimePolys(
 
 \item{buffDist}{buffer distance for cells available to be burned outside of each regime polygon}
 
-\item{pJmp}{default spread probability for degenerate polygons}
+\item{pJmp}{numeric. default spread probability for degenerate polygons}
 
-\item{pMin}{minimum spread probability}
+\item{pMin}{numeric. minimum spread probability}
 
-\item{pMax}{maximum allowable spread probability}
+\item{pMax}{numeric. maximum allowable spread probability}
 
-\item{flammableMap}{a packed \code{SpatRaster} - see \code{\link[terra:wrap]{terra::wrap()}}}
+\item{flammableMap}{a packed \code{SpatRaster} (see \code{\link[terra:wrap]{terra::wrap()}})}
 
-\item{plotPath}{file name specifying an output directory to use for producing plots of the scam
-fit for each polygon.}
+\item{plotPath}{character. file name specifying an output directory to use for producing plots
+of the scam fit for each polygon.}
 
-\item{optimizer}{the numerical optimization method to use with scam fitting; see \code{?scam}.}
+\item{outputPath}{character. path to output directory.}
+
+\item{optimizer}{character. the numerical optimization method to use with scam fitting; see \code{?scam}.}
 }
 \value{
 TODO

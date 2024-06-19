@@ -31,8 +31,6 @@ calcZonalRegimePars(
 \item{targetBurnRate}{TODO}
 
 \item{targetMaxFireSize}{TODO}
-
-\item{landscapeAttr}{TODO}
 }
 \value{
 list containing the following elements and their values:
