@@ -106,7 +106,7 @@ ratioPartition2 <- function(targetBurnRate, empiricalBurnRate, pEscape, xBar, ra
   remains <- remains / step
   step <- min(remains, 2)
   pEscape <- pEscape * step
-  remains <- remains/step
+  remains <- remains / step
   step <- min(remains, 2)
   xBar <- xBar * step
   remains <- remains / step

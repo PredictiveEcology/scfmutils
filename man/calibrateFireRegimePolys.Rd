@@ -41,10 +41,19 @@ of the scam fit for each polygon.}
 
 \item{outputPath}{character. path to output directory.}
 
-\item{optimizer}{character. the numerical optimization method to use with scam fitting; see \code{?scam}.}
+\item{optimizer}{character. the numerical optimization method to use with scam fitting;
+see \code{?scam}.}
 }
 \value{
-\code{data.table} with columns \code{PolyID}, \code{pSpread}, \code{p0}, \code{naiveP0}, \code{pIgnition}, \code{maxBurnCells}.
+\code{data.table} with columns:
+\itemize{
+\item \code{PolyID}: polygon ID;
+\item \code{pSpread}: spread probability;
+\item \code{p0}: TODO;
+\item \code{naiveP0}: TODO;
+\item \code{pIgnition}: ignition probability;
+\item \code{maxBurnCells}: maximum number of burned cells.
+}
 }
 \description{
 Calibrate fire regime polygons ... (TODO)

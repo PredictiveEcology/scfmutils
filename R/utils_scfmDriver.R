@@ -40,7 +40,7 @@ genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {
                         useSAcrs = TRUE, filename2 = NULL)
 
   #Generate landscape Index raster
-  landscapeIndex <- rasterize(polyLandscape, flammableMap, fun = 'min', "fooField")
+  landscapeIndex <- rasterize(polyLandscape, flammableMap, fun = "min", "fooField")
 
   calibrationLandscape <- list(polyLandscape, landscapeIndex, flammableMap)
   names(calibrationLandscape) <- c("fireRegimePoly", "landscapeIndex", "flammableMap")
@@ -102,14 +102,15 @@ executeDesign <- function(L, dT, maxCells) {
   probRas <- L
   startTime <- Sys.time()
 
-  .executeDesignInternal <- function(x, L, ProbRas, startTime) { ## L, P are rasters, passed by reference
+  .executeDesignInternal <- function(x, L, ProbRas, startTime) {
+    ## L, ProbRas are rasters, passed by reference
     iter <<- iter + 1
     currentTime <- Sys.time()
     diffTime <- currentTime - startTime
     units(diffTime) <- "secs"
     timePer <- as.numeric(diffTime) / iter
     timeLeft <- (NROW(dT) - iter) * timePer
-    timeLeft <- round(as.difftime(timeLeft, units = "mins")/60, 1)
+    timeLeft <- round(as.difftime(timeLeft, units = "mins") / 60, 1)
     nrowDT <- NROW(dT)
     if (iter %% 200 == 0) {
       message("  ", iter, " of ", nrowDT, " total; estimated time remaining: ",
@@ -118,7 +119,7 @@ executeDesign <- function(L, dT, maxCells) {
 
     threadsDT <- data.table::getDTthreads()
     data.table::setDTthreads(1)
-    on.exit({data.table::setDTthreads(threadsDT)}, add = TRUE)
+    on.exit(data.table::setDTthreads(threadsDT), add = TRUE)
 
     i <- x[1]
     p0 <- x[2]
@@ -146,7 +147,7 @@ executeDesign <- function(L, dT, maxCells) {
                                           asRaster = FALSE)
 
     tmp <- nrow(spreadState0)
-    res[2:3] <- c(tmp - 1,tmp)
+    res[2:3] <- c(tmp - 1, tmp)
     if (tmp == 1) { # the fire did not spread
       return(res)
     }
@@ -221,7 +222,7 @@ hatP0 <- function(pEscape, n = 8) {
 #' @rdname pEscape
 escapeProbDelta <- function(p0, w, hatPE) {
   ## TODO: a real clever boots would minimise the abs log odds ratio.
-  abs(sum(w*(1 - (1 - p0) ** (0:8))) - hatPE)
+  abs(sum(w * (1 - (1 - p0) ** (0:8))) - hatPE)
 }
 
 #' `scfmDriver`: `calibrateFireRegimePolys`
@@ -250,9 +251,16 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #'
 #' @param outputPath character. path to output directory.
 #'
-#' @param optimizer character. the numerical optimization method to use with scam fitting; see `?scam`.
+#' @param optimizer character. the numerical optimization method to use with scam fitting;
+#'                  see `?scam`.
 #'
-#' @return `data.table` with columns `PolyID`, `pSpread`, `p0`, `naiveP0`, `pIgnition`, `maxBurnCells`.
+#' @return `data.table` with columns:
+#' - `PolyID`: polygon ID;
+#' - `pSpread`: spread probability;
+#' - `p0`: TODO;
+#' - `naiveP0`: TODO;
+#' - `pIgnition`: ignition probability;
+#' - `maxBurnCells`: maximum number of burned cells.
 #'
 #' @export
 #' @importFrom data.table melt.data.table
@@ -267,15 +275,15 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
                                      plotPath = NULL, outputPath = NULL, optimizer = "bfgs") {
   ## must be a packed SpatRaster when run in parallel as SpatRaster can't be serialized
   flammableMap <- terra::unwrap(flammableMap)
-  fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == polygonType,]
+  fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == polygonType, ]
 
-  frp <- as.data.table(fireRegimePoly)#drop geometry
+  frp <- as.data.table(fireRegimePoly) ## drop geometry
   frp <- unique(frp[, geometry := NULL])
 
   maxBurnCells <- as.integer(round(frp$emfs_ha / frp$cellSize)) ## will return NA if emfs is NA
   if (is.na(maxBurnCells)) {
     warning("maxBurnCells cannot be NA... there is a problem with scfmRegime")
-    maxBurnCells = 1
+    maxBurnCells <- 1
   }
 
   message("generating buffered landscapes...")
@@ -296,8 +304,10 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
   index[calibLand$flammableMap[] != 1 | is.na(calibLand$flammableMap[])] <- NA
   index[calibLand$landscapeIndex[] != 1 | is.na(calibLand$landscapeIndex[])] <- NA
   index <- index[!is.na(index)]
-  if (length(index) == 0)
+
+  if (length(index) == 0) {
     stop("polygon has no flammable cells!")
+  }
 
   message(paste0("calibrating for polygon ", polygonType, " (Time: ", Sys.time(), ")"))
 
@@ -325,7 +335,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
   calibModel <- try({
     scam::scam(as.formula(scamFormula), data = cD, optimizer = optimizer)
   }, silent = TRUE)
-  while (count < 5 & inherits(calibModel, "try-error")) {
+  while (count < 5 && inherits(calibModel, "try-error")) {
     kcount <- kcount + 5
     count <- count + 1
     message("|_ failed! retrying scam fitting (attempt ", count, "/5) ...")
@@ -351,8 +361,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
                               calibModel, xBar, # "..."
                               interval = c(min(cD$p), max(cD$p)),
                               extendInt = "no",
-                              tol = 0.00001
-    ), silent = TRUE)
+                              tol = 0.00001), silent = TRUE)
     if (inherits(Res, "try-error")) {
       ## TODO: should pick the closest value (of min and max) if error is value not of opposite sign
       pJmp <- min(cD$p)
@@ -369,7 +378,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
   nNbrs <- melt.data.table(frp, id.vars = "PolyID", measure.vars = patterns("nNbr"),
                            variable.name = "nNbr", value.name = "count")
   nNbrs <- nNbrs$count
-  w <- nNbrs/sum(nNbrs)
+  w <- nNbrs / sum(nNbrs)
   neighbours <- length(nNbrs) - 1 #because 0 is counted
 
   hatPE <- frp$pEscape
@@ -390,8 +399,8 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
                     hatPE = hatPE)
     p0 <- res[["minimum"]]
     ## It is almost obvious that the true minimum must occur within the interval specified in the
-    ## call to optimise, but I have not proved it, nor am I certain that the function being minimised is
-    ## monotone.
+    ## call to optimise, but I have not proved it, nor am I certain that the function being
+    ## minimised is monotone.
   }
   ## don't forget to scale by number of years, as well, if your timestep is ever != 1yr
   rate <- fireRegimePoly$ignitionRate * frp$cellSize

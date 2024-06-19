@@ -53,7 +53,7 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL,
 
   fireIDs <- unique(fireRegimePolys$PolyID)
   out <- lapply(fireIDs, function(x) {
-    fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == x,]
+    fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == x, ]
 
     simLength <- times$end - times$start + 1
     fireRegimePoints <- fireRegimePoints[fireRegimePoints$PolyID == as.numeric(x), ]
@@ -81,27 +81,27 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL,
     ## grp 4: pixels from fires ignited outside SAR & spread outside SAR
     burnSum <- burnSummary[PolyID == x, ]
     targetIgnitions <- pIg * fireRegimePoly$burnyArea
-    achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 would double count ignitions
+    achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 double counts igns
 
     #escapes
     targetEscapes <- fireRegimePoly$pEscape * targetIgnitions
     achievedEscapes <- nrow(burnSum[grp %in% 1 & N > 1]) / simLength
 
     ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
-    burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]  # nolint
     burnSum1 <- burnSum1[areaBurned > fireRegimePoly$cellSize, ]
     meanFireSize <- ifelse(nrow(burnSum1) == 0, 0, mean(burnSum1$areaBurned))
 
     ## Mean Annual Area Burned: total area of all burned pixels in SAR over n years of simulation
-    burnSum2 <- burnSum[grp %in% c(1, 3), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]
+    burnSum2 <- burnSum[grp %in% c(1, 3), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"] # nolint
     burnSum2 <- burnSum1[areaBurned > fireRegimePoly$cellSize, ]
     MAAB <- sum(burnSum2$areaBurned) / simLength
 
-    achievedFRI <- simLength / ( sum(0, burnSum2$areaBurned) / fireRegimePoly$burnyArea)
+    achievedFRI <- simLength / (sum(0, burnSum2$areaBurned) / fireRegimePoly$burnyArea)
     targetFRI  <- 1 / fireRegimePoly$empiricalBurnRate
 
     pred <- data.frame("PolyID" = x,
-                       "histMeanSize" = fireRegimePoly$xBar, ## predicted (empirical) mean size of fires
+                       "histMeanSize" = fireRegimePoly$xBar, ## predicted (empirical) mean fire size
                        "histMedianSize" = medianFireSize,
                        "modMeanSize" = meanFireSize,
                        "achievedFRI" = achievedFRI,
@@ -156,7 +156,7 @@ comparePredictions_fireReturnInterval <- function(dt, times) {
     warning("achievedFRI may be off where targetFRI is less than 4x the simulated time.")
   }
 
-  ## TODO: remove the targetFRI filter below. plot those points differently to indicate poor estimates
+  ## TODO: remove targetFRI filter below. plot those points differently to indicate poor estimates
   ggplot(dt[!is.infinite(achievedFRI) & targetFRI < c(times$end - times$start) * 4],
          aes(x = targetFRI, y = achievedFRI)) +
     geom_point() +
@@ -176,8 +176,8 @@ comparePredictions_annualIgnitions <- function(dt) {
   }
 
   dt <- copy(dt) #avoid adding per ha cols (or add them?)
-  dt[, targetIgnitions_Mha := targetIgnitions/burnableArea_ha * 1e6]
-  dt[, achievedIgnitions_Mha := achievedIgnitions/burnableArea_ha * 1e6]
+  dt[, targetIgnitions_Mha := targetIgnitions / burnableArea_ha * 1e6]
+  dt[, achievedIgnitions_Mha := achievedIgnitions / burnableArea_ha * 1e6]
 
 
   ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
@@ -198,8 +198,8 @@ comparePredictions_annualEscapes <- function(dt) {
   }
 
   dt <- copy(dt) #avoid adding per ha cols (or add them?)
-  dt[, targetEscapes_Mha := targetEscapes/burnableArea_ha * 1e6]
-  dt[, achievedEscapes_Mha := achievedEscapes/burnableArea_ha * 1e6]
+  dt[, targetEscapes_Mha := targetEscapes / burnableArea_ha * 1e6]
+  dt[, achievedEscapes_Mha := achievedEscapes / burnableArea_ha * 1e6]
 
 
   ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +

@@ -20,14 +20,14 @@
 #'
 #' @export
 calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, maxSizeFactor,
-                                fireSizeColumnName, targetBurnRate = NULL, targetMaxFireSize = NULL) {
-
-  firePoly <- firePolys[firePolys$PolyID == polygonID,]
+                                fireSizeColumnName, targetBurnRate = NULL,
+                                targetMaxFireSize = NULL) {
+  firePoly <- firePolys[firePolys$PolyID == polygonID, ]
   landAttr <- as.data.table(firePoly)
   landAttr <- unique(landAttr[, .SD, .SDcol = setdiff(colnames(firePoly), "geometry")])
-  polyPoints <- firePoints[firePoints$PolyID == as.numeric(polygonID),]
+  polyPoints <- firePoints[firePoints$PolyID == as.numeric(polygonID), ]
 
-  cellSize = landAttr[["cellSize"]]
+  cellSize <- landAttr[["cellSize"]]
   nFires <- dim(polyPoints)[1]
   if (nFires == 0) {
     return(firePoly) ## confirm whether NULL values must be added for rbind to work
@@ -93,16 +93,16 @@ calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, m
   ## to allow for dynamic regeneration of disturbanceDriver pars.
   if (emfs_ha < 1) {
     warning("this can't happen") ## TODO: improve messaging for users
-    emfs_ha = cellSize
+    emfs_ha <- cellSize
   }
 
   empiricalBurnRate <- sum(polyPoints[[fireSizeColumnName]]) / (epochLength * landAttr$burnyArea)
 
-  if (is.na(targetBurnRate) | is.null(targetBurnRate)) {
+  if (is.na(targetBurnRate) || is.null(targetBurnRate)) {
     ratio <- 1
   }
 
-  if (!is.na(targetBurnRate) | is.null(targetBurnRate)) {
+  if (!is.na(targetBurnRate) || is.null(targetBurnRate)) {
     ratio <-  targetBurnRate / empiricalBurnRate
     if (ratio >= 1) {
       newFireValues <- ratioPartition2(targetBurnRate = targetBurnRate,
@@ -120,14 +120,15 @@ calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, m
   }
 
   ## override maximum fire size if user supplied
-  if (!is.na(targetMaxFireSize) | is.null(targetMaxFireSize)) {
+  if (!is.na(targetMaxFireSize) || is.null(targetMaxFireSize)) {
     emfs_ha <- targetMaxFireSize
     xMax <- targetMaxFireSize
     ## TODO: add check that max is larger than mean, else stop
   }
 
 
-  paramData <- as.data.table(cbind(ignitionRate, pEscape, xBar, lxBar, xMax, emfs_ha, empiricalBurnRate))
+  paramData <- cbind(ignitionRate, pEscape, xBar, lxBar, xMax, emfs_ha, empiricalBurnRate) |>
+    as.data.table()
   paramData$PolyID <- polygonID
   ## rate - per ha/per year ; pEscape; xBar - mean fire size; lxBar - mean log;
   ## xMax - maximum observed size; #emfs_ha - Estiamted maximum Fire Size in ha

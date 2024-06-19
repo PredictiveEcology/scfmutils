@@ -17,7 +17,7 @@ utils::globalVariables(c(
 .makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys, neighbours) {
 
   cellSize <- prod(res(flammableMap)) / 1e4 # in ha
-  neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
+  neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default fun is sum(..., na.rm)
 
   # extract table for each polygon
   valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE) ## TODO: use terra
@@ -26,10 +26,10 @@ utils::globalVariables(c(
   valsByPoly <- valsByPoly[flam == 1]
 
   #get the FRP ID
-  tempDT <- data.table(PolyID = fireRegimePolys$PolyID, ID = 1:nrow(fireRegimePolys))
+  tempDT <- data.table(PolyID = fireRegimePolys$PolyID, ID = seq_len(nrow(fireRegimePolys)))
   valsByPoly <- valsByPoly[tempDT, on = c("ID")]
 
-  valsByZone <- lapply(fireRegimePolys$PolyID, FUN = function(x, df = valsByPoly){
+  valsByZone <- lapply(fireRegimePolys$PolyID, FUN = function(x, df = valsByPoly) {
     df[PolyID == x]
   })
 

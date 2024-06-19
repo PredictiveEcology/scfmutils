@@ -29,7 +29,8 @@ getFirePoints_NFDB_scfm <- function(url = NULL,
   if (is.null(url))
     url <- "http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point.zip"
 
-  check <- Checksums(NFDB_pointPath, checksumFile = file.path(NFDB_pointPath, "CHECKSUMS.txt"), write = TRUE)
+  check <- Checksums(NFDB_pointPath, checksumFile = file.path(NFDB_pointPath, "CHECKSUMS.txt"),
+                     write = TRUE)
   whRowIsShp <- grep("NFDB_point.*shp$", check$expectedFile)
   whIsOK <- which(check$result[whRowIsShp] == "OK")
   needNewDownload <- TRUE

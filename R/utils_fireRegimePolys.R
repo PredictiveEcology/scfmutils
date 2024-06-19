@@ -163,7 +163,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
   tmp2 <- group_by(tmp, USETHIS) |> summarise(geometry = sf::st_union(geometry)) |> ungroup()
   polys <- sf::st_collection_extract(tmp2)
-  polys[["PolyID"]] <- as.integer(1:nrow(polys))
+  polys[["PolyID"]] <- as.integer(seq_len(nrow(polys)))
   polys[["USETHIS"]] <- NULL
 
   return(polys)
@@ -188,7 +188,8 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 #' @export
 #' @importFrom reproducible Cache
 #' @importFrom sf st_area st_crs st_is_longlat
-checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableMap, sliverThresh, cacheTag) {
+checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableMap, sliverThresh,
+                           cacheTag) {
   stopifnot(
     st_crs(rasterToMatch) == st_crs(flammableMap), ## TODO: is there a better check?
     st_crs(rasterToMatch) == st_crs(fireRegimePolys) ## TODO: is there a better check?
@@ -205,7 +206,8 @@ checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableM
 
   if (any(as.numeric(fireRegimePolys$trueArea) < sliverThresh)) {
     message("sliver polygon(s) detected. Merging to their nearest valid neighbour.")
-    fireRegimePolys <- Cache(deSliver, fireRegimePolys, threshold = sliverThresh, userTags = cacheTag)
+    fireRegimePolys <- deSliver(fireRegimePolys, threshold = sliverThresh) |>
+      Cache(userTags = cacheTag)
   }
 
   return(fireRegimePolys)
@@ -251,12 +253,12 @@ deSliver <- function(x, threshold) {
       featurePolys <- nearestFeature == i
       xMerge <- st_union(s[featurePolys, ])
       yMerge <- ns[i, ]
-      out <- st_union(x = xMerge, y = yMerge) # convert slivers back to multipolygon
-      yMerge$geometry <- out # update the geometry
+      out <- st_union(x = xMerge, y = yMerge) ## convert slivers back to multipolygon
+      yMerge$geometry <- out ## update the geometry
       return(yMerge)
     }
   )
-  otherPolys <- xNotSlivers[!(1:nrow(xNotSlivers) %in% nearestFeature),]
+  otherPolys <- xNotSlivers[!(seq_len(nrow(xNotSlivers)) %in% nearestFeature), ]
   if (length(mergeSlivers) > 1) {
     ## these polygons must be tracked and merged.
     ## they may be nrow(0) if every feature was modified in some way
@@ -276,11 +278,10 @@ deSliver <- function(x, threshold) {
   }
   ## the geometry will be sfc
   m <- st_cast(m, to = "MULTIPOLYGON")
-  m$tempArea <- NULL # remove the temporary column
+  m$tempArea <- NULL ## remove the temporary column
 
   ## remove self-intersecting geometries
   if (any(!st_is_valid(m))) {
-    #m <- rgeos::gBuffer(spgeom = m, byid = TRUE, width = 0) ## TODO: use sf here
     m <- st_buffer(m, dist = 0) ## done by geometry
   }
 
