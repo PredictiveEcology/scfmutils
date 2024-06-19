@@ -14,17 +14,18 @@ checkForIssues(
 )
 }
 \arguments{
-\item{fireRegimePolys}{TODO}
+\item{fireRegimePolys}{\code{sf} polygon or multipolygon object defining the fire regime polygons}
 
-\item{studyArea}{TODO}
+\item{studyArea}{\code{sf} object corresponding to the study area of interest.}
 
-\item{rasterToMatch}{TODO}
+\item{rasterToMatch}{\code{SpatRaster} object covering the spatial extent of \code{studyArea},
+used as a template for raster layer creation.}
 
-\item{flammableMap}{TODO}
+\item{flammableMap}{\code{SpatRaster} with values \code{0} indicating non-flammable pixels, \code{1} flammable.}
 
-\item{sliverThresh}{TODO}
+\item{sliverThresh}{minimum sliver size}
 
-\item{cacheTag}{TODO}
+\item{cacheTag}{character specifying additional user tags for caching}
 }
 \value{
 a cleaned up \code{fireRegimePolys} object

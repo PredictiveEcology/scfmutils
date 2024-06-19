@@ -8,8 +8,11 @@ utils::globalVariables(c(
 #' Create `data.table` to compare scfm predictions with historical observations
 #'
 #' @param burnSummary `data.table`, produced by `scfmSpread` module
+#'
 #' @param fireRegimePoints `sf` object produced `scfmRegime` module
-#' @param fireRegimePolys `sf` object modified by `scfm` modules
+#'
+#' @template fireRegimePolys
+#'
 #' @param times list of simulation start and end times (i.e., output from `times(sim)`)
 #'
 #' @return `comparePredictions_summaryDT` returns a `data.table` object;

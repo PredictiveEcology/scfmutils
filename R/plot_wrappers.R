@@ -4,7 +4,7 @@ utils::globalVariables(c(
 
 #' Plot fire regime polygons
 #'
-#' @param fireRegimePolys `sf` polygon or multipolygon object defining the fire regime polygons
+#' @template fireRegimePolys
 #'
 #' @return a `ggplot` object
 #'

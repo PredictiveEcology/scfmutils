@@ -25,7 +25,8 @@ as well as national Fire Regime Types and Fire Regime Units from Erni et al. (20
 
 \item{studyArea}{\code{sf} object corresponding to the study area of interest.}
 
-\item{rasterToMatch}{TODO}
+\item{rasterToMatch}{\code{SpatRaster} object covering the spatial extent of \code{studyArea},
+used as a template for raster layer creation.}
 
 \item{type}{character. The polygon type to use:
 Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", "ECOZONE",

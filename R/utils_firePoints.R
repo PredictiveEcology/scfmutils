@@ -2,10 +2,15 @@
 #'
 #' @param url URL from which to download the fire points data. Default `NULL` fetches data from
 #'            <http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point.zip>.
-#' @param studyArea TODO
-#' @param rasterToMatch TODO
+#'
+#' @param studyArea `sf` object corresponding to the study area of interest.
+#'
+#' @param rasterToMatch `SpatRaster` object covering the spatial extent of `studyArea`,
+#'                      used as a template for raster layer creation.
+#'
 #' @param redownloadIn time in years that we tolerate the data to be "old", and require redownload.
 #'                     I.e. 0.5 would mean "redownload data older than 6 months". Default 2.
+#'
 #' @param NFDB_pointPath file path to save the download data. Must be provided.
 #'
 #' @export

@@ -16,9 +16,10 @@ getFirePoints_NFDB_scfm(
 \item{url}{URL from which to download the fire points data. Default \code{NULL} fetches data from
 \url{http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point.zip}.}
 
-\item{studyArea}{TODO}
+\item{studyArea}{\code{sf} object corresponding to the study area of interest.}
 
-\item{rasterToMatch}{TODO}
+\item{rasterToMatch}{\code{SpatRaster} object covering the spatial extent of \code{studyArea},
+used as a template for raster layer creation.}
 
 \item{redownloadIn}{time in years that we tolerate the data to be "old", and require redownload.
 I.e. 0.5 would mean "redownload data older than 6 months". Default 2.}

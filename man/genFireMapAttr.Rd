@@ -7,11 +7,11 @@
 genFireMapAttr(flammableMap, fireRegimePolys, neighbours)
 }
 \arguments{
-\item{flammableMap}{\code{SpatRaster}. TODO.}
+\item{flammableMap}{\code{SpatRaster} with values \code{0} indicating non-flammable pixels, \code{1} flammable.}
 
-\item{fireRegimePolys}{TODO}
+\item{fireRegimePolys}{\code{sf} polygon or multipolygon object defining the fire regime polygons}
 
-\item{neighbours}{TODO}
+\item{neighbours}{integer of value \code{4} or \code{8} specifying the number of neighbouring pixels}
 }
 \value{
 TODO

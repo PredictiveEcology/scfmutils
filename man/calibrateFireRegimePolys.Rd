@@ -23,7 +23,7 @@ calibrateFireRegimePolys(
 
 \item{targetN}{the number of fires to simulate during calibration}
 
-\item{fireRegimePolys}{fire regime polygons}
+\item{fireRegimePolys}{\code{sf} polygon or multipolygon object defining the fire regime polygons}
 
 \item{buffDist}{buffer distance for cells available to be burned outside of each regime polygon}
 
@@ -33,7 +33,8 @@ calibrateFireRegimePolys(
 
 \item{pMax}{numeric. maximum allowable spread probability}
 
-\item{flammableMap}{a packed \code{SpatRaster} (see \code{\link[terra:wrap]{terra::wrap()}})}
+\item{flammableMap}{a packed \code{SpatRaster} (see \code{\link[terra:wrap]{terra::wrap()}}) with values \code{0} indicating
+non-flammable pixels, \code{1} flammable.}
 
 \item{plotPath}{character. file name specifying an output directory to use for producing plots
 of the scam fit for each polygon.}
@@ -43,7 +44,7 @@ of the scam fit for each polygon.}
 \item{optimizer}{character. the numerical optimization method to use with scam fitting; see \code{?scam}.}
 }
 \value{
-TODO
+\code{data.table} with columns \code{PolyID}, \code{pSpread}, \code{p0}, \code{naiveP0}, \code{pIgnition}, \code{maxBurnCells}.
 }
 \description{
 Calibrate fire regime polygons ... (TODO)

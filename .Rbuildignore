@@ -1,7 +1,9 @@
-^scfmutils\.Rproj$
+^\.github$
+^\.httr-oauth$
+^\.lintr$
+^.*\.Rproj$
 ^\.Rproj\.user$
-^LICENSE\.md$
 ^_pkgdown\.yml$
 ^docs$
-^pkgdown$
-^\.github$
+^LICENSE\.md$
+^man-roxygen$

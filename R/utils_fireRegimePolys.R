@@ -22,7 +22,8 @@ fireRegimePolyTypes <- function() {
 #'
 #' @param studyArea `sf` object corresponding to the study area of interest.
 #'
-#' @param rasterToMatch TODO
+#' @param rasterToMatch `SpatRaster` object covering the spatial extent of `studyArea`,
+#'                      used as a template for raster layer creation.
 #'
 #' @param type character. The polygon type to use:
 #'             Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", "ECOZONE",
@@ -170,12 +171,17 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
 #' Check for various issues with `fireRegimePolys`
 #'
-#' @param fireRegimePolys TODO
-#' @param studyArea TODO
-#' @param rasterToMatch TODO
-#' @param flammableMap TODO
-#' @param sliverThresh TODO
-#' @param cacheTag TODO
+#' @template fireRegimePolys
+#'
+#' @template studyArea
+#'
+#' @template rasterToMatch
+#'
+#' @template flammableMap
+#'
+#' @param sliverThresh minimum sliver size
+#'
+#' @param cacheTag character specifying additional user tags for caching
 #'
 #' @return a cleaned up `fireRegimePolys` object
 #'

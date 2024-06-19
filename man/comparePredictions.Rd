@@ -31,7 +31,7 @@ comparePredictions_fireDistribution(dt)
 
 \item{burnSummary}{\code{data.table}, produced by \code{scfmSpread} module}
 
-\item{fireRegimePolys}{\code{sf} object modified by \code{scfm} modules}
+\item{fireRegimePolys}{\code{sf} polygon or multipolygon object defining the fire regime polygons}
 
 \item{times}{list of simulation start and end times (i.e., output from \code{times(sim)})}
 

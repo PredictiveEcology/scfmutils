@@ -66,9 +66,11 @@ utils::globalVariables(c(
 
 #' `scfmLandCoverInit`: `genFireMapAttr`
 #'
-#' @param flammableMap `SpatRaster`. TODO.
-#' @param fireRegimePolys TODO
-#' @param neighbours TODO
+#' @template flammableMap
+#'
+#' @template fireRegimePolys
+#'
+#' @param neighbours integer of value `4` or `8` specifying the number of neighbouring pixels
 #'
 #' @return TODO
 #'

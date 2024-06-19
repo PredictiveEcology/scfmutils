@@ -7,8 +7,10 @@ utils::globalVariables(c(
 #' Buffers polygon, generates index raster
 #'
 #' @param coreLand TODO
+#'
 #' @param buffDist distance to buffer `coreLand`
-#' @param flammableMap `SpatRaster` with values 0 indicating non-flammable pixels, 1 flammable.
+#'
+#' @template flammableMap
 #'
 #' @return list containing `fireRegimePoly`, `landscapeIndex`, `flammableMap` objects.
 #'
@@ -227,19 +229,30 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' Calibrate fire regime polygons ... (TODO)
 #'
 #' @param polygonType the names of polygons, i.e. `PolyID`
+#'
 #' @param targetN the number of fires to simulate during calibration
-#' @param fireRegimePolys fire regime polygons
+#'
+#' @template fireRegimePolys
+#'
 #' @param buffDist buffer distance for cells available to be burned outside of each regime polygon
+#'
 #' @param pJmp numeric. default spread probability for degenerate polygons
+#'
 #' @param pMin numeric. minimum spread probability
+#'
 #' @param pMax numeric. maximum allowable spread probability
-#' @param flammableMap a packed `SpatRaster` (see [terra::wrap()])
+#'
+#' @param flammableMap a packed `SpatRaster` (see [terra::wrap()]) with values `0` indicating
+#'                     non-flammable pixels, `1` flammable.
+#'
 #' @param plotPath character. file name specifying an output directory to use for producing plots
 #'                  of the scam fit for each polygon.
+#'
 #' @param outputPath character. path to output directory.
+#'
 #' @param optimizer character. the numerical optimization method to use with scam fitting; see `?scam`.
 #'
-#' @return TODO
+#' @return `data.table` with columns `PolyID`, `pSpread`, `p0`, `naiveP0`, `pIgnition`, `maxBurnCells`.
 #'
 #' @export
 #' @importFrom data.table melt.data.table
@@ -252,7 +265,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
                                      buffDist, pJmp, pMin, pMax, flammableMap = NULL,
                                      plotPath = NULL, outputPath = NULL, optimizer = "bfgs") {
-  #must be a file path when run in parallel as SpatRaster can't be serialized
+  ## must be a packed SpatRaster when run in parallel as SpatRaster can't be serialized
   flammableMap <- terra::unwrap(flammableMap)
   fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == polygonType,]
 
