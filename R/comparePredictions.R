@@ -39,6 +39,7 @@ utils::globalVariables(c(
 #' @importFrom data.table rbindlist copy
 #' @importFrom SpaDES.core times
 #' @importFrom stats median
+#' @importFrom fpCompare %>>%
 #' @rdname comparePredictions
 comparePredictions_summaryDT <- function(fireRegimePoints = NULL,
                                          burnSummary = NULL,
@@ -89,7 +90,7 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL,
 
     ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
     burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]  # nolint
-    burnSum1 <- burnSum1[areaBurned > fireRegimePoly$cellSize, ]
+    burnSum1 <- burnSum1[areaBurned %>>% fireRegimePoly$cellSize, ]
     meanFireSize <- ifelse(nrow(burnSum1) == 0, 0, mean(burnSum1$areaBurned))
 
     ## Mean Annual Area Burned: total area of all burned pixels in SAR over n years of simulation

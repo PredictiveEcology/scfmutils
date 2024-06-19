@@ -28,6 +28,7 @@ Depends:
 Imports:
     data.table,
     dplyr,
+    fpCompare,
     ggplot2,
     graphics,
     grDevices,
