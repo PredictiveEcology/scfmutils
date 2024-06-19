@@ -1,0 +1,102 @@
+# scfmutils 2.0.0
+
+- fully implement use of `sf` polygons object instead of lists of polygon attributes;
+- bump minimum versions of `Require`, `reproducible`, `SpaDES.core`, `SpaDES.tools`;
+- new ggplot wrappers for plotting scfm rasters;
+- documentation improvements;
+
+
+# scfmutils v1.0.0
+
+**Transitional version: introduces several breaking changes**
+
+- transitioning to using `sf` polygons object instead of lists of polygon attributes;
+- remove arguments `cellSize` and `neighbours` from `calibrateFireRegimePolys()`;
+- `calcZonalRegimePars()` now returns a `data.table` instead of a list;
+- fix issue with `prepInputsFireRegimePolys()` when url supplied by user;
+- warn instead of error if scam plots can't be created;
+
+# scfmutils 0.0.13
+
+- drop support for R 4.1;
+- remove `LandR` dependency;
+- improved documentation;
+- improved messaging;
+
+# scfmutils 0.0.12
+
+- add package `bcdata` to Suggests to allow use of BEC zones etc. `prepInputsfireRegimePolys()`;
+
+# scfmutils 0.0.11
+
+- fix for 0 neighbour instance in `makeLandscapeAttr()`;
+
+# scfmutils 0.0.10
+
+- add package `googledrive` to Suggests;
+- increase the minimum `SpaDES.core` and `SpaDES.tools` versions following `terra` migration and other changes;
+- update `prepInputsFireRegimePolys()` example to use `terra`;
+- documentation improvements;
+
+# scfmutils 0.0.9
+- transition to using `terra` instead of `raster` package;
+- remove `fasterize` dependency;
+- use R native pipe instead of `magrittr`'s;
+- drop R 4.0 support (reproducible requires R >= 4.1)
+- add plotting functions for escapes and historical fire distributions;
+- improved diagnostic plot calculations using `studyAreaReporting`;
+- internal package restructuring;
+
+# scfmutils 0.0.8
+
+- use `%>%` for pipe (R < v4.2);
+- add Erni et al. (2020) FRTs + FRUs to `prepInputsFireRegimePolys()`;
+
+# scfmutils 0.0.7
+
+- corrections calculating stats for diagnostics;
+
+# scfmutils 0.0.6
+
+- `prepInputsFireRegimePolys()` from BEC NDTs: allow either col name;
+- ensure `plotPath` exists for scam plots;
+- fix bug in `comparePredictions_summaryDT()`;
+- fix bug in `deSliver()` and clarify documentation;
+- pass 'optimizer' argument to `scam()` in `calibrateFireRegimePolys()`;
+- additional messaging for driver calibration;
+- save scam plots per poly during driver calibration;
+
+# scfmutils 0.0.5
+
+- add `scfmRegime` functions;
+- add functions `checkForIssues()` and `deSliver()` for working with fire regime polygons;
+- add BECNDT to `prepInputsFireRegimePolys()`;
+
+# scfmutils 0.0.4
+
+- increase minimum `SpaDES.core` version requirement;
+- rename `PolyId` to `PolyID`;
+- fix bug in `executeDesign()`;
+- improved messaging;
+
+# scfmutils 0.0.3
+
+- use `theme_bw()` instead of `theme_minimal()` in diagnostic plots;
+
+# scfmutils 0.0.2
+
+- export `fireRegimePolyTypes()`;
+- export `comparePredictions_annualIgnitions()`;
+
+# scfmutils 0.0.1
+
+- requires R >= 4.0;
+- add `times` argument to `comparePredictions_fireReturnInterval()`;
+- pass only what's used from `simList` to `comparePredictions_summaryDT()`;
+- add note re: output crs using `prepInputsFireRegimePolys()`;
+- pass `startTime` to `.executeDesignInternal()`;
+- fix `.makeLandscapeAttr()`;
+- add functions from `scfmLandCoverInit`;
+- fix use of `inherits`;
+- add `prepInputsFireRegimePolys()`;
+- use `pkgdown` for website;
