@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  "iter"
+  "iter", "patterns"
 ))
 
 #' `scfmDriver`: `genSimLand`
