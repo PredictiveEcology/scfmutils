@@ -30,7 +30,7 @@ calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, m
   cellSize <- landAttr[["cellSize"]]
   nFires <- dim(polyPoints)[1]
   if (nFires == 0) {
-    return(firePoly) ## confirm whether NULL values must be added for rbind to work
+    return(data.table(PolyID = polygonID)) ## confirm whether NULL values must be added for rbind to work
   }
   ignitionRate <- nFires / (epochLength * landAttr$burnyArea) ## fires per ha per yr
   pEscape <- 0
