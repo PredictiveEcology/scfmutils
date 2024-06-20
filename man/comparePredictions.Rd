@@ -24,7 +24,11 @@ comparePredictions_annualIgnitions(dt)
 
 comparePredictions_annualEscapes(dt)
 
-comparePredictions_fireDistribution(dt)
+comparePredictions_fireDistribution(
+  fireRegimePoints = NULL,
+  burnSummary = NULL,
+  size
+)
 }
 \arguments{
 \item{fireRegimePoints}{\code{sf} object produced \code{scfmRegime} module}

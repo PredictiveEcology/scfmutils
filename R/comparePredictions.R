@@ -215,18 +215,24 @@ comparePredictions_annualEscapes <- function(dt) {
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_fireDistribution <- function(dt) {
-  if (any(is.null(dt))) {
-    stop("all arguments must be provided and cannot be NULL.")
-  }
+comparePredictions_fireDistribution <- function(fireRegimePoints = NULL,
+                                                burnSummary = NULL, size) {
 
-  ggplot(dt, aes(x = histMedianSize, y = histMeanSize)) +
-    geom_point() +
-    xlab("estimated median fire size (ha)") +
-    ylab("estimated mean fire size (ha)") +
+  histDistribution <- fireRegimePoints[fireRegimePoints$SIZE_HA %>>% size,]
+  histDistribution <- as.data.table(histDistribution)[, .(SIZE_HA, PolyID)]
+  histDistribution[, source := "historical"]
+  setnames(histDistribution, old = "SIZE_HA", new = "areaBurned")
+
+  simDistribution <- burnSummary[N > 1, .(areaBurned, PolyID)]
+  simDistribution[, source := "simulated"]
+
+  allFires <- rbind(simDistribution, histDistribution)
+  allFires[, PolyID := as.factor(PolyID)]
+  #
+
+  ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
+    geom_histogram() +
+    xlab("log of escaped fire size (ha)") +
     theme_bw() +
-    geom_abline(slope = 1) +
-    scale_y_continuous(limits = c(0, NA)) +
-    scale_x_continuous(limits = c(0, NA)) +
-    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+    facet_wrap(~source, scales = "free_y", nrow = 2)
 }
