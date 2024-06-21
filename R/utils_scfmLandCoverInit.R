@@ -19,8 +19,8 @@ utils::globalVariables(c(
   cellSize <- prod(res(flammableMap)) / 1e4 # in ha
   neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default fun is sum(..., na.rm)
 
-  # extract table for each polygon
-  valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE) ## TODO: use terra
+  # extract table for each polygon - terra extract numbers N polys from 1:N
+  valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE)
   valsByPoly <- as.data.table(valsByPoly)
   valsByPoly[, flam := values(flammableMap, mat = FALSE)[cell]]
   valsByPoly <- valsByPoly[flam == 1]
@@ -41,8 +41,10 @@ utils::globalVariables(c(
   nNbrs <- lapply(valsByZone, function(x) {
     nNbrs <- x[, .N, .(focal_sum, PolyID)] # depends on sfcmLandCoverInit
 
-    possibleNbrs <- data.table(nbr = 0:neighbours)
-    nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr")]
+    possibleNbrs <- data.table(nbr = 0:neighbours,
+                               PolyID = unique(x$PolyID))
+    nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr",
+                                        "PolyID" = "PolyID")]
     nNbrs[, focal_sum := paste0("nNbr_", focal_sum)]
     nNbrs[is.na(N), N := 0]
     nNbrs <- dcast(nNbrs, formula = PolyID ~ focal_sum, value.var = "N")
