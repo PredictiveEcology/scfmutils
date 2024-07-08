@@ -187,12 +187,13 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 #'
 #' @export
 #' @importFrom reproducible Cache
-#' @importFrom sf st_area st_crs st_is_longlat
+#' @importFrom sf st_area st_is_longlat
+#' @importFrom terra compareGeom same.crs
 checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableMap, sliverThresh,
                            cacheTag) {
   stopifnot(
-    st_crs(rasterToMatch) == st_crs(flammableMap), ## TODO: is there a better check?
-    st_crs(rasterToMatch) == st_crs(fireRegimePolys) ## TODO: is there a better check?
+    compareGeom(rasterToMatch, flammableMap),
+    same.crs(rasterToMatch, fireRegimePolys)
   )
 
   if (is.null(fireRegimePolys[["PolyID"]])) {
