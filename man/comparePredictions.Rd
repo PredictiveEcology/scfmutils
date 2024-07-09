@@ -40,6 +40,8 @@ comparePredictions_fireDistribution(
 \item{times}{list of simulation start and end times (i.e., output from \code{times(sim)})}
 
 \item{dt}{scfm summary \code{data.table} produced by \code{comparePredictions_summaryDT()}}
+
+\item{size}{minimum fire size (ha)}
 }
 \value{
 \code{comparePredictions_summaryDT} returns a \code{data.table} object;
@@ -61,7 +63,7 @@ gg_fri <- comparePredictions_fireReturnInterval(dt)
 gg_ign <- comparePredictions_annualIgnitions(dt)
 gg_frp <- plot_fireRegimePolys(mySimOut$fireRegimePolys)
 
-grid.extra::grid.arrange(fps,  gg_mfs,  gg_fri,  gg_ign, nrow = 2, ncol = 2)
+gridExtra::grid.arrange(fps,  gg_mfs,  gg_fri,  gg_ign, nrow = 2, ncol = 2)
 }
 
 }

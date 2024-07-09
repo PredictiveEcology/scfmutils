@@ -1,7 +1,7 @@
 utils::globalVariables(c(
   ".SD", "achievedEscapes", "achievedEscapes_Mha", "achievedFRI", "achievedIgnitions",
   "achievedIgnitions_Mha", "areaBurned", "burnableArea_ha", "pSpread", "burnyArea",
-  "grp", "histMeanSize", "histMedianSize", "modMeanSize", "N", "PolyID",
+  "grp", "histMeanSize", "histMedianSize", "modMeanSize", "N", "PolyID", "SIZE_HA",
   "targetEscapes", "targetEscapes_Mha", "targetFRI", "targetIgnitions", "targetIgnitions_Mha"
 ))
 
@@ -31,7 +31,7 @@ utils::globalVariables(c(
 #' gg_ign <- comparePredictions_annualIgnitions(dt)
 #' gg_frp <- plot_fireRegimePolys(mySimOut$fireRegimePolys)
 #'
-#' grid.extra::grid.arrange(fps,  gg_mfs,  gg_fri,  gg_ign, nrow = 2, ncol = 2)
+#' gridExtra::grid.arrange(fps,  gg_mfs,  gg_fri,  gg_ign, nrow = 2, ncol = 2)
 #' }
 #'
 #' @author Ian Eddy
@@ -41,11 +41,8 @@ utils::globalVariables(c(
 #' @importFrom stats median
 #' @importFrom fpCompare %>>%
 #' @rdname comparePredictions
-comparePredictions_summaryDT <- function(fireRegimePoints = NULL,
-                                         burnSummary = NULL,
-                                         fireRegimePolys = NULL,
-                                         times = NULL) {
-
+comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = NULL,
+                                         fireRegimePolys = NULL, times = NULL) {
   if (any(is.null(fireRegimePolys$pSpread), is.null(fireRegimePolys$xBar),
           is.null(fireRegimePolys$burnyArea), is.null(fireRegimePoints),
           is.null(burnSummary), is.null(times))) {
@@ -213,12 +210,15 @@ comparePredictions_annualEscapes <- function(dt) {
     geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
 }
 
+#' @param size minimum fire size (ha)
+#'
 #' @export
+#' @importFrom data.table as.data.table setnames
+#' @importFrom fpCompare %>>%
+#' @importFrom ggplot2 facet_wrap geom_histogram
 #' @rdname comparePredictions
-comparePredictions_fireDistribution <- function(fireRegimePoints = NULL,
-                                                burnSummary = NULL, size) {
-
-  histDistribution <- fireRegimePoints[fireRegimePoints$SIZE_HA %>>% size,]
+comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSummary = NULL, size) {
+  histDistribution <- fireRegimePoints[fireRegimePoints$SIZE_HA %>>% size, ]
   histDistribution <- as.data.table(histDistribution)[, .(SIZE_HA, PolyID)]
   histDistribution[, source := "historical"]
   setnames(histDistribution, old = "SIZE_HA", new = "areaBurned")
@@ -227,8 +227,7 @@ comparePredictions_fireDistribution <- function(fireRegimePoints = NULL,
   simDistribution[, source := "simulated"]
 
   allFires <- rbind(simDistribution, histDistribution)
-  allFires[, PolyID := as.factor(PolyID)]
-  #
+  allFires[ , PolyID := as.factor(PolyID)]
 
   ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
     geom_histogram() +
