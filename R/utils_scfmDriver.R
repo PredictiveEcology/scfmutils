@@ -36,8 +36,10 @@ genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {
   polyLandscape <- st_difference(polyLandscape)
   polyLandscape <- st_cast(polyLandscape, "MULTIPOLYGON")
 
-  flammableMap <- Cache(postProcess, flammableMap, studyArea = polyLandscape,
-                        useSAcrs = TRUE, filename2 = NULL)
+  #it should already be in the correct CRS
+  flammableMap <- Cache(postProcess, flammableMap,
+                        cropTo = polyLandscape,
+                        maskTo = polyLandscape)
 
   #Generate landscape Index raster
   landscapeIndex <- rasterize(polyLandscape, flammableMap, fun = "min", "fooField")
@@ -341,7 +343,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
     calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
   }
   if (inherits(calibModel, "try-error")) {
-    stop("could not calibrate fire model.")
+    warning("could not calibrate spread model for ", unique(fireRegimePoly$PolyID))
   } else {
     message("|_ success!")
     plotPath <- checkPath(plotPath, create = TRUE)
@@ -353,8 +355,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
     }, error = function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
   }
   xBar <- frp$xBar / frp$cellSize
-
-  if (xBar > 0) {
+  if (!inherits(calibModel, "try-error")) {
     ## now for the inverse step.
     Res <- try(stats::uniroot(unirootFunction,
                               calibModel, xBar, # "..."
