@@ -35,9 +35,9 @@ getFirePoints_NFDB_scfm <- function(url = NULL,
   whIsOK <- which(check$result[whRowIsShp] == "OK")
   needNewDownload <- TRUE
   if (any(whIsOK)) {
-    filesToCheck <- file_path_sans_ext(unlist(lapply(check[whRowIsShp[whIsOK],
-                                                           "expectedFile"],
-                                                     as.character)))
+    filesToCheck <- lapply(check[whRowIsShp[whIsOK], "expectedFile"], as.character) |>
+      unlist() |>
+      tools::file_path_sans_ext()
     dateOfFile <- substr(x = filesToCheck,
                          start = nchar(filesToCheck) - 8 + 1,
                          nchar(filesToCheck))

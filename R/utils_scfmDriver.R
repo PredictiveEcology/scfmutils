@@ -31,17 +31,17 @@ genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {
   }
 
   message("creating polyLandscape...")
-  #union doe not work, neither does default st_join
+  ## union does not work, neither does default st_join
   polyLandscape <- rbind(coreLand, bfireRegimePoly)
   polyLandscape <- st_difference(polyLandscape)
   polyLandscape <- st_cast(polyLandscape, "MULTIPOLYGON")
 
-  #it should already be in the correct CRS
+  ## it should already be in the correct CRS
   flammableMap <- Cache(postProcess, flammableMap,
                         cropTo = polyLandscape,
                         maskTo = polyLandscape)
 
-  #Generate landscape Index raster
+  ## generate landscape index raster
   landscapeIndex <- rasterize(polyLandscape, flammableMap, fun = "min", "fooField")
 
   calibrationLandscape <- list(polyLandscape, landscapeIndex, flammableMap)
