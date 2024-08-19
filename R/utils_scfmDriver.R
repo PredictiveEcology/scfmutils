@@ -346,13 +346,16 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
     warning("could not calibrate spread model for ", unique(fireRegimePoly$PolyID))
   } else {
     message("|_ success!")
-    plotPath <- checkPath(plotPath, create = TRUE)
-    tryCatch({
-      png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
-          height = 600, width = 800)
-      plot(calibModel, main = paste("polygon", polygonType))
-      dev.off()
-    }, error = function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
+
+    if (isTRUE(getOption("scfmutils.driver.plot.scam", TRUE))) {
+      plotPath <- checkPath(plotPath, create = TRUE)
+      tryCatch({
+        png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
+            height = 600, width = 800)
+        plot(calibModel, main = paste("polygon", polygonType))
+        dev.off()
+      }, error = function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
+    }
   }
   xBar <- frp$xBar / frp$cellSize
   if (!inherits(calibModel, "try-error")) {

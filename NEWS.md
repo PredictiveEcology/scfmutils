@@ -1,3 +1,7 @@
+# scfmutils 2.0.3
+
+- new option `scfmutils.driver.plot.scam` (default `TRUE`) to allow user to disable creation of scam plots in `calibrateFireRegimePolys()`;
+
 # scfmutils 2.0.2
 
 - warn instead of error if spread model calibration fails in `calibrateFireRegimePolys()`;
