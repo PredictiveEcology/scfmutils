@@ -48,7 +48,7 @@ getFirePoints_NFDB_scfm <- function(url = NULL,
   if (needNewDownload) {
     print("downloading NFDB")
     firePoints <- Cache(prepInputs, url = url,
-                        studyArea = studyArea,
+                        to = studyArea,
                         fun = "sf::read_sf",
                         destination = NFDB_pointPath,
                         useCache = "overwrite",
@@ -62,9 +62,7 @@ getFirePoints_NFDB_scfm <- function(url = NULL,
 
     firePoints <- Cache(postProcess,
                         x = firePoints,
-                        studyArea = studyArea,
-                        filename2 = NULL,
-                        rasterToMatch = rasterToMatch,
+                        to = studyArea,
                         userTags = c("cacheTags", "NFDB"))
   }
 

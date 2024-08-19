@@ -112,8 +112,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
       tmp <- prepInputs(url = url,
                         destinationPath = destinationPath,
-                        studyArea = studyArea,
-                        rasterToMatch = rasterToMatch,
+                        to = studyArea,
                         fun = "sf::st_read",
                         overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
 
@@ -127,8 +126,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else {
     tmp <- prepInputs(url = url,
                       destinationPath = destinationPath,
-                      studyArea = studyArea,
-                      rasterToMatch = rasterToMatch,
+                      to = studyArea,
                       fun = "sf::st_read",
                       overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
 

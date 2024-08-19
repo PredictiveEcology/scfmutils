@@ -35,7 +35,7 @@ Imports:
     methods,
     purrr,
     raster,
-    reproducible (>= 2.0.9),
+    reproducible (>= 2.1.0),
     rlang,
     scam,
     sf,

@@ -1,5 +1,7 @@
 # scfmutils 2.0.3
 
+- require `reproducible >= 2.1.0`;
+- updates for recent changes to `reproducible`: pass `to` arguments to `reproducible::prepInputs()` and related functions, instead of passing `studyArea` or `rasterToMatch`;
 - new option `scfmutils.driver.plot.scam` (default `TRUE`) to allow user to disable creation of scam plots in `calibrateFireRegimePolys()`;
 
 # scfmutils 2.0.2
