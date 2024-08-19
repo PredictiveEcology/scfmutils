@@ -1,10 +1,23 @@
+# scfmutils 2.0.2
+
+- warn instead of error if spread model calibration fails in `calibrateFireRegimePolys()`;
+- improve documentation;
+
+# scfmutils 2.0.1
+
+- add `fpCompare` to Imports, for improved floating point number comparisons;
+- bump minimum versions requirements for dependency packages `SpaDES.core`, `SpaDES.tools`, and `reproducible`;
+- fix issue with per-polygon flammable cell calculations in  `.makeLandscapeAttr()` that was introduced by switching to `sf` for fire regime polygons;
+- modified `comparePredictions_fireDistribution()` to use arguments `fireRegimePoints`, `burnSummary`, and `size` instead of `dt`;
+- improve CRS checks in `checkForIssues()`;
+- documentation improvements;
+
 # scfmutils 2.0.0
 
 - fully implement use of `sf` polygons object instead of lists of polygon attributes;
 - bump minimum versions of `Require`, `reproducible`, `SpaDES.core`, `SpaDES.tools`;
 - new ggplot wrappers for plotting scfm rasters;
 - documentation improvements;
-
 
 # scfmutils v1.0.0
 

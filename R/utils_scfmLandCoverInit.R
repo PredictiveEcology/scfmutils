@@ -12,20 +12,20 @@ utils::globalVariables(c(
 #' @importFrom data.table := as.data.table data.table dcast
 #' @importFrom dplyr left_join
 #' @importFrom purrr transpose
-#' @importFrom terra extract focal values res
+#' @importFrom terra extract focal res values
 #' @importFrom stats na.omit
 .makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys, neighbours) {
 
   cellSize <- prod(res(flammableMap)) / 1e4 # in ha
   neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default fun is sum(..., na.rm)
 
-  # extract table for each polygon - terra extract numbers N polys from 1:N
+  ## extract table for each polygon - terra extract numbers N polys from 1:N
   valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE)
   valsByPoly <- as.data.table(valsByPoly)
   valsByPoly[, flam := values(flammableMap, mat = FALSE)[cell]]
   valsByPoly <- valsByPoly[flam == 1]
 
-  #get the FRP ID
+  ## get the FRP ID
   tempDT <- data.table(PolyID = fireRegimePolys$PolyID, ID = seq_len(nrow(fireRegimePolys)))
   valsByPoly <- valsByPoly[tempDT, on = c("ID")]
 
@@ -33,18 +33,16 @@ utils::globalVariables(c(
     df[PolyID == x]
   })
 
-  #there are occasional NAs - rasterize/extract differences?
+  ## there are occasional NAs - rasterize/extract differences?
   valsByZone <- lapply(valsByZone, na.omit)
   names(valsByZone) <- fireRegimePolys$PolyID
 
-  #Derive frequency tables of number of flammable cells, per polygon type, currently ECOREGION
+  ## derive frequency tables of number of flammable cells, per polygon type
   nNbrs <- lapply(valsByZone, function(x) {
-    nNbrs <- x[, .N, .(focal_sum, PolyID)] # depends on sfcmLandCoverInit
+    nNbrs <- x[, .N, .(focal_sum, PolyID)] ## depends on sfcmLandCoverInit
 
-    possibleNbrs <- data.table(nbr = 0:neighbours,
-                               PolyID = unique(x$PolyID))
-    nNbrs <- nNbrs[possibleNbrs, on = c("focal_sum" = "nbr",
-                                        "PolyID" = "PolyID")]
+    possibleNbrs <- data.table(nbr = 0:neighbours, PolyID = unique(x$PolyID))
+    nNbrs <- nNbrs[possibleNbrs, on = c(focal_sum = "nbr", PolyID = "PolyID")]
     nNbrs[, focal_sum := paste0("nNbr_", focal_sum)]
     nNbrs[is.na(N), N := 0]
     nNbrs <- dcast(nNbrs, formula = PolyID ~ focal_sum, value.var = "N")
@@ -53,10 +51,10 @@ utils::globalVariables(c(
   })
 
   nNbrs <- rbindlist(nNbrs)
-  #find total flammable pixels in cell
+  ## find total flammable pixels in cell
   flamByPoly <- valsByPoly[, .(flam = sum(flam, na.rm = TRUE)), PolyID]
 
-  #assign nFlammable, cellSize, burnyArea, and nBrs to fireRegimePolys
+  ## assign nFlammable, cellSize, burnyArea, and nBrs to fireRegimePolys
   fireRegimePolys$nFlammable <- flamByPoly$flam
   fireRegimePolys$cellSize <- cellSize
   fireRegimePolys$burnyArea <- cellSize * fireRegimePolys$nFlammable
