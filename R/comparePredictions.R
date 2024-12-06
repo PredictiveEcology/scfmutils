@@ -220,6 +220,7 @@ comparePredictions_annualEscapes <- function(dt) {
 comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSummary = NULL, size) {
   histDistribution <- fireRegimePoints[fireRegimePoints$SIZE_HA %>>% size, ]
   if (nrow(histDistribution) < 1){
+    warning("no historical fires > escape size - showing all fires instead")
     histDistribution <- fireRegimePoints
   }
   histDistribution <- as.data.table(histDistribution)[, .(SIZE_HA, PolyID)]
@@ -228,6 +229,7 @@ comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSum
 
   simDistribution <- burnSummary[N > 1, .(areaBurned, PolyID)]
   if (nrow(simDistribution) < 1) {
+    warning("no simulated fires > escape size - showing all fires instead")
     simDistribution <- burnSummary
   }
   simDistribution[, source := "simulated"]
