@@ -267,14 +267,14 @@ deSliver <- function(x, threshold) {
     } else {
       m <- rbind(mergeSlivers)
     }
-  } else { #lapply over length 1 is special
-    if (nrow(otherPolys) != 0) {
-      mergeSlivers <- mergeSlivers[[1]]
-      m <- rbind(mergeSlivers, otherPolys)
-    } else {
-      m <- mergeSlivers[[1]]
-    }
+  } else if (length(mergeSlivers) == 1) {
+    #lapply over length 1 is special
+    mergeSlivers <- mergeSlivers[[1]]
+    m <- rbind(mergeSlivers, otherPolys)
+  } else {
+    m <- otherPolys
   }
+
   ## the geometry will be sfc
   m <- st_cast(m, to = "MULTIPOLYGON")
   m$tempArea <- NULL ## remove the temporary column
