@@ -5,8 +5,14 @@ test_that("download of fireRegimePolys works", {
   mainDir <- tempdir()
   dPath <- file.path(mainDir, "inputs")
   set.seed(123)
-  SA <- LandR::randomStudyArea(size = 10000000)
-  RTM <- rast(SA, res = 250)
+  center <- terra::vect(cbind(-1349980, 6986895))
+  terra::crs(center) <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0",
+                       "+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
+  SA <- terra::buffer(center, 20000)
+  SA$studyArea <- "Fort McMurrayish"
+  RTM <- terra::rast(SA, res = 250)
+  RTM[] <- 1
+  RTM <- terra::mask(RTM, SA)
 
   frp1 <- prepInputsFireRegimePolys(destinationPath = dPath, studyArea = SA,
                                     rasterToMatch = RTM)
