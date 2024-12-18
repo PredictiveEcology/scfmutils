@@ -258,19 +258,16 @@ deSliver <- function(x, threshold) {
     }
   )
   otherPolys <- xNotSlivers[!(seq_len(nrow(xNotSlivers)) %in% nearestFeature), ]
-  if (length(mergeSlivers) > 1) {
+  #otherPolys will be zero if every polygon was either a sliver or nearest to a sliver
+
+  if (length(mergeSlivers) > 0) {
+    m <- do.call(rbind, mergeSlivers)
     ## these polygons must be tracked and merged.
     ## they may be nrow(0) if every feature was modified in some way
-    if (nrow(otherPolys) != 0) {
-      mergeSlivers <- do.call(rbind, mergeSlivers)
-      m <- rbind(otherPolys, mergeSlivers)
-    } else {
-      m <- rbind(mergeSlivers)
+    if (nrow(otherPolys) > 0) {
+      #merge polygons are merged
+      m <- rbind(otherPolys, m)
     }
-  } else if (length(mergeSlivers) == 1) {
-    #lapply over length 1 is special
-    mergeSlivers <- mergeSlivers[[1]]
-    m <- rbind(mergeSlivers, otherPolys)
   } else {
     m <- otherPolys
   }

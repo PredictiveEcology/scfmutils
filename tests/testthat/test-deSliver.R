@@ -32,5 +32,23 @@ test_that("deSliver works", {
   out <- scfmutils::deSliver(frp, threshold = polyAreas[3]-1)
   expect_true(nrow(out) == 3) #because we used the 3rd largest area
 
+  #an actual error
+
+  targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95 +x_0=0 +y_0=0",
+                     "+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
+  ecod <- prepInputs(url = "https://sis.agr.gc.ca/cansis/nsdb/ecostrat/district/ecodistrict_shp.zip",
+                     destinationPath = dPath)
+  ecod <- ecod[ecod$ECODISTRIC == "972",]
+  ecod <- sf::st_transform(ecod, targetCRS)
+  studyArea <- sf::st_make_valid(ecod)
+
+  studyAreaCalibration <- sf::st_buffer(studyArea, 6000)
+  #slivers created by intersection of ecod and ecor
+  frp <- prepInputsFireRegimePolys(studyArea = studyAreaCalibration,
+                                   destinationPath = dPath)
+  deSliver_frp <- deSliver(frp, threshold = 6.25e8)
+  expect_true(nrow(deSliver_frp)==2)
+  expect_true(all(deSliver_frp$PolyID %in% c(4, 5)))
+
   unlink(mainDir, recursive = TRUE)
 })
