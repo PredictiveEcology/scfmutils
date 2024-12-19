@@ -53,13 +53,17 @@ studyAreaBC <- vect(cbind(-122.14, 52.14), crs = "epsg:4326") |>
   randomStudyArea(seed = 60, size = 1e10)
 
 \donttest{
-frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "ECOREGION")
-plot(frpEcoregion)
+try({
+  frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "ECOREGION")
+  plot(frpEcoregion)
+})
 }
 
 \donttest{
-frpBECNDT <- prepInputsFireRegimePolys(studyArea = studyAreaBC, type = "BECNDT")
-plot(frpBECNDT)
+try({
+  frpBECNDT <- prepInputsFireRegimePolys(studyArea = studyAreaBC, type = "BECNDT")
+  plot(frpBECNDT)
+})
 }
 
 frpFRT <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRT")
