@@ -15,7 +15,7 @@ utils::globalVariables(c(
 #'
 #' @param times list of simulation start and end times (i.e., output from `times(sim)`)
 #'
-#' @return `comparePredictions_summaryDT` returns a `data.table` object;
+#' @returns `comparePredictions_summaryDT` returns a `data.table` object;
 #'         other functions return `ggplot` objects.
 #'
 #' @examples

@@ -6,7 +6,7 @@ utils::globalVariables(c(
 #'
 #' @template fireRegimePolys
 #'
-#' @return a `ggplot` object
+#' @returns a `ggplot` object
 #'
 #' @export
 #' @importFrom ggplot2 aes geom_sf ggplot scale_fill_discrete theme_minimal
@@ -27,7 +27,7 @@ plot_fireRegimePolys <- function(fireRegimePolys) {
 #'
 #' @param title character, the plot title
 #'
-#' @return `ggplot` object
+#' @returns `ggplot` object
 #'
 #' @export
 #' @importFrom ggplot2 ggplot ggtitle scale_fill_brewer theme_bw
@@ -48,7 +48,7 @@ plot_fireRegimeRas <- function(x, title) {
 #'
 #' @param maxAge the maximum age to plot
 #'
-#' @return `ggplot` object
+#' @returns `ggplot` object
 #'
 #' @export
 #' @importFrom ggplot2 ggplot ggtitle scale_fill_distiller theme_bw
@@ -69,7 +69,7 @@ plot_ageMap <- function(x, title, maxAge) {
 #'
 #' @param title character, the plot title
 #'
-#' @return `ggplot` object
+#' @returns `ggplot` object
 #'
 #' @export
 #' @importFrom ggplot2 ggplot ggtitle theme_bw
@@ -89,7 +89,7 @@ plot_burnMap <- function(x, title) {
 #'
 #' @param title character, the plot title
 #'
-#' @return `ggplot` object
+#' @returns `ggplot` object
 #'
 #' @export
 #' @importFrom ggplot2 ggplot ggtitle scale_fill_distiller theme_bw

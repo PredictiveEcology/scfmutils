@@ -72,7 +72,7 @@ utils::globalVariables(c(
 #'
 #' @param neighbours integer of value `4` or `8` specifying the number of neighbouring pixels
 #'
-#' @return TODO
+#' @returns TODO
 #'
 #' @export
 #' @importFrom terra res

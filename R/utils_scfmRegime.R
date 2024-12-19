@@ -9,7 +9,7 @@
 #' @param targetBurnRate TODO
 #' @param targetMaxFireSize TODO
 #'
-#' @return list containing the following elements and their values:
+#' @returns list containing the following elements and their values:
 #'  `ignitionRate` (ignition rate),
 #'  `pEscape` (escape probability),
 #'  `xBar` (mean fire size),

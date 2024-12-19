@@ -194,7 +194,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 #'
 #' @param cacheTag character specifying additional user tags for caching
 #'
-#' @return a cleaned up `fireRegimePolys` object
+#' @returns a cleaned up `fireRegimePolys` object
 #'
 #' @export
 #' @importFrom reproducible Cache
@@ -236,7 +236,7 @@ checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableM
 #'
 #' @param threshold the minimum area below which a polygon is considered a sliver
 #'
-#' @return an object of class `sf` with sliver polygons merged to their nearest valid neighbour.
+#' @returns an object of class `sf` with sliver polygons merged to their nearest valid neighbour.
 #'
 #' @export
 #' @importFrom sf st_area st_buffer st_cast st_is_valid st_nearest_feature st_union

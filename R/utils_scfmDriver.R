@@ -12,7 +12,7 @@ utils::globalVariables(c(
 #'
 #' @template flammableMap
 #'
-#' @return list containing `fireRegimePoly`, `landscapeIndex`, `flammableMap` objects.
+#' @returns list containing `fireRegimePoly`, `landscapeIndex`, `flammableMap` objects.
 #'
 #' @export
 #' @importFrom terra rasterize
@@ -61,7 +61,7 @@ genSimLand <- function(coreLand, buffDist, flammableMap = NULL) {
 #' @param pmax TODO
 #' @param q TODO
 #'
-#' @return `data.frame` with columns `igLoc`, `p0`, and `p`.
+#' @returns `data.frame` with columns `igLoc`, `p0`, and `p`.
 #'
 #' @export
 #' @importFrom stats runif
@@ -91,7 +91,7 @@ makeDesign <- function(indices, targetN, pEscape = 0.1, pmin, pmax, q = 1) {
 #' @param dT TODO
 #' @param maxCells TODO
 #'
-#' @return TODO
+#' @returns TODO
 #'
 #' @export
 #' @importFrom data.table getDTthreads setDTthreads
@@ -181,7 +181,7 @@ executeDesign <- function(L, dT, maxCells) {
 #'
 #' @param ... objects to pass through to `makeDesign` and `executeDesign`.
 #'
-#' @return output of `executeDesign` (TODO)
+#' @returns output of `executeDesign` (TODO)
 #'
 #' @export
 makeAndExecuteDesign <- function(...) {
@@ -209,7 +209,7 @@ makeAndExecuteDesign <- function(...) {
 #' @param pEscape TODO
 #' @param n TODO
 #'
-#' @return TODO
+#' @returns TODO
 #'
 #' @export
 #' @rdname pEscape
@@ -256,7 +256,7 @@ escapeProbDelta <- function(p0, w, hatPE) {
 #' @param optimizer character. the numerical optimization method to use with scam fitting;
 #'                  see `?scam`.
 #'
-#' @return `data.table` with columns:
+#' @returns `data.table` with columns:
 #' - `PolyID`: polygon ID;
 #' - `pSpread`: spread probability;
 #' - `p0`: TODO;
@@ -438,7 +438,7 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
 #' @param cM TODO
 #' @param xBar TODO
 #'
-#' @return TODO
+#' @returns TODO
 #'
 #' @export
 #' @importFrom stats predict

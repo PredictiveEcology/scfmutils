@@ -6,7 +6,7 @@
 #' @param xBar mean fire size
 #' @param rate ignition rate
 #'
-#' @return a list containing the following elements:
+#' @returns a list containing the following elements:
 #'         `rate` (ignition rate),
 #'         `pEscape` (escape probability),
 #'         `xBar` (mean fire size).
