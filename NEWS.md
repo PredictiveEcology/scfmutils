@@ -1,3 +1,9 @@
+# scfmutils 2.0.4
+
+- add `withr` to Suggests (used with testing);
+- fix plotting to handle cases with no escaped fires;
+- more robust deslivering;
+
 # scfmutils 2.0.3
 
 - require `reproducible >= 2.1.0`;
