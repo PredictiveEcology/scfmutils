@@ -1,3 +1,7 @@
+# scfmutils 2.0.5
+
+- add Erni et al. (2020) fire regime polygon attributes to FRT and FRU polygons;
+
 # scfmutils 2.0.4
 
 - add `withr` to Suggests (used with testing);

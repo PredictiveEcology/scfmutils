@@ -7,3 +7,4 @@
 ^docs$
 ^LICENSE\.md$
 ^man-roxygen$
+^data-raw$

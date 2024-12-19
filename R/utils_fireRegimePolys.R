@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  "geometry", "USETHIS"
+  ".data", "geometry", "USETHIS"
 ))
 
 #' @export
@@ -32,10 +32,11 @@ fireRegimePolyTypes <- function() {
 #'             "BECNDT", "BECSUBZONE", or "BECZONE".
 #'
 #' @export
-#' @importFrom dplyr group_by summarise ungroup
+#' @importFrom dplyr group_by mutate summarise ungroup
 #' @importFrom raster crs
 #' @importFrom reproducible Cache postProcessTo prepInputs
 #' @importFrom sf st_as_sf st_collection_extract st_union
+#' @importFrom utils data
 #'
 #' @examples
 #' library(terra)
@@ -161,6 +162,18 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
   tmp2 <- group_by(tmp, USETHIS) |> summarise(geometry = sf::st_union(geometry)) |> ungroup()
   polys <- sf::st_collection_extract(tmp2)
+
+  ## join FRT/FRU attributes tables to the geometries
+  if (type == "FRT") {
+    frp_attr <- get(utils::data("frt_attr", package = "scfmutils", envir = environment()))
+  } else if (type == "FRU") {
+    frp_attr <- get(utils::data("fru_attr", package = "scfmutils", envir = environment()))
+  }
+
+  attr_tbl <- frp_attr[frp_attr[[type]] %in% polys$USETHIS, ] |>
+    dplyr::mutate(USETHIS = .data[[type]], .before = !!type)
+
+  polys <- merge(polys, attr_tbl)
   polys[["PolyID"]] <- as.integer(seq_len(nrow(polys)))
   polys[["USETHIS"]] <- NULL
 
