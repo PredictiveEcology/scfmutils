@@ -19,6 +19,9 @@ utils::globalVariables(c(
   cellSize <- prod(res(flammableMap)) / 1e4 # in ha
   neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default fun is sum(..., na.rm)
 
+  #in the event that fireRegimePolys has retained sfc_GEOMETRY, change to polygon to prevent error
+  fireRegimePolys <- st_cast(fireRegimePolys, "POLYGON")
+  
   ## extract table for each polygon - terra extract numbers N polys from 1:N
   valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE)
   valsByPoly <- as.data.table(valsByPoly)
