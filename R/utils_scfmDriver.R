@@ -278,157 +278,169 @@ calibrateFireRegimePolys <- function(polygonType, targetN, fireRegimePolys,
   ## must be a packed SpatRaster when run in parallel as SpatRaster can't be serialized
   flammableMap <- terra::unwrap(flammableMap)
   fireRegimePoly <- fireRegimePolys[fireRegimePolys$PolyID == polygonType, ]
-
-  frp <- as.data.table(fireRegimePoly) ## drop geometry
-  frp <- unique(frp[, geometry := NULL])
-
-  maxBurnCells <- as.integer(round(frp$emfs_ha / frp$cellSize)) ## will return NA if emfs is NA
-  if (is.na(maxBurnCells)) {
-    warning("maxBurnCells cannot be NA... there is a problem with scfmRegime")
-    maxBurnCells <- 1
-  }
-
-  message("generating buffered landscapes...")
-  ## this function returns too much data to be worth caching (4 rasters per poly)
-  if (is(fireRegimePolys, "quosure")) {
-    fireRegimePolys <- eval_tidy(fireRegimePolys)
-  }
-
-  message("running genSimLand() ...")
-  calibLand <- genSimLand(fireRegimePoly,
-                          buffDist = buffDist, flammableMap = flammableMap)
-
-  ## Need a vector of igniteable cells
-  ## Item 1 = L, the flammable Map
-  ## Item 2 = B (aka the landscape Index) this denotes buffer
-  ## Item 3 = igLoc(index of igniteable cells) L[igloc] == 1 &&(B[igLoc]) == 1 (ie within core)
-  index <- 1:ncell(calibLand$flammableMap)
-  index[calibLand$flammableMap[] != 1 | is.na(calibLand$flammableMap[])] <- NA
-  index[calibLand$landscapeIndex[] != 1 | is.na(calibLand$landscapeIndex[])] <- NA
-  index <- index[!is.na(index)]
-
-  if (length(index) == 0) {
-    stop("polygon has no flammable cells!")
-  }
-
-  message(paste0("calibrating for polygon ", polygonType, " (Time: ", Sys.time(), ")"))
-
-  ## NOTE: these functions have been wrapped to allow for simpler caching
-  message("running makeAndExecuteDesign()...")
-  cD <- Cache(makeAndExecuteDesign,
-              indices = index,
-              targetN = targetN,
-              pmin = pMin, pmax = pMax,
-              ## TODO: change pEscape to use p0 which is calculated afterward (independently),
-              ## but naively inside makeDesign (it assumes 8 neighbours)
-              pEscape = ifelse(frp$pEscape == 0, 0.1, frp$pEscape),
-              L = calibLand$flammableMap,
-              maxCells = maxBurnCells,
-              userTags = c("scfmDriver", "executeDesign", polygonType),
-              omitArgs = c("indices"))
-
-  count <- 0
-  kcount <- 50
-  scamFormula <- "finalSize ~ s(p, bs = 'micx', k = kcount)"
-
-  message("fitting scam model...")
-  stopifnot(optimizer %in% c("bfgs", "efs", "nlm", "nlm.fd", "optim")) ## see ?scam
-  calibModel <- try({
-    scam::scam(as.formula(scamFormula), data = cD, optimizer = optimizer)
-  }, silent = TRUE)
-  while (count < 5 && inherits(calibModel, "try-error")) {
-    kcount <- kcount + 5
-    count <- count + 1
-    message("|_ failed! retrying scam fitting (attempt ", count, "/5) ...")
-    calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
-  }
-  if (inherits(calibModel, "try-error")) {
-    warning("could not calibrate spread model for ", unique(fireRegimePoly$PolyID))
+  if (is.na(fireRegimePoly$ignitionRate)) {
+    driverResult <- data.table(
+      PolyID = polygonType,
+      pSpread = 0,
+      p0 = 0,
+      naiveP0 = 0,
+      pIgnition = 0,
+      maxBurnCells = 0
+      # calibModel = calibModel,
+      # uniroot.Res = Res
+    )
   } else {
-    message("|_ success!")
-
-    if (isTRUE(getOption("scfmutils.driver.plot.scam", TRUE))) {
-      plotPath <- checkPath(plotPath, create = TRUE)
-      tryCatch({
-        png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
-            height = 600, width = 800)
-        plot(calibModel, main = paste("polygon", polygonType))
-        dev.off()
-      }, error = function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
+    frp <- as.data.table(fireRegimePoly) ## drop geometry
+    frp <- unique(frp[, geometry := NULL])
+    
+    maxBurnCells <- as.integer(round(frp$emfs_ha / frp$cellSize)) ## will return NA if emfs is NA
+    if (is.na(maxBurnCells)) {
+      warning("maxBurnCells cannot be NA... there is a problem with scfmRegime")
+      maxBurnCells <- 1
     }
-  }
-  xBar <- frp$xBar / frp$cellSize
-  if (!inherits(calibModel, "try-error")) {
-    ## now for the inverse step.
-    Res <- try(stats::uniroot(unirootFunction,
-                              calibModel, xBar, # "..."
-                              interval = c(min(cD$p), max(cD$p)),
-                              extendInt = "no",
-                              tol = 0.00001), silent = TRUE)
-    if (inherits(Res, "try-error")) {
-      ## TODO: should pick the closest value (of min and max) if error is value not of opposite sign
-      pJmp <- min(cD$p)
-      message("the loess model may underestimate the spread probability for polygon ", polygonType)
+    
+    message("generating buffered landscapes...")
+    ## this function returns too much data to be worth caching (4 rasters per poly)
+    if (is(fireRegimePolys, "quosure")) {
+      fireRegimePolys <- eval_tidy(fireRegimePolys)
+    }
+    
+    message("running genSimLand() ...")
+    calibLand <- genSimLand(fireRegimePoly,
+                            buffDist = buffDist, flammableMap = flammableMap)
+    
+    ## Need a vector of igniteable cells
+    ## Item 1 = L, the flammable Map
+    ## Item 2 = B (aka the landscape Index) this denotes buffer
+    ## Item 3 = igLoc(index of igniteable cells) L[igloc] == 1 &&(B[igLoc]) == 1 (ie within core)
+    index <- 1:ncell(calibLand$flammableMap)
+    index[calibLand$flammableMap[] != 1 | is.na(calibLand$flammableMap[])] <- NA
+    index[calibLand$landscapeIndex[] != 1 | is.na(calibLand$landscapeIndex[])] <- NA
+    index <- index[!is.na(index)]
+    
+    if (length(index) == 0) {
+      stop("polygon has no flammable cells!")
+    }
+    
+    message(paste0("calibrating for polygon ", polygonType, " (Time: ", Sys.time(), ")"))
+    
+    ## NOTE: these functions have been wrapped to allow for simpler caching
+    message("running makeAndExecuteDesign()...")
+    cD <- Cache(makeAndExecuteDesign,
+                indices = index,
+                targetN = targetN,
+                pmin = pMin, pmax = pMax,
+                ## TODO: change pEscape to use p0 which is calculated afterward (independently),
+                ## but naively inside makeDesign (it assumes 8 neighbours)
+                pEscape = ifelse(frp$pEscape == 0, 0.1, frp$pEscape),
+                L = calibLand$flammableMap,
+                maxCells = maxBurnCells,
+                userTags = c("scfmDriver", "executeDesign", polygonType),
+                omitArgs = c("indices"))
+    
+    count <- 0
+    kcount <- 50
+    scamFormula <- "finalSize ~ s(p, bs = 'micx', k = kcount)"
+    
+    message("fitting scam model...")
+    stopifnot(optimizer %in% c("bfgs", "efs", "nlm", "nlm.fd", "optim")) ## see ?scam
+    calibModel <- try({
+      scam::scam(as.formula(scamFormula), data = cD, optimizer = optimizer)
+    }, silent = TRUE)
+    while (count < 5 && inherits(calibModel, "try-error")) {
+      kcount <- kcount + 5
+      count <- count + 1
+      message("|_ failed! retrying scam fitting (attempt ", count, "/5) ...")
+      calibModel <- try(scam::scam(as.formula(scamFormula), data = cD), silent = TRUE)
+    }
+    if (inherits(calibModel, "try-error")) {
+      warning("could not calibrate spread model for ", unique(fireRegimePoly$PolyID))
     } else {
-      pJmp <- Res$root
+      message("|_ success!")
+      
+      if (isTRUE(getOption("scfmutils.driver.plot.scam", TRUE))) {
+        plotPath <- checkPath(plotPath, create = TRUE)
+        tryCatch({
+          png(file.path(plotPath, sprintf("scfmDriver_scam_plot_Poly%s.png", polygonType)),
+              height = 600, width = 800)
+          plot(calibModel, main = paste("polygon", polygonType))
+          dev.off()
+        }, error = function(e) warning("Error creating scam plots in scfmDriver:\n\n", e))
+      }
     }
-  } else {
-    calibModel <- "No Model"
-    Res <- "No Uniroot result"
+    xBar <- frp$xBar / frp$cellSize
+    if (!inherits(calibModel, "try-error")) {
+      ## now for the inverse step.
+      Res <- try(stats::uniroot(unirootFunction,
+                                calibModel, xBar, # "..."
+                                interval = c(min(cD$p), max(cD$p)),
+                                extendInt = "no",
+                                tol = 0.00001), silent = TRUE)
+      if (inherits(Res, "try-error")) {
+        ## TODO: should pick the closest value (of min and max) if error is value not of opposite sign
+        pJmp <- min(cD$p)
+        message("the loess model may underestimate the spread probability for polygon ", polygonType)
+      } else {
+        pJmp <- Res$root
+      }
+    } else {
+      calibModel <- "No Model"
+      Res <- "No Uniroot result"
+    }
+    ## check convergence, and out of bounds errors etc
+    
+    nNbrs <- melt.data.table(frp, id.vars = "PolyID", measure.vars = patterns("nNbr"),
+                             variable.name = "nNbr", value.name = "count")
+    nNbrs <- nNbrs$count
+    w <- nNbrs / sum(nNbrs)
+    neighbours <- length(nNbrs) - 1 #because 0 is counted
+    
+    hatPE <- frp$pEscape
+    
+    if (hatPE == 0) {
+      # no fires in polygon zone escaped
+      p0 <- 0
+    } else if (hatPE == 1) {
+      # all fires in polygon zone escaped
+      p0 <- 1
+    } else {
+      message("running optimise() to determine p0...")
+      res <- optimise(escapeProbDelta,
+                      interval = c(hatP0(hatPE, neighbours),
+                                   hatP0(hatPE, floor(sum(w * 0:neighbours)))),
+                      tol = 1e-4,
+                      w = w,
+                      hatPE = hatPE)
+      p0 <- res[["minimum"]]
+      ## It is almost obvious that the true minimum must occur within the interval specified in the
+      ## call to optimise, but I have not proved it, nor am I certain that the function being
+      ## minimised is monotone.
+    }
+    ## don't forget to scale by number of years, as well, if your timestep is ever != 1yr
+    rate <- fireRegimePoly$ignitionRate * frp$cellSize
+    ## fireRegimeModel and this module must agree on an annual time step. How to test / enforce?
+    pIgnition <- rate
+    ## approximate Poisson arrivals as a Bernoulli process at cell level.
+    ## for Poisson rate << 1, the expected values are the same, partially accounting
+    ## for multiple arrivals within years. Formerly, I used a poorer approximation
+    ## where 1-p = P[x==0 | lambda=rate] (Armstrong and Cumming 2003).
+    
+    outputPath <- checkPath(outputPath, create = TRUE)
+    calibResults <- list(model = calibModel, Res = Res)
+    calibFile <- file.path(outputPath, paste0("Poly", polygonType, "_calibResults.rds"))
+    saveRDS(calibResults, file = calibFile)
+    
+    driverResult <- data.table(
+      PolyID = polygonType,
+      pSpread = pJmp,
+      p0 = p0,
+      naiveP0 = hatP0(frp$pEscape, 8),
+      pIgnition = pIgnition,
+      maxBurnCells = maxBurnCells
+      # calibModel = calibModel,
+      # uniroot.Res = Res
+    )
   }
-  ## check convergence, and out of bounds errors etc
-
-  nNbrs <- melt.data.table(frp, id.vars = "PolyID", measure.vars = patterns("nNbr"),
-                           variable.name = "nNbr", value.name = "count")
-  nNbrs <- nNbrs$count
-  w <- nNbrs / sum(nNbrs)
-  neighbours <- length(nNbrs) - 1 #because 0 is counted
-
-  hatPE <- frp$pEscape
-
-  if (hatPE == 0) {
-    # no fires in polygon zone escaped
-    p0 <- 0
-  } else if (hatPE == 1) {
-    # all fires in polygon zone escaped
-    p0 <- 1
-  } else {
-    message("running optimise() to determine p0...")
-    res <- optimise(escapeProbDelta,
-                    interval = c(hatP0(hatPE, neighbours),
-                                 hatP0(hatPE, floor(sum(w * 0:neighbours)))),
-                    tol = 1e-4,
-                    w = w,
-                    hatPE = hatPE)
-    p0 <- res[["minimum"]]
-    ## It is almost obvious that the true minimum must occur within the interval specified in the
-    ## call to optimise, but I have not proved it, nor am I certain that the function being
-    ## minimised is monotone.
-  }
-  ## don't forget to scale by number of years, as well, if your timestep is ever != 1yr
-  rate <- fireRegimePoly$ignitionRate * frp$cellSize
-  ## fireRegimeModel and this module must agree on an annual time step. How to test / enforce?
-  pIgnition <- rate
-  ## approximate Poisson arrivals as a Bernoulli process at cell level.
-  ## for Poisson rate << 1, the expected values are the same, partially accounting
-  ## for multiple arrivals within years. Formerly, I used a poorer approximation
-  ## where 1-p = P[x==0 | lambda=rate] (Armstrong and Cumming 2003).
-
-  outputPath <- checkPath(outputPath, create = TRUE)
-  calibResults <- list(model = calibModel, Res = Res)
-  calibFile <- file.path(outputPath, paste0("Poly", polygonType, "_calibResults.rds"))
-  saveRDS(calibResults, file = calibFile)
-
-  driverResult <- data.table(
-    PolyID = polygonType,
-    pSpread = pJmp,
-    p0 = p0,
-    naiveP0 = hatP0(frp$pEscape, 8),
-    pIgnition = pIgnition,
-    maxBurnCells = maxBurnCells
-    # calibModel = calibModel,
-    # uniroot.Res = Res
-  )
   return(driverResult)
 }
 
