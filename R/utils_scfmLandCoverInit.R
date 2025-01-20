@@ -15,12 +15,12 @@ utils::globalVariables(c(
 #' @importFrom terra extract focal res values
 #' @importFrom stats na.omit
 .makeLandscapeAttr <- function(flammableMap, weight, fireRegimePolys, neighbours) {
-
+  
   cellSize <- prod(res(flammableMap)) / 1e4 # in ha
-  neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default fun is sum(..., na.rm)
-
-  ## extract table for each polygon - terra extract numbers N polys from 1:N
-  valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE)
+  neighMap <- focal(x = flammableMap, w = weight, na.rm = TRUE) # default function is sum(..., na.rm)
+  
+  # extract table for each polygon
+  valsByPoly <- extract(neighMap, fireRegimePolys, cells = TRUE, ID = TRUE) ## TODO: use terra
   valsByPoly <- as.data.table(valsByPoly)
   valsByPoly[, flam := values(flammableMap, mat = FALSE)[cell]]
   valsByPoly <- valsByPoly[flam == 1]
