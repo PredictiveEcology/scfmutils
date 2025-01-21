@@ -1,6 +1,6 @@
 # scfmutils 2.0.7
 
-- scfmDriver `calibrateFireRegimePolys()` gracefully exits if polygons have no fires;
+- `calibrateFireRegimePolys()` gracefully exits if polygons have no fires;
 
 # scfmutils 2.0.6
 
