@@ -16,7 +16,7 @@
 #'  `lxBar` (mean log-fire-size),
 #'  `xMax` (maximum observed fire size),
 #'  `emfs_ha` (estimated maximum fire size in ha),
-#'  `empiricalBurnRate` (empircal burn rate)
+#'  `empiricalBurnRate` (empirical burn rate)
 #'
 #' @export
 calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, maxSizeFactor,

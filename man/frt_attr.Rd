@@ -3,7 +3,7 @@
 \docType{data}
 \name{frt_attr}
 \alias{frt_attr}
-\title{Attributes and ﬁre metrics of the 15 Fire Regime Units (FRTs)}
+\title{Attributes and fire metrics of the 15 Fire Regime Units (FRTs)}
 \format{
 A data frame with 15 rows and 10 columns:
 \describe{
@@ -32,10 +32,10 @@ Table A2 from Erni et al. (2020).
 }
 \note{
 Spring and summer columns provide the distribution, in percent, of area burned during
-the ﬁre season, i.e. during spring (1 April to 21 June) and summer (22 June to 30 September).
-Lightning and human columns provide the distribution, in percent, of the number of ﬁres
+the fire season, i.e. during spring (1 April to 21 June) and summer (22 June to 30 September).
+Lightning and human columns provide the distribution, in percent, of the number of fires
 depending on the cause.
-The median of each ﬁre metric was calculated by year, using ﬁre data ≥ 50 ha for 1970–2016,
+The median of each fire metric was calculated by year, using fire data ≥ 50 ha for 1970–2016,
 and these then averaged to obtain one value per FRT.
 Bold values indicate the three highest items for each category.
 }

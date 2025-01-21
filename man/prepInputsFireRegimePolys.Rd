@@ -31,7 +31,7 @@ used as a template for raster layer creation.}
 \item{type}{character. The polygon type to use:
 Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", "ECOZONE",
 "FRT", or "FRU".
-If \code{url} to BEC shapefile is provided, can also be one of:
+If suggested package \code{bcdata} is installed, can also be one of:
 "BECNDT", "BECSUBZONE", or "BECZONE".}
 }
 \description{
