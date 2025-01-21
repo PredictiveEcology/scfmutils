@@ -1,3 +1,7 @@
+# scfmutils 2.0.7
+
+- scfmDriver `calibrateFireRegimePolys()` gracefully exits if polygons have no fires;
+
 # scfmutils 2.0.6
 
 - fix attempt to use fire regime attributes when not using FRT/FRU polygons;
