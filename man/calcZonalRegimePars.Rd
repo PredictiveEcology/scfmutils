@@ -40,7 +40,7 @@ list containing the following elements and their values:
 \code{lxBar} (mean log-fire-size),
 \code{xMax} (maximum observed fire size),
 \code{emfs_ha} (estimated maximum fire size in ha),
-\code{empiricalBurnRate} (empircal burn rate)
+\code{empiricalBurnRate} (empirical burn rate)
 }
 \description{
 \code{scfmRegime}: \code{calcZonalRegimePars}

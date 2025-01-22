@@ -5,7 +5,8 @@ utils::globalVariables(c(
 #' @export
 #' @rdname prepInputsFireRegimePolys
 fireRegimePolyTypes <- function() {
-  c("BECNDT", "BECSUBZONE", "BECZONE", "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE",
+  c("BECNDT", "BECSUBZONE", "BECZONE",
+    "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE",
     "FRT", "FRU")
 }
 
@@ -28,7 +29,7 @@ fireRegimePolyTypes <- function() {
 #' @param type character. The polygon type to use:
 #'             Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", "ECOZONE",
 #'             "FRT", or "FRU".
-#'             If `url` to BEC shapefile is provided, can also be one of:
+#'             If suggested package `bcdata` is installed, can also be one of:
 #'             "BECNDT", "BECSUBZONE", or "BECZONE".
 #'
 #' @export

@@ -1,3 +1,7 @@
+# scfmutils 2.0.7
+
+- `calibrateFireRegimePolys()` gracefully exits if polygons have no fires;
+
 # scfmutils 2.0.6
 
 - fix attempt to use fire regime attributes when not using FRT/FRU polygons;
@@ -10,7 +14,7 @@
 
 - add `withr` to Suggests (used with testing);
 - fix plotting to handle cases with no escaped fires;
-- more robust deslivering;
+- more robust de-slivering;
 
 # scfmutils 2.0.3
 
@@ -36,7 +40,7 @@
 
 - fully implement use of `sf` polygons object instead of lists of polygon attributes;
 - bump minimum versions of `Require`, `reproducible`, `SpaDES.core`, `SpaDES.tools`;
-- new ggplot wrappers for plotting scfm rasters;
+- new `ggplot` wrappers for plotting scfm rasters;
 - documentation improvements;
 
 # scfmutils v1.0.0
@@ -126,7 +130,7 @@
 - requires R >= 4.0;
 - add `times` argument to `comparePredictions_fireReturnInterval()`;
 - pass only what's used from `simList` to `comparePredictions_summaryDT()`;
-- add note re: output crs using `prepInputsFireRegimePolys()`;
+- add note re: output CRS using `prepInputsFireRegimePolys()`;
 - pass `startTime` to `.executeDesignInternal()`;
 - fix `.makeLandscapeAttr()`;
 - add functions from `scfmLandCoverInit`;
