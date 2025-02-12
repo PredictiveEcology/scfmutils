@@ -50,7 +50,7 @@ utils::globalVariables(c(
     return(nNbrs)
   })
 
-  nNbrs <- rbindlist(nNbrs)
+  nNbrs <- rbindlist(nNbrs, fill = TRUE)
   ## find total flammable pixels in cell
   flamByPoly <- valsByPoly[, .(flam = sum(flam, na.rm = TRUE)), PolyID]
 
