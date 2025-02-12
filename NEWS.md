@@ -1,3 +1,7 @@
+# scfmutils 2.0.8
+
+- `.makeLandscapeAttr()` properly handles cases with missing neighbours;
+
 # scfmutils 2.0.7
 
 - `calibrateFireRegimePolys()` gracefully exits if polygons have no fires;
