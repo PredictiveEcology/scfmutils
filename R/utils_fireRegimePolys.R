@@ -38,10 +38,11 @@ fireRegimePolyTypes <- function() {
 #' @importFrom reproducible Cache postProcessTo prepInputs
 #' @importFrom sf st_as_sf st_collection_extract st_union
 #' @importFrom utils data
+#' @importFrom withr local_package
 #'
 #' @examples
-#' library(terra)
-#' library(SpaDES.tools)
+#' withr::local_package("terra")
+#' withr::local_package("SpaDES.tools")
 #'
 #' ## random study area in central Alberta
 #' studyAreaAB <- vect(cbind(-115, 55), crs = "epsg:4326") |>
@@ -54,25 +55,26 @@ fireRegimePolyTypes <- function() {
 #'                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
 #'   randomStudyArea(seed = 60, size = 1e10)
 #'
-#' \donttest{
+#' ## may error due to issues with the server hosting the data
 #' try({
 #'   frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "ECOREGION")
 #'   plot(frpEcoregion)
 #' })
-#' }
 #'
-#' \donttest{
+#' ## will error if suggested package 'bcdata' not installed
 #' try({
 #'   frpBECNDT <- prepInputsFireRegimePolys(studyArea = studyAreaBC, type = "BECNDT")
 #'   plot(frpBECNDT)
 #' })
-#' }
 #'
 #' frpFRT <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRT")
 #' plot(frpFRT)
 #'
 #' frpFRU <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRU")
 #' plot(frpFRU)
+#'
+#' ## cleanup
+#' withr::deferred_run()
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                                       studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION") {
   type <- toupper(type)
@@ -85,7 +87,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
   if (is.null(url)) {
     if (grepl("BEC", type)) {
-      if (requireNamespace("bcdata", quietly = TRUE)) {
+      if (requireNamespace("bcdata", quietly = FALSE)) {
         bcidList <- list(
           becndt = "61044e1a-cd80-4ed6-9f95-907262b9910f",
           becsubzone = "f358a53b-ffde-4830-a325-a5a03ff672c3",

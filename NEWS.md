@@ -1,3 +1,7 @@
+# scfmutils (development version)
+
+- add `withr` to Imports from Suggests, for use in examples;
+
 # scfmutils 2.0.8
 
 - `.makeLandscapeAttr()` properly handles cases with missing neighbours;
