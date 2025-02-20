@@ -160,8 +160,10 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                         tmp[[cols2keep[1]]])
   tmp$USETHIS <- as.factor(tmp$USETHIS)
 
-  tmp2 <- group_by(tmp, USETHIS) |> summarise(geometry = sf::st_union(geometry)) |> ungroup()
-  polys <- sf::st_collection_extract(tmp2)
+  polys <- dplyr::group_by(tmp, USETHIS) |>
+    dplyr::summarise(geometry = sf::st_union(geometry)) |>
+    dplyr::ungroup() |>
+    sf::st_collection_extract()
 
   if (type %in% c("FRT", "FRU")) {
     ## join FRT/FRU attributes tables to the geometries
@@ -272,14 +274,14 @@ deSliver <- function(x, threshold) {
     }
   )
   otherPolys <- xNotSlivers[!(seq_len(nrow(xNotSlivers)) %in% nearestFeature), ]
-  #otherPolys will be zero if every polygon was either a sliver or nearest to a sliver
+  ## otherPolys will be zero if every polygon was either a sliver or nearest to a sliver
 
   if (length(mergeSlivers) > 0) {
     m <- do.call(rbind, mergeSlivers)
     ## these polygons must be tracked and merged.
     ## they may be nrow(0) if every feature was modified in some way
     if (nrow(otherPolys) > 0) {
-      #merge polygons are merged
+      ## merge polygons are merged
       m <- rbind(otherPolys, m)
     }
   } else {
