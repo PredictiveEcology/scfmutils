@@ -88,15 +88,8 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   if (is.null(url)) {
     if (grepl("BEC", type)) {
       if (requireNamespace("bcdata", quietly = FALSE)) {
-        bcidList <- list(
-          becndt = "61044e1a-cd80-4ed6-9f95-907262b9910f",
-          becsubzone = "f358a53b-ffde-4830-a325-a5a03ff672c3",
-          beczone = "f358a53b-ffde-4830-a325-a5a03ff672c3"
-        )
-        bcid <- bcidList[[tolower(type)]]
-
         tmp <- Cache({
-          bcdata::bcdc_get_data(bcid) |>
+          bcdata::bcdc_get_data("f358a53b-ffde-4830-a325-a5a03ff672c3") |>
             sf::st_cast("MULTIPOLYGON")
         })
 
@@ -151,7 +144,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else if (grepl("^BEC.*ZONE", type)) {
     cols2keep <- c("ZONE", "SUBZONE")
   } else if (type == "BECNDT") {
-    cols2keep <- names(tmp)[names(tmp) %in% "NATURAL_DISTURBANCE_TYPE_CODE"]
+    cols2keep <- names(tmp)[names(tmp) %in% "NATURAL_DISTURBANCE"]
   } else if (type == "FRT") {
     cols2keep <- "Cluster"
   } else if (type == "FRU") {

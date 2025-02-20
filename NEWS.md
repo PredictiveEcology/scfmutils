@@ -1,6 +1,7 @@
 # scfmutils (development version)
 
 - add `withr` to Imports from Suggests, for use in examples;
+- streamline `prepInputsFireRegimePolys()` for BEC;
 
 # scfmutils 2.0.8
 
