@@ -38,10 +38,11 @@ fireRegimePolyTypes <- function() {
 #' @importFrom reproducible Cache postProcessTo prepInputs
 #' @importFrom sf st_as_sf st_collection_extract st_union
 #' @importFrom utils data
+#' @importFrom withr local_package
 #'
 #' @examples
-#' library(terra)
-#' library(SpaDES.tools)
+#' withr::local_package("terra")
+#' withr::local_package("SpaDES.tools")
 #'
 #' ## random study area in central Alberta
 #' studyAreaAB <- vect(cbind(-115, 55), crs = "epsg:4326") |>
@@ -54,25 +55,26 @@ fireRegimePolyTypes <- function() {
 #'                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
 #'   randomStudyArea(seed = 60, size = 1e10)
 #'
-#' \donttest{
+#' ## may error due to issues with the server hosting the data
 #' try({
 #'   frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "ECOREGION")
 #'   plot(frpEcoregion)
 #' })
-#' }
 #'
-#' \donttest{
+#' ## will error if suggested package 'bcdata' not installed
 #' try({
 #'   frpBECNDT <- prepInputsFireRegimePolys(studyArea = studyAreaBC, type = "BECNDT")
 #'   plot(frpBECNDT)
 #' })
-#' }
 #'
 #' frpFRT <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRT")
 #' plot(frpFRT)
 #'
 #' frpFRU <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRU")
 #' plot(frpFRU)
+#'
+#' ## cleanup
+#' withr::deferred_run()
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                                       studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION") {
   type <- toupper(type)
@@ -85,16 +87,9 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
   if (is.null(url)) {
     if (grepl("BEC", type)) {
-      if (requireNamespace("bcdata", quietly = TRUE)) {
-        bcidList <- list(
-          becndt = "61044e1a-cd80-4ed6-9f95-907262b9910f",
-          becsubzone = "f358a53b-ffde-4830-a325-a5a03ff672c3",
-          beczone = "f358a53b-ffde-4830-a325-a5a03ff672c3"
-        )
-        bcid <- bcidList[[tolower(type)]]
-
+      if (requireNamespace("bcdata", quietly = FALSE)) {
         tmp <- Cache({
-          bcdata::bcdc_get_data(bcid) |>
+          bcdata::bcdc_get_data("f358a53b-ffde-4830-a325-a5a03ff672c3") |>
             sf::st_cast("MULTIPOLYGON")
         })
 
@@ -149,7 +144,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else if (grepl("^BEC.*ZONE", type)) {
     cols2keep <- c("ZONE", "SUBZONE")
   } else if (type == "BECNDT") {
-    cols2keep <- names(tmp)[names(tmp) %in% "NATURAL_DISTURBANCE_TYPE_CODE"]
+    cols2keep <- names(tmp)[names(tmp) %in% "NATURAL_DISTURBANCE"]
   } else if (type == "FRT") {
     cols2keep <- "Cluster"
   } else if (type == "FRU") {
@@ -165,8 +160,10 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                         tmp[[cols2keep[1]]])
   tmp$USETHIS <- as.factor(tmp$USETHIS)
 
-  tmp2 <- group_by(tmp, USETHIS) |> summarise(geometry = sf::st_union(geometry)) |> ungroup()
-  polys <- sf::st_collection_extract(tmp2)
+  polys <- dplyr::group_by(tmp, USETHIS) |>
+    dplyr::summarise(geometry = sf::st_union(geometry)) |>
+    dplyr::ungroup() |>
+    sf::st_collection_extract()
 
   if (type %in% c("FRT", "FRU")) {
     ## join FRT/FRU attributes tables to the geometries
@@ -277,14 +274,14 @@ deSliver <- function(x, threshold) {
     }
   )
   otherPolys <- xNotSlivers[!(seq_len(nrow(xNotSlivers)) %in% nearestFeature), ]
-  #otherPolys will be zero if every polygon was either a sliver or nearest to a sliver
+  ## otherPolys will be zero if every polygon was either a sliver or nearest to a sliver
 
   if (length(mergeSlivers) > 0) {
     m <- do.call(rbind, mergeSlivers)
     ## these polygons must be tracked and merged.
     ## they may be nrow(0) if every feature was modified in some way
     if (nrow(otherPolys) > 0) {
-      #merge polygons are merged
+      ## merge polygons are merged
       m <- rbind(otherPolys, m)
     }
   } else {

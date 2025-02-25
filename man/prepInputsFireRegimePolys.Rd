@@ -38,8 +38,8 @@ If suggested package \code{bcdata} is installed, can also be one of:
 Create fire regime polygons for \code{scfmRegime}.
 }
 \examples{
-library(terra)
-library(SpaDES.tools)
+withr::local_package("terra")
+withr::local_package("SpaDES.tools")
 
 ## random study area in central Alberta
 studyAreaAB <- vect(cbind(-115, 55), crs = "epsg:4326") |>
@@ -52,23 +52,24 @@ studyAreaBC <- vect(cbind(-122.14, 52.14), crs = "epsg:4326") |>
                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
   randomStudyArea(seed = 60, size = 1e10)
 
-\donttest{
+## may error due to issues with the server hosting the data
 try({
   frpEcoregion <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "ECOREGION")
   plot(frpEcoregion)
 })
-}
 
-\donttest{
+## will error if suggested package 'bcdata' not installed
 try({
   frpBECNDT <- prepInputsFireRegimePolys(studyArea = studyAreaBC, type = "BECNDT")
   plot(frpBECNDT)
 })
-}
 
 frpFRT <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRT")
 plot(frpFRT)
 
 frpFRU <- prepInputsFireRegimePolys(studyArea = studyAreaAB, type = "FRU")
 plot(frpFRU)
+
+## cleanup
+withr::deferred_run()
 }
