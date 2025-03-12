@@ -234,7 +234,7 @@ comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSum
   }
   simDistribution[, source := "simulated"]
 
-  allFires <- rbind(simDistribution, histDistribution)
+  allFires <- rbind(simDistribution, histDistribution, fill = TRUE)
   allFires[ , PolyID := as.factor(PolyID)]
 
   ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
