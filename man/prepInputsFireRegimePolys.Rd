@@ -12,7 +12,8 @@ prepInputsFireRegimePolys(
   destinationPath = tempdir(),
   studyArea = NULL,
   rasterToMatch = NULL,
-  type = "ECOREGION"
+  type = "ECOREGION",
+  subsetType = "intersects"
 )
 }
 \arguments{
@@ -33,6 +34,11 @@ Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", "ECOZONE",
 "FRT", or "FRU".
 If suggested package \code{bcdata} is installed, can also be one of:
 "BECNDT", "BECSUBZONE", or "BECZONE".}
+
+\item{subsetType}{GIS operation to derive \code{fireRegimePolys} based on \code{studyArea}.
+One of 'intersects' or 'contains', where 'intersects' (default) is the spatial intersection of
+the fire regime zones and \code{studyArea}, and 'contains' includes all fire regime polygons contained
+within \code{studyArea} (i.e. crops it to \code{studyArea}).}
 }
 \description{
 Create fire regime polygons for \code{scfmRegime}.
@@ -48,7 +54,7 @@ studyAreaAB <- vect(cbind(-115, 55), crs = "epsg:4326") |>
   randomStudyArea(seed = 60, size = 1e10)
 
 studyAreaBC <- vect(cbind(-122.14, 52.14), crs = "epsg:4326") |>
-  project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
+ project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
   randomStudyArea(seed = 60, size = 1e10)
 

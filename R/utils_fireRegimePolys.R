@@ -31,6 +31,11 @@ fireRegimePolyTypes <- function() {
 #'             "FRT", or "FRU".
 #'             If suggested package `bcdata` is installed, can also be one of:
 #'             "BECNDT", "BECSUBZONE", or "BECZONE".
+#' @param subsetType GIS operation to derive `fireRegimePolys` based on `studyArea`.
+#' One of 'intersects' or 'contains', where 'intersects' (default) is the spatial intersection of
+#' the fire regime zones and `studyArea`, and 'contains' includes all fire regime polygons contained
+#' within `studyArea` (i.e. crops it to `studyArea`).
+#'
 #'
 #' @export
 #' @importFrom dplyr group_by mutate summarise ungroup
@@ -51,7 +56,7 @@ fireRegimePolyTypes <- function() {
 #'   randomStudyArea(seed = 60, size = 1e10)
 #'
 #' studyAreaBC <- vect(cbind(-122.14, 52.14), crs = "epsg:4326") |>
-#'   project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
+#'  project(paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
 #'                 "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")) |>
 #'   randomStudyArea(seed = 60, size = 1e10)
 #'
@@ -76,7 +81,9 @@ fireRegimePolyTypes <- function() {
 #' ## cleanup
 #' withr::deferred_run()
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
-                                      studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION") {
+                                      studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION",
+                                      subsetType = "intersects") {
+
   type <- toupper(type)
   allowedTypes <- fireRegimePolyTypes()
   stopifnot(type %in% allowedTypes)
@@ -95,9 +102,9 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
         ## workaround issues with postProcess() using studyArea / rasterToMatch:
         if (!is.null(rasterToMatch)) {
-          tmp <- postProcessTo(tmp, to = rasterToMatch)
+          tmp <- postProcessTo(tmp, projectTo = rasterToMatch)
         } else if (is.null(rasterToMatch) && !is.null(studyArea)) {
-          tmp <- postProcessTo(tmp, to = studyArea)
+          tmp <- postProcessTo(tmp, projectTo = studyArea)
         }
       }
     } else {
@@ -113,7 +120,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 
       tmp <- prepInputs(url = url,
                         destinationPath = destinationPath,
-                        to = studyArea,
+                        projectTo = studyArea,
                         fun = "sf::st_read",
                         overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
 
@@ -127,7 +134,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   } else {
     tmp <- prepInputs(url = url,
                       destinationPath = destinationPath,
-                      to = studyArea,
+                      projectTo = studyArea,
                       fun = "sf::st_read",
                       overwrite = TRUE) ## TODO: doesn't reproject -- fix upstream?
 
@@ -151,6 +158,21 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
     cols2keep <- "GRIDCODE"
   }
 
+  #intersect and optionally crop
+  if (subsetType == "contains") {
+    #possibly cast to Polygon first##
+    tmp <- sf::st_collection_extract(tmp, "POLYGON", warn = FALSE) |>
+      sf::st_cast(to = "POLYGON")
+
+    tmp <- tmp[which(sapply(st_intersects(tmp, studyArea), length) > 0), ]
+    tmp <- sf::st_cast(tmp, "MULTIPOLYGON", ids = cols2Keep)
+  } else if (subsetType == "intersects") {
+    #do the intersection
+    tmp <- postProcess(tmp, to = studyArea)
+  } else {
+    stop("subsetType must be one of 'contains' or 'intersects'")
+  }
+
   tmp <- tmp[, cols2keep]
 
   tmp$USETHIS <- switch(type,
@@ -163,7 +185,7 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
   polys <- dplyr::group_by(tmp, USETHIS) |>
     dplyr::summarise(geometry = sf::st_union(geometry)) |>
     dplyr::ungroup() |>
-    sf::st_collection_extract()
+    sf::st_collection_extract(warn = FALSE)
 
   if (type %in% c("FRT", "FRU")) {
     ## join FRT/FRU attributes tables to the geometries
