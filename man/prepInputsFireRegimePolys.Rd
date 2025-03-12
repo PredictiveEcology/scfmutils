@@ -35,10 +35,10 @@ Must be one of "ECODISTRICT", "ECOREGION" (default), "ECOPROVINCE", "ECOZONE",
 If suggested package \code{bcdata} is installed, can also be one of:
 "BECNDT", "BECSUBZONE", or "BECZONE".}
 
-\item{subsetType}{GIS operation to derive \code{fireRegimePolys} based on \code{studyArea}.
-One of 'intersects' or 'contains', where 'intersects' (default) is the spatial intersection of
-the fire regime zones and \code{studyArea}, and 'contains' includes all fire regime polygons contained
-within \code{studyArea} (i.e. crops it to \code{studyArea}).}
+\item{subsetType}{character. GIS operation to derive \code{fireRegimePolys} based on \code{studyArea}.
+One of 'intersects' (default) or 'contains', where 'intersects' is the
+spatial intersection of the fire regime zones and \code{studyArea},
+and 'contains' includes the full fire regime zones polygons in \code{studyArea}.}
 }
 \description{
 Create fire regime polygons for \code{scfmRegime}.

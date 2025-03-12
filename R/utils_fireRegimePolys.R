@@ -31,11 +31,11 @@ fireRegimePolyTypes <- function() {
 #'             "FRT", or "FRU".
 #'             If suggested package `bcdata` is installed, can also be one of:
 #'             "BECNDT", "BECSUBZONE", or "BECZONE".
-#' @param subsetType GIS operation to derive `fireRegimePolys` based on `studyArea`.
-#' One of 'intersects' or 'contains', where 'intersects' (default) is the spatial intersection of
-#' the fire regime zones and `studyArea`, and 'contains' includes all fire regime polygons contained
-#' within `studyArea` (i.e. crops it to `studyArea`).
 #'
+#' @param subsetType character. GIS operation to derive `fireRegimePolys` based on `studyArea`.
+#'                   One of 'intersects' (default) or 'contains', where 'intersects' is the
+#'                   spatial intersection of the fire regime zones and `studyArea`,
+#'                   and 'contains' includes the full fire regime zones polygons in `studyArea`.
 #'
 #' @export
 #' @importFrom dplyr group_by mutate summarise ungroup
