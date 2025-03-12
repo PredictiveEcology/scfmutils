@@ -1,3 +1,7 @@
+scfmutils 2.0.9 
+ - prepInputsFireRegimePolys has a new argument to retrieve entire polygons bordering studyArea
+ - The default argument retrieves the spatial intersection (preserving previous behavior) 
+
 # scfmutils (development version)
 
 - add `withr` to Imports from Suggests, for use in examples;
