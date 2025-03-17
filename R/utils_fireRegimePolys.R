@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  ".data", "geometry", "USETHIS", "cols2Keep"
+  ".data", "cols2Keep", "geometry", "USETHIS"
 ))
 
 #' @export
@@ -41,7 +41,7 @@ fireRegimePolyTypes <- function() {
 #' @importFrom dplyr group_by mutate summarise ungroup
 #' @importFrom raster crs
 #' @importFrom reproducible Cache postProcessTo prepInputs
-#' @importFrom sf st_as_sf st_collection_extract st_union st_intersects
+#' @importFrom sf st_as_sf st_collection_extract st_intersects st_union
 #' @importFrom utils data
 #' @importFrom withr local_package
 #'
