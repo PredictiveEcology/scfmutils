@@ -5,9 +5,11 @@ utils::globalVariables(c(
 #' @export
 #' @rdname prepInputsFireRegimePolys
 fireRegimePolyTypes <- function() {
-  c("BECNDT", "BECSUBZONE", "BECZONE",
-    "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE",
-    "FRT", "FRU")
+  c(
+    "BECNDT", "BECSUBZONE", "BECZONE",                    ## BC BEC
+    "ECODISTRICT", "ECOREGION", "ECOPROVINCE", "ECOZONE", ## national eco* boundaries
+    "FRT", "FRU"                                          ## Erni et al. 2020 fire regime polygons
+  )
 }
 
 #' `prepInputsFireRegimePolys`
@@ -83,7 +85,6 @@ fireRegimePolyTypes <- function() {
 prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
                                       studyArea = NULL, rasterToMatch = NULL, type = "ECOREGION",
                                       subsetType = "intersects") {
-
   type <- toupper(type)
   allowedTypes <- fireRegimePolyTypes()
   stopifnot(type %in% allowedTypes)
@@ -158,16 +159,15 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
     cols2keep <- "GRIDCODE"
   }
 
-  #intersect and optionally crop
+  ## intersect and optionally crop
   if (subsetType == "contains") {
-    #possibly cast to Polygon first##
     tmp <- sf::st_collection_extract(tmp, "POLYGON", warn = FALSE) |>
       sf::st_cast(to = "POLYGON")
 
-    tmp <- tmp[which(sapply(st_intersects(tmp, studyArea), length) > 0), ]
+    tmp <- tmp[which(sapply(sf::st_intersects(tmp, studyArea), length) > 0), ]
     tmp <- sf::st_cast(tmp, "MULTIPOLYGON", ids = cols2Keep)
   } else if (subsetType == "intersects") {
-    #do the intersection
+    ## do the intersection
     tmp <- postProcess(tmp, to = studyArea)
   } else {
     stop("subsetType must be one of 'contains' or 'intersects'")
@@ -228,18 +228,18 @@ prepInputsFireRegimePolys <- function(url = NULL, destinationPath = tempdir(),
 checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableMap, sliverThresh,
                            cacheTag) {
   stopifnot(
-    compareGeom(rasterToMatch, flammableMap),
-    same.crs(rasterToMatch, fireRegimePolys)
+    terra::compareGeom(rasterToMatch, flammableMap),
+    terra::same.crs(rasterToMatch, fireRegimePolys)
   )
 
   if (is.null(fireRegimePolys[["PolyID"]])) {
     stop("please supply fireRegimePolys with a PolyID")
   }
 
-  if (st_is_longlat(fireRegimePolys)) {
+  if (sf::st_is_longlat(fireRegimePolys)) {
     stop("scfm requires projected coordinate systems - lat/lon too prone to error.")
   }
-  fireRegimePolys$trueArea <- round(st_area(fireRegimePolys), digits = 0)
+  fireRegimePolys$trueArea <- round(sf::st_area(fireRegimePolys), digits = 0)
 
   if (any(as.numeric(fireRegimePolys$trueArea) < sliverThresh)) {
     message("sliver polygon(s) detected. Merging to their nearest valid neighbour.")
@@ -266,7 +266,7 @@ checkForIssues <- function(fireRegimePolys, studyArea, rasterToMatch, flammableM
 #' @export
 #' @importFrom sf st_area st_buffer st_cast st_is_valid st_nearest_feature st_union
 deSliver <- function(x, threshold) {
-  x$tempArea <- as.numeric(st_area(x))
+  x$tempArea <- as.numeric(sf::st_area(x))
   ## determine slivers by area
   xSlivers <- x[x$tempArea < threshold, ]
   xNotSlivers <- x[x$tempArea >= threshold, ]
@@ -275,10 +275,10 @@ deSliver <- function(x, threshold) {
   }
 
   ## split slivers from multipolygon, or nearest feature may be incorrect
-  xSlivers <- suppressWarnings(st_cast(xSlivers, "POLYGON"))
+  xSlivers <- suppressWarnings(sf::st_cast(xSlivers, "POLYGON"))
 
   ## find nearest non-sliver
-  nearestFeature <- st_nearest_feature(xSlivers, xNotSlivers)
+  nearestFeature <- sf::st_nearest_feature(xSlivers, xNotSlivers)
 
   ## merge each sliver polygon into nearest neighbour
   mergeSlivers <- lapply(
@@ -288,9 +288,9 @@ deSliver <- function(x, threshold) {
                    s = xSlivers,
                    nf = nearestFeature) {
       featurePolys <- nearestFeature == i
-      xMerge <- st_union(s[featurePolys, ])
+      xMerge <- sf::st_union(s[featurePolys, ])
       yMerge <- ns[i, ]
-      out <- st_union(x = xMerge, y = yMerge) ## convert slivers back to multipolygon
+      out <- sf::st_union(x = xMerge, y = yMerge) ## convert slivers back to multipolygon
       yMerge$geometry <- out ## update the geometry
       return(yMerge)
     }
@@ -311,12 +311,12 @@ deSliver <- function(x, threshold) {
   }
 
   ## the geometry will be sfc
-  m <- st_cast(m, to = "MULTIPOLYGON")
+  m <- sf::st_cast(m, to = "MULTIPOLYGON")
   m$tempArea <- NULL ## remove the temporary column
 
   ## remove self-intersecting geometries
-  if (any(!st_is_valid(m))) {
-    m <- st_buffer(m, dist = 0) ## done by geometry
+  if (any(!sf::st_is_valid(m))) {
+    m <- sf::st_buffer(m, dist = 0) ## done by geometry
   }
 
   return(m)
