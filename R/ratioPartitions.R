@@ -98,14 +98,23 @@ ratioPartition2 <- function(targetBurnRate, empiricalBurnRate, pEscape, xBar, ra
   #   xBar = xBar  #mean fire size
   # ))
   # }
+
   step <- min(remains, 2)
-  pEscape <- pEscape * step
-  remains <- remains / step
+  #peEscape can't exceed 1
+  newEscape <- pmin(pEscape * step, 1)
+  step <- pmin(step, newEscape/pEscape)
+  pEscape <- newEscape
+
+  remains <- remains/step
   step <- min(remains, 2)
   xBar <- xBar * step
   remains <- remains / step
   step <- min(remains, 2)
-  pEscape <- pEscape * step
+
+  newEscape <- pmin(pEscape * step, 1)
+  step <- pmin(step, newEscape/pEscape)
+  pEscape <- newEscape
+
   remains <- remains / step
   step <- min(remains, 2)
   xBar <- xBar * step
