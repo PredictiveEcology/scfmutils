@@ -4,13 +4,15 @@ utils::globalVariables(c(
 
 #' Plot fire regime polygons
 #'
-#' @template fireRegimePolys
+#' @template fireRegimePolys#'
+#'
+#' @param title character, the plot title
 #'
 #' @returns a `ggplot` object
 #'
 #' @export
 #' @importFrom ggplot2 aes geom_sf ggplot scale_fill_discrete theme_minimal
-plot_fireRegimePolys <- function(fireRegimePolys) {
+plot_fireRegimePolys <- function(fireRegimePolys, title) {
   if (!is.factor(fireRegimePolys$PolyID)) {
     fireRegimePolys$PolyID <- as.factor(fireRegimePolys$PolyID)
   }
@@ -18,6 +20,7 @@ plot_fireRegimePolys <- function(fireRegimePolys) {
   ggplot(fireRegimePolys) +
     geom_sf(aes(fill = PolyID)) +
     scale_fill_discrete() + ## TODO: use same palette as plot_fireRegimeRas ??
+    ggtitle(title) +
     theme_bw()
 }
 

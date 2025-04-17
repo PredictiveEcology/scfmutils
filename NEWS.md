@@ -4,6 +4,7 @@
 - streamline `prepInputsFireRegimePolys()` for BEC;
 - `prepInputsFireRegimePolys()` gets a new argument `subsetType` to retrieve entire polygons
   bordering `studyArea` or only the spatial intersection (default, preserving previous behaviour) 
+- add a title parameter for `scfmDiagnostics` plots 
 
 # scfmutils 2.0.8
 
