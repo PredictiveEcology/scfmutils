@@ -4,7 +4,7 @@ utils::globalVariables(c(
 
 #' Plot fire regime polygons
 #'
-#' @template fireRegimePolys#'
+#' @template fireRegimePolys
 #'
 #' @param title character, the plot title
 #'

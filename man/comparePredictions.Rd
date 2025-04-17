@@ -16,18 +16,19 @@ comparePredictions_summaryDT(
   times = NULL
 )
 
-comparePredictions_meanFireSize(dt)
+comparePredictions_meanFireSize(dt, title)
 
-comparePredictions_fireReturnInterval(dt, times)
+comparePredictions_fireReturnInterval(dt, times, title)
 
-comparePredictions_annualIgnitions(dt)
+comparePredictions_annualIgnitions(dt, title)
 
-comparePredictions_annualEscapes(dt)
+comparePredictions_annualEscapes(dt, title)
 
 comparePredictions_fireDistribution(
   fireRegimePoints = NULL,
   burnSummary = NULL,
-  size
+  size,
+  title
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ comparePredictions_fireDistribution(
 
 \item{dt}{scfm summary \code{data.table} produced by \code{comparePredictions_summaryDT()}}
 
+\item{title}{character, the plot title}
+
 \item{size}{minimum fire size (ha)}
 }
 \value{
@@ -53,17 +56,19 @@ Create \code{data.table} to compare scfm predictions with historical observation
 \examples{
 \dontrun{
 ## assumes user has run scfm to produce the simList `mySimOut`
-dt <- comparePredictions_summaryDT(fireRegimePoints = mySimOut$fireRegimePoints,
-                                   burnSummary = mySimOut$burnSummary,
-                                   fireRegimePolys = mySimOut$fireRegimePolys,
-                                   times = times(mySimOut))
+dt <- comparePredictions_summaryDT(
+  fireRegimePoints = mySimOut$fireRegimePoints,
+  burnSummary = mySimOut$burnSummary,
+  fireRegimePolys = mySimOut$fireRegimePolys,
+  times = times(mySimOut)
+)
 
 gg_mfs <- comparePredictions_meanFireSize(dt)
 gg_fri <- comparePredictions_fireReturnInterval(dt)
 gg_ign <- comparePredictions_annualIgnitions(dt)
 gg_frp <- plot_fireRegimePolys(mySimOut$fireRegimePolys)
 
-gridExtra::grid.arrange(fps,  gg_mfs,  gg_fri,  gg_ign, nrow = 2, ncol = 2)
+gridExtra::grid.arrange(fps, gg_mfs, gg_fri, gg_ign, nrow = 2, ncol = 2)
 }
 
 }
