@@ -12,7 +12,7 @@ utils::globalVariables(c(
 #'
 #' @export
 #' @importFrom ggplot2 aes geom_sf ggplot scale_fill_discrete theme_minimal
-plot_fireRegimePolys <- function(fireRegimePolys, title) {
+plot_fireRegimePolys <- function(fireRegimePolys, title = NULL) {
   if (!is.factor(fireRegimePolys$PolyID)) {
     fireRegimePolys$PolyID <- as.factor(fireRegimePolys$PolyID)
   }

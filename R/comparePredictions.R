@@ -134,7 +134,7 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = 
 #' @importFrom ggplot2 aes geom_abline geom_point geom_text ggplot labs
 #' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_bw xlab ylab
 #' @rdname comparePredictions
-comparePredictions_meanFireSize <- function(dt, title) {
+comparePredictions_meanFireSize <- function(dt, title = NULL) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
@@ -163,7 +163,7 @@ comparePredictions_meanFireSize <- function(dt, title) {
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_fireReturnInterval <- function(dt, times, title) {
+comparePredictions_fireReturnInterval <- function(dt, times, title = NULL) {
   if (any(is.null(dt), is.null(times))) {
     stop("dt and times must be provided and cannot be NULL.")
   }
@@ -206,7 +206,7 @@ comparePredictions_fireReturnInterval <- function(dt, times, title) {
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_annualIgnitions <- function(dt, title) {
+comparePredictions_annualIgnitions <- function(dt, title = NULL) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
@@ -239,7 +239,7 @@ comparePredictions_annualIgnitions <- function(dt, title) {
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_annualEscapes <- function(dt, title) {
+comparePredictions_annualEscapes <- function(dt, title = NULL) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
@@ -279,7 +279,7 @@ comparePredictions_annualEscapes <- function(dt, title) {
 #' @importFrom fpCompare %>>%
 #' @importFrom ggplot2 facet_wrap geom_histogram
 #' @rdname comparePredictions
-comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSummary = NULL, size, title) {
+comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSummary = NULL, size, title = NULL) {
   histDistribution <- fireRegimePoints[fireRegimePoints$SIZE_HA %>>% size, ]
   if (nrow(histDistribution) < 1) {
     warning("no historical fires > escape size - showing all fires instead")
