@@ -16,12 +16,19 @@ plot_fireRegimePolys <- function(fireRegimePolys, title) {
   if (!is.factor(fireRegimePolys$PolyID)) {
     fireRegimePolys$PolyID <- as.factor(fireRegimePolys$PolyID)
   }
-
-  ggplot(fireRegimePolys) +
-    geom_sf(aes(fill = PolyID)) +
-    scale_fill_discrete() + ## TODO: use same palette as plot_fireRegimeRas ??
-    ggtitle(title) +
-    theme_bw()
+  if (is.null(title)) {
+    ggplot(fireRegimePolys) +
+      geom_sf(aes(fill = PolyID)) +
+      scale_fill_discrete() + ## TODO: use same palette as plot_fireRegimeRas ??
+      theme_bw()
+  }
+  else {
+    ggplot(fireRegimePolys) +
+      geom_sf(aes(fill = PolyID)) +
+      scale_fill_discrete() + ## TODO: use same palette as plot_fireRegimeRas ??
+      ggtitle(title) +
+      theme_bw()
+  }
 }
 
 #' Plot fire regime raster
