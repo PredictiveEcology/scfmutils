@@ -135,7 +135,7 @@ calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, m
     stop("pEscape exceeds 1, which should not be possible")
   }
   ## rate - per ha/per year ; pEscape; xBar - mean fire size; lxBar - mean log;
-  ## xMax - maximum observed size; #emfs_ha - Estiamted maximum Fire Size in ha
+  ## xMax - maximum observed size; emfs_ha - Estimated maximum Fire Size in ha
   ## max fire size is returned twice - I think this is a backwards compatibility decision
   return(paramData)
 }
