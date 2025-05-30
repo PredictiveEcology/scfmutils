@@ -138,26 +138,16 @@ comparePredictions_meanFireSize <- function(dt, title = NULL) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
-
-  if (is.null(title)) {
-    ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
-      geom_point(aes(histMeanSize, modMeanSize)) +
-      labs(x = "historical mean fire size (ha)", y = "modeled mean fire size (ha)") +
-      theme_bw() +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID), vjust = "inward", hjust = "inward") +
-      geom_abline(slope = 1)
-  } else {
-    ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
-      geom_point(aes(histMeanSize, modMeanSize)) +
-      labs(x = "historical mean fire size (ha)", y = "modeled mean fire size (ha)") +
-      theme_bw() +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID), vjust = "inward", hjust = "inward") +
-      geom_abline(slope = 1) +
-      ggtitle(title)
+  gg_mfs <- ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
+    geom_point(aes(histMeanSize, modMeanSize)) +
+    labs(x = "historical mean fire size (ha)", y = "modeled mean fire size (ha)") +
+    theme_bw() +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(limits = c(0, NA)) +
+    geom_text(aes(label = PolyID), vjust = "inward", hjust = "inward") +
+    geom_abline(slope = 1)
+  if (!is.null(title)) {
+    gg_mfs + ggtitle(title)
   }
 }
 
@@ -176,31 +166,19 @@ comparePredictions_fireReturnInterval <- function(dt, times, title = NULL) {
     warning("achievedFRI may be off where targetFRI is less than 4x the simulated time.")
   }
   ## TODO: remove targetFRI filter below. plot those points differently to indicate poor estimates
-  if (is.null(title)) {
-    ggplot(
-      dt[!is.infinite(achievedFRI) & targetFRI < c(times$end - times$start) * 4],
-      aes(x = targetFRI, y = achievedFRI)
-    ) +
-      geom_point() +
-      labs(y = "simulation FRI (years)", x = "estimated FRI (years)") +
-      theme_bw() +
-      geom_abline(slope = 1) +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
-  } else {
-    ggplot(
-      dt[!is.infinite(achievedFRI) & targetFRI < c(times$end - times$start) * 4],
-      aes(x = targetFRI, y = achievedFRI)
-    ) +
-      geom_point() +
-      labs(y = "simulation FRI (years)", x = "estimated FRI (years)") +
-      theme_bw() +
-      geom_abline(slope = 1) +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward")) +
-      ggtitle(title)
+  gg_fri <- ggplot(
+    dt[!is.infinite(achievedFRI) & targetFRI < c(times$end - times$start) * 4],
+    aes(x = targetFRI, y = achievedFRI)
+  ) +
+    geom_point() +
+    labs(y = "simulation FRI (years)", x = "estimated FRI (years)") +
+    theme_bw() +
+    geom_abline(slope = 1) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(limits = c(0, NA)) +
+    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+  if (!is.null(title)) {
+    gg_fri + ggtitle(title)
   }
 }
 
@@ -215,25 +193,16 @@ comparePredictions_annualIgnitions <- function(dt, title = NULL) {
   dt[, targetIgnitions_Mha := targetIgnitions / burnableArea_ha * 1e6]
   dt[, achievedIgnitions_Mha := achievedIgnitions / burnableArea_ha * 1e6]
 
-  if (is.null(title)) {
-    ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
-      geom_point() +
-      labs(y = "simulation annual ignitions (per Mha)", x = "estimated annual ignitions (per Mha)") +
-      theme_bw() +
-      geom_abline(slope = 1) +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
-  } else {
-    ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
-      geom_point() +
-      labs(y = "simulation annual ignitions (per Mha)", x = "estimated annual ignitions (per Mha)") +
-      theme_bw() +
-      geom_abline(slope = 1) +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward")) +
-      ggtitle(title)
+  gg_ai <- ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
+    geom_point() +
+    labs(y = "simulation annual ignitions (per Mha)", x = "estimated annual ignitions (per Mha)") +
+    theme_bw() +
+    geom_abline(slope = 1) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(limits = c(0, NA)) +
+    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+  if (!is.null(title)) {
+    gg_ai + ggtitle(title)
   }
 }
 
@@ -248,25 +217,16 @@ comparePredictions_annualEscapes <- function(dt, title = NULL) {
   dt[, targetEscapes_Mha := targetEscapes / burnableArea_ha * 1e6]
   dt[, achievedEscapes_Mha := achievedEscapes / burnableArea_ha * 1e6]
 
-  if (is.null(title)) {
-    ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
-      geom_point() +
-      labs(y = "simulation annual escapes (per Mha)", x = "estimated annual escapes (per Mha)") +
-      theme_bw() +
-      geom_abline(slope = 1) +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
-  } else {
-    ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
-      geom_point() +
-      labs(y = "simulation annual escapes (per Mha)", x = "estimated annual escapes (per Mha)") +
-      theme_bw() +
-      geom_abline(slope = 1) +
-      scale_y_continuous(limits = c(0, NA)) +
-      scale_x_continuous(limits = c(0, NA)) +
-      geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward")) +
-      ggtitle(title)
+  gg_ae <- ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
+    geom_point() +
+    labs(y = "simulation annual escapes (per Mha)", x = "estimated annual escapes (per Mha)") +
+    theme_bw() +
+    geom_abline(slope = 1) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_x_continuous(limits = c(0, NA)) +
+    geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+  if (!is.null(title)) {
+    gg_ae + ggtitle(title)
   }
 }
 
@@ -299,18 +259,12 @@ comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSum
   allFires <- rbind(simDistribution, histDistribution, fill = TRUE)
   allFires[, PolyID := as.factor(PolyID)]
 
-  if (is.null(title)) {
-    ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
-      geom_histogram() +
-      xlab("log of escaped fire size (ha)") +
-      theme_bw() +
-      facet_wrap(~source, scales = "free_y", nrow = 2)
-  } else {
-    ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
-      geom_histogram() +
-      xlab("log of escaped fire size (ha)") +
-      theme_bw() +
-      facet_wrap(~source, scales = "free_y", nrow = 2) +
-      ggtitle(title)
+  gg_fd <- ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
+    geom_histogram() +
+    xlab("log of escaped fire size (ha)") +
+    theme_bw() +
+    facet_wrap(~source, scales = "free_y", nrow = 2)
+  if (!is.null(title)) {
+    gg_fd + ggtitle(title)
   }
 }
