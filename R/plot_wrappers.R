@@ -17,9 +17,9 @@ plot_fireRegimePolys <- function(fireRegimePolys, title = NULL) {
     fireRegimePolys$PolyID <- as.factor(fireRegimePolys$PolyID)
   }
   gg_frp <- ggplot(fireRegimePolys) +
-      geom_sf(aes(fill = PolyID)) +
-      scale_fill_discrete() + ## TODO: use same palette as plot_fireRegimeRas ??
-      theme_bw()
+    geom_sf(aes(fill = PolyID)) +
+    scale_fill_discrete() + ## TODO: use same palette as plot_fireRegimeRas ??
+    theme_bw()
   
   if (!is.null(title)) {
     gg_frp + ggtitle(title)
@@ -46,7 +46,7 @@ plot_fireRegimeRas <- function(x, title) {
   if (!is.null(title)) {
     gg_frr + ggtitle(title)
   }
-  }
+}
 
 #' Plot age map
 #'
@@ -63,7 +63,7 @@ plot_fireRegimeRas <- function(x, title) {
 #' @importFrom tidyterra geom_spatraster
 plot_ageMap <- function(x, title, maxAge) {
   x[x > maxAge] <- maxAge
-
+  
   gg_am <- ggplot() +
     geom_spatraster(data = x) +
     scale_fill_distiller(palette = "Greens", direction = 1, na.value = "transparent") +
