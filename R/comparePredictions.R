@@ -81,7 +81,7 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = 
     targetIgnitions <- pIg * fireRegimePoly$burnyArea
     achievedIgnitions <- nrow(burnSum[grp %in% 1, ]) / simLength ## incl grp 2 double counts igns
 
-    #escapes
+    ## escapes
     targetEscapes <- fireRegimePoly$pEscape * targetIgnitions
     achievedEscapes <- nrow(burnSum[grp %in% 1 & N > 1]) / simLength
 
