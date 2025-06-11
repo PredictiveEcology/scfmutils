@@ -22,8 +22,9 @@ plot_fireRegimePolys <- function(fireRegimePolys, title = NULL) {
     theme_bw()
   
   if (!is.null(title)) {
-    gg_frp + ggtitle(title)
+    gg_frp <- gg_frp + ggtitle(title)
   }
+  return(gg_frp)
 }
 
 #' Plot fire regime raster
@@ -44,8 +45,9 @@ plot_fireRegimeRas <- function(x, title) {
     theme_bw()
   
   if (!is.null(title)) {
-    gg_frr + ggtitle(title)
+    gg_frr <- gg_frr + ggtitle(title)
   }
+  return(gg_frr)
 }
 
 #' Plot age map
@@ -70,8 +72,9 @@ plot_ageMap <- function(x, title, maxAge) {
     theme_bw()
   
   if (!is.null(title)) {
-    gg_am + ggtitle(title)
+    gg_am <- gg_am + ggtitle(title)
   }
+  return(gg_am)
 }
 
 #' Plot burn maps
@@ -93,9 +96,9 @@ plot_burnMap <- function(x, title) {
     theme_bw()
   
   if (!is.null(title)) {
-    gg_bm + ggtitle(title)
+    gg_bm <- gg_bm + ggtitle(title)
   }
-  
+  return(gg_bm) 
 }
 
 #' Plot flammable map
@@ -116,6 +119,7 @@ plot_flammableMap <- function(x, title) {
     theme_bw()
   
   if (!is.null(title)) {
-    gg_fm + ggtitle(title)
+    gg_fm <- gg_fm + ggtitle(title)
   }
+  return(gg_fm)
 }

@@ -16,19 +16,19 @@ comparePredictions_summaryDT(
   times = NULL
 )
 
-comparePredictions_meanFireSize(dt, title)
+comparePredictions_meanFireSize(dt, title = NULL)
 
-comparePredictions_fireReturnInterval(dt, times, title)
+comparePredictions_fireReturnInterval(dt, times, title = NULL)
 
-comparePredictions_annualIgnitions(dt, title)
+comparePredictions_annualIgnitions(dt, title = NULL)
 
-comparePredictions_annualEscapes(dt, title)
+comparePredictions_annualEscapes(dt, title = NULL)
 
 comparePredictions_fireDistribution(
   fireRegimePoints = NULL,
   burnSummary = NULL,
   size,
-  title
+  title = NULL
 )
 }
 \arguments{

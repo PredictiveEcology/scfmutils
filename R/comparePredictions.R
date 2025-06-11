@@ -147,8 +147,9 @@ comparePredictions_meanFireSize <- function(dt, title = NULL) {
     geom_text(aes(label = PolyID), vjust = "inward", hjust = "inward") +
     geom_abline(slope = 1)
   if (!is.null(title)) {
-    gg_mfs + ggtitle(title)
+    gg_mfs <- gg_mfs + ggtitle(title)
   }
+  return(gg_mfs)
 }
 
 #' @export
@@ -178,8 +179,9 @@ comparePredictions_fireReturnInterval <- function(dt, times, title = NULL) {
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
   if (!is.null(title)) {
-    gg_fri + ggtitle(title)
+    gg_fri <- gg_fri + ggtitle(title)
   }
+  return(gg_fri)
 }
 
 #' @export
@@ -202,8 +204,9 @@ comparePredictions_annualIgnitions <- function(dt, title = NULL) {
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
   if (!is.null(title)) {
-    gg_ai + ggtitle(title)
+    gg_ai <- gg_ai + ggtitle(title)
   }
+  return(gg_ai)
 }
 
 #' @export
@@ -226,8 +229,9 @@ comparePredictions_annualEscapes <- function(dt, title = NULL) {
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
   if (!is.null(title)) {
-    gg_ae + ggtitle(title)
+    gg_ae <- gg_ae + ggtitle(title)
   }
+  return(gg_ae)
 }
 
 #' @param size minimum fire size (ha)
@@ -265,6 +269,7 @@ comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSum
     theme_bw() +
     facet_wrap(~source, scales = "free_y", nrow = 2)
   if (!is.null(title)) {
-    gg_fd + ggtitle(title)
+    gg_fd <- gg_fd + ggtitle(title)
   }
+  return(gg_fd)
 }

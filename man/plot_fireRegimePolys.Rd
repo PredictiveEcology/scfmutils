@@ -4,7 +4,7 @@
 \alias{plot_fireRegimePolys}
 \title{Plot fire regime polygons}
 \usage{
-plot_fireRegimePolys(fireRegimePolys, title)
+plot_fireRegimePolys(fireRegimePolys, title = NULL)
 }
 \arguments{
 \item{fireRegimePolys}{\code{sf} polygon or multipolygon object defining the fire regime polygons}
