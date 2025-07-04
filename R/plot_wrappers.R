@@ -20,7 +20,7 @@ plot_fireRegimePolys <- function(fireRegimePolys, title = NULL) {
     geom_sf(aes(fill = PolyID)) +
     scale_fill_discrete() + ## TODO: use same palette as plot_fireRegimeRas ??
     theme_bw()
-  
+
   if (!is.null(title)) {
     gg_frp <- gg_frp + ggtitle(title)
   }
@@ -43,7 +43,7 @@ plot_fireRegimeRas <- function(x, title) {
     geom_spatraster(data = terra::as.factor(x)) +
     scale_fill_brewer(palette = "Paired", type = "qual", na.value = "transparent") +
     theme_bw()
-  
+
   if (!is.null(title)) {
     gg_frr <- gg_frr + ggtitle(title)
   }
@@ -65,12 +65,12 @@ plot_fireRegimeRas <- function(x, title) {
 #' @importFrom tidyterra geom_spatraster
 plot_ageMap <- function(x, title, maxAge) {
   x[x > maxAge] <- maxAge
-  
+
   gg_am <- ggplot() +
     geom_spatraster(data = x) +
     scale_fill_distiller(palette = "Greens", direction = 1, na.value = "transparent") +
     theme_bw()
-  
+
   if (!is.null(title)) {
     gg_am <- gg_am + ggtitle(title)
   }
@@ -83,22 +83,23 @@ plot_ageMap <- function(x, title, maxAge) {
 #'
 #' @param title character, the plot title
 #'
+#' @param subtitle character, the plot subtitle
+#'
 #' @returns `ggplot` object
 #'
 #' @export
 #' @importFrom ggplot2 ggplot ggtitle theme_bw
 #' @importFrom tidyterra geom_spatraster
 #' @importFrom viridis scale_fill_viridis
-plot_burnMap <- function(x, title) {
+plot_burnMap <- function(x, title = NULL, subtitle = NULL) {
   gg_bm <- ggplot() +
     geom_spatraster(data = x) +
     scale_fill_viridis(na.value = "transparent") +
     theme_bw()
-  
-  if (!is.null(title)) {
-    gg_bm <- gg_bm + ggtitle(title)
-  }
-  return(gg_bm) 
+
+    gg_bm <- gg_bm + ggtitle(title) + labs(subtitle = subtitle)
+
+  return(gg_bm)
 }
 
 #' Plot flammable map
