@@ -4,12 +4,14 @@
 \alias{plot_burnMap}
 \title{Plot burn maps}
 \usage{
-plot_burnMap(x, title)
+plot_burnMap(x, title = NULL, subtitle = NULL)
 }
 \arguments{
 \item{x}{\code{SpatRaster} object corresponding to a current or cumulative burn map.}
 
 \item{title}{character, the plot title}
+
+\item{subtitle}{character, the plot subtitle}
 }
 \value{
 \code{ggplot} object

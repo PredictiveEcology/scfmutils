@@ -21,17 +21,19 @@ utils::globalVariables(c(
 #' @examples
 #' \dontrun{
 #' ## assumes user has run scfm to produce the simList `mySimOut`
-#' dt <- comparePredictions_summaryDT(fireRegimePoints = mySimOut$fireRegimePoints,
-#'                                    burnSummary = mySimOut$burnSummary,
-#'                                    fireRegimePolys = mySimOut$fireRegimePolys,
-#'                                    times = times(mySimOut))
+#' dt <- comparePredictions_summaryDT(
+#'   fireRegimePoints = mySimOut$fireRegimePoints,
+#'   burnSummary = mySimOut$burnSummary,
+#'   fireRegimePolys = mySimOut$fireRegimePolys,
+#'   times = times(mySimOut)
+#' )
 #'
 #' gg_mfs <- comparePredictions_meanFireSize(dt)
 #' gg_fri <- comparePredictions_fireReturnInterval(dt)
 #' gg_ign <- comparePredictions_annualIgnitions(dt)
 #' gg_frp <- plot_fireRegimePolys(mySimOut$fireRegimePolys)
 #'
-#' gridExtra::grid.arrange(fps,  gg_mfs,  gg_fri,  gg_ign, nrow = 2, ncol = 2)
+#' gridExtra::grid.arrange(fps, gg_mfs, gg_fri, gg_ign, nrow = 2, ncol = 2)
 #' }
 #'
 #' @author Ian Eddy
@@ -43,9 +45,11 @@ utils::globalVariables(c(
 #' @rdname comparePredictions
 comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = NULL,
                                          fireRegimePolys = NULL, times = NULL) {
-  if (any(is.null(fireRegimePolys$pSpread), is.null(fireRegimePolys$xBar),
-          is.null(fireRegimePolys$burnyArea), is.null(fireRegimePoints),
-          is.null(burnSummary), is.null(times))) {
+  if (any(
+    is.null(fireRegimePolys$pSpread), is.null(fireRegimePolys$xBar),
+    is.null(fireRegimePolys$burnyArea), is.null(fireRegimePoints),
+    is.null(burnSummary), is.null(times)
+  )) {
     stop("fireRegimePolys is missing columns or insufficient args provided")
   }
 
@@ -62,14 +66,16 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = 
     ## median fire size is not used by scfm but is worth recording
     ## regimes where mean is much greater than median will be hard to recreate
     escaped <- fireRegimePoints[fireRegimePoints$SIZE_HA > fireRegimePoly$cellSize, ]
-    medianFireSize <- median(escaped$SIZE_HA) #should be no need for na.rm
+    medianFireSize <- median(escaped$SIZE_HA) # should be no need for na.rm
 
     pSpread <- fireRegimePoly$pSpread
     pIg <- fireRegimePoly$ignitionRate
 
     if (!"grp" %in% names(burnSummary)) {
-      stop("burnSummary data.table does not have a 'grp' column.\n",
-           "Are you running a recent version of scfmSpread (>= 2.0.0)?")
+      stop(
+        "burnSummary data.table does not have a 'grp' column.\n",
+        "Are you running a recent version of scfmSpread (>= 2.0.0)?"
+      )
     }
 
     ## burnSummary data.table from scfmSpread is coded as follows:
@@ -86,7 +92,7 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = 
     achievedEscapes <- nrow(burnSum[grp %in% 1 & N > 1]) / simLength
 
     ## mean fire size: mean size of all fires ignited and escaped in SAR, regardless of where spread
-    burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"]  # nolint
+    burnSum1 <- burnSum[grp %in% c(1, 2), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"] # nolint
     burnSum1 <- burnSum1[areaBurned %>>% fireRegimePoly$cellSize, ]
     meanFireSize <- ifelse(nrow(burnSum1) == 0, 0, mean(burnSum1$areaBurned))
 
@@ -96,23 +102,25 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = 
     MAAB <- sum(burnSum2$areaBurned) / simLength
 
     achievedFRI <- simLength / (sum(0, burnSum2$areaBurned) / fireRegimePoly$burnyArea)
-    targetFRI  <- 1 / fireRegimePoly$empiricalBurnRate
+    targetFRI <- 1 / fireRegimePoly$empiricalBurnRate
 
-    pred <- data.frame("PolyID" = x,
-                       "histMeanSize" = fireRegimePoly$xBar, ## predicted (empirical) mean fire size
-                       "histMedianSize" = medianFireSize,
-                       "modMeanSize" = meanFireSize,
-                       "achievedFRI" = achievedFRI,
-                       "targetFRI" = targetFRI,
-                       "burnableArea_ha" = fireRegimePoly$burnyArea,
-                       "targetIgnitions" = targetIgnitions,
-                       "achievedIgnitions" = achievedIgnitions,
-                       "targetEscapes" = targetEscapes,
-                       "achievedEscapes" = achievedEscapes,
-                       "pEscape" = fireRegimePoly$pEscape, ## escape prob (no. fires > cellSize / no. fires)
-                       "p0" = fireRegimePoly$p0,  ## p0 and pEscape may indicate something incorrect
-                       "pSpread" = pSpread, ## spread probability estimated from the SCAM model
-                       "pIgnition" = pIg) ## ignition probability of a single pixel
+    pred <- data.frame(
+      "PolyID" = x,
+      "histMeanSize" = fireRegimePoly$xBar, ## predicted (empirical) mean fire size
+      "histMedianSize" = medianFireSize,
+      "modMeanSize" = meanFireSize,
+      "achievedFRI" = achievedFRI,
+      "targetFRI" = targetFRI,
+      "burnableArea_ha" = fireRegimePoly$burnyArea,
+      "targetIgnitions" = targetIgnitions,
+      "achievedIgnitions" = achievedIgnitions,
+      "targetEscapes" = targetEscapes,
+      "achievedEscapes" = achievedEscapes,
+      "pEscape" = fireRegimePoly$pEscape, ## escape prob (no. fires > cellSize / no. fires)
+      "p0" = fireRegimePoly$p0, ## p0 and pEscape may indicate something incorrect
+      "pSpread" = pSpread, ## spread probability estimated from the SCAM model
+      "pIgnition" = pIg
+    ) ## ignition probability of a single pixel
     return(pred)
   })
   return(rbindlist(out))
@@ -120,16 +128,17 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = 
 
 #' @param dt scfm summary `data.table` produced by `comparePredictions_summaryDT()`
 #'
+#' @param title character, the plot title
+#'
 #' @export
 #' @importFrom ggplot2 aes geom_abline geom_point geom_text ggplot labs
 #' @importFrom ggplot2 scale_x_continuous scale_y_continuous theme_bw xlab ylab
 #' @rdname comparePredictions
-comparePredictions_meanFireSize <- function(dt) {
+comparePredictions_meanFireSize <- function(dt, title = NULL) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
-
-  ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
+  gg_mfs <- ggplot(dt, aes(x = histMeanSize, y = modMeanSize)) +
     geom_point(aes(histMeanSize, modMeanSize)) +
     labs(x = "historical mean fire size (ha)", y = "modeled mean fire size (ha)") +
     theme_bw() +
@@ -137,13 +146,17 @@ comparePredictions_meanFireSize <- function(dt) {
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyID), vjust = "inward", hjust = "inward") +
     geom_abline(slope = 1)
+  if (!is.null(title)) {
+    gg_mfs <- gg_mfs + ggtitle(title)
+  }
+  return(gg_mfs)
 }
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_fireReturnInterval <- function(dt, times) {
+comparePredictions_fireReturnInterval <- function(dt, times, title = NULL) {
   if (any(is.null(dt), is.null(times))) {
-    stop("all arguments must be provided and cannot be NULL.")
+    stop("dt and times must be provided and cannot be NULL.")
   }
 
   ## remove the infinite FRI caused by no simulated fires
@@ -153,10 +166,11 @@ comparePredictions_fireReturnInterval <- function(dt, times) {
     ## TODO: confirm wording of this, with comment above
     warning("achievedFRI may be off where targetFRI is less than 4x the simulated time.")
   }
-
   ## TODO: remove targetFRI filter below. plot those points differently to indicate poor estimates
-  ggplot(dt[!is.infinite(achievedFRI) & targetFRI < c(times$end - times$start) * 4],
-         aes(x = targetFRI, y = achievedFRI)) +
+  gg_fri <- ggplot(
+    dt[!is.infinite(achievedFRI) & targetFRI < c(times$end - times$start) * 4],
+    aes(x = targetFRI, y = achievedFRI)
+  ) +
     geom_point() +
     labs(y = "simulation FRI (years)", x = "estimated FRI (years)") +
     theme_bw() +
@@ -164,21 +178,24 @@ comparePredictions_fireReturnInterval <- function(dt, times) {
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+  if (!is.null(title)) {
+    gg_fri <- gg_fri + ggtitle(title)
+  }
+  return(gg_fri)
 }
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_annualIgnitions <- function(dt) {
+comparePredictions_annualIgnitions <- function(dt, title = NULL) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
 
-  dt <- copy(dt) #avoid adding per ha cols (or add them?)
+  dt <- copy(dt) # avoid adding per ha cols (or add them?)
   dt[, targetIgnitions_Mha := targetIgnitions / burnableArea_ha * 1e6]
   dt[, achievedIgnitions_Mha := achievedIgnitions / burnableArea_ha * 1e6]
 
-
-  ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
+  gg_ai <- ggplot(dt, aes(x = targetIgnitions_Mha, y = achievedIgnitions_Mha)) +
     geom_point() +
     labs(y = "simulation annual ignitions (per Mha)", x = "estimated annual ignitions (per Mha)") +
     theme_bw() +
@@ -186,21 +203,24 @@ comparePredictions_annualIgnitions <- function(dt) {
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+  if (!is.null(title)) {
+    gg_ai <- gg_ai + ggtitle(title)
+  }
+  return(gg_ai)
 }
 
 #' @export
 #' @rdname comparePredictions
-comparePredictions_annualEscapes <- function(dt) {
+comparePredictions_annualEscapes <- function(dt, title = NULL) {
   if (any(is.null(dt))) {
     stop("all arguments must be provided and cannot be NULL.")
   }
 
-  dt <- copy(dt) #avoid adding per ha cols (or add them?)
+  dt <- copy(dt) # avoid adding per ha cols (or add them?)
   dt[, targetEscapes_Mha := targetEscapes / burnableArea_ha * 1e6]
   dt[, achievedEscapes_Mha := achievedEscapes / burnableArea_ha * 1e6]
 
-
-  ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
+  gg_ae <- ggplot(dt, aes(x = targetEscapes_Mha, y = achievedEscapes_Mha)) +
     geom_point() +
     labs(y = "simulation annual escapes (per Mha)", x = "estimated annual escapes (per Mha)") +
     theme_bw() +
@@ -208,18 +228,24 @@ comparePredictions_annualEscapes <- function(dt) {
     scale_y_continuous(limits = c(0, NA)) +
     scale_x_continuous(limits = c(0, NA)) +
     geom_text(aes(label = PolyID, vjust = "inward", hjust = "inward"))
+  if (!is.null(title)) {
+    gg_ae <- gg_ae + ggtitle(title)
+  }
+  return(gg_ae)
 }
 
 #' @param size minimum fire size (ha)
+#'
+#' @param title character, the plot title
 #'
 #' @export
 #' @importFrom data.table as.data.table setnames
 #' @importFrom fpCompare %>>%
 #' @importFrom ggplot2 facet_wrap geom_histogram
 #' @rdname comparePredictions
-comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSummary = NULL, size) {
+comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSummary = NULL, size, title = NULL) {
   histDistribution <- fireRegimePoints[fireRegimePoints$SIZE_HA %>>% size, ]
-  if (nrow(histDistribution) < 1){
+  if (nrow(histDistribution) < 1) {
     warning("no historical fires > escape size - showing all fires instead")
     histDistribution <- fireRegimePoints
   }
@@ -235,11 +261,15 @@ comparePredictions_fireDistribution <- function(fireRegimePoints = NULL, burnSum
   simDistribution[, source := "simulated"]
 
   allFires <- rbind(simDistribution, histDistribution, fill = TRUE)
-  allFires[ , PolyID := as.factor(PolyID)]
+  allFires[, PolyID := as.factor(PolyID)]
 
-  ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
+  gg_fd <- ggplot(allFires, aes(x = log(areaBurned), fill = PolyID)) +
     geom_histogram() +
     xlab("log of escaped fire size (ha)") +
     theme_bw() +
     facet_wrap(~source, scales = "free_y", nrow = 2)
+  if (!is.null(title)) {
+    gg_fd <- gg_fd + ggtitle(title)
+  }
+  return(gg_fd)
 }
