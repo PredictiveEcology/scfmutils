@@ -1,6 +1,6 @@
 #' `scfmRegime`: `calcZonalRegimePars`
 #'
-#' @param polygonID TODO
+#' @param polygonID TODO  
 #' @param firePolys TODO
 #' @param firePoints TODO
 #' @param epochLength TODO
@@ -103,13 +103,15 @@ calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, m
   }
 
   if (!is.na(targetBurnRate) || is.null(targetBurnRate)) {
-    ratio <-  targetBurnRate / empiricalBurnRate
+    ratio <- targetBurnRate / empiricalBurnRate
     if (ratio >= 1) {
-      newFireValues <- ratioPartition2(targetBurnRate = targetBurnRate,
-                                       empiricalBurnRate = empiricalBurnRate,
-                                       pEscape = pEscape,
-                                       xBar = xBar,
-                                       rate = ignitionRate)
+      newFireValues <- ratioPartition2(
+        targetBurnRate = targetBurnRate,
+        empiricalBurnRate = empiricalBurnRate,
+        pEscape = pEscape,
+        xBar = xBar,
+        rate = ignitionRate
+      )
       ignitionRate <- newFireValues$rate
       pEscape <- newFireValues$pEscape
       xBar <- newFireValues$xBar
