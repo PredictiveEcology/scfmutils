@@ -4,10 +4,12 @@
 \alias{plot_fireRegimePolys}
 \title{Plot fire regime polygons}
 \usage{
-plot_fireRegimePolys(fireRegimePolys)
+plot_fireRegimePolys(fireRegimePolys, title = NULL)
 }
 \arguments{
 \item{fireRegimePolys}{\code{sf} polygon or multipolygon object defining the fire regime polygons}
+
+\item{title}{character, the plot title}
 }
 \value{
 a \code{ggplot} object
