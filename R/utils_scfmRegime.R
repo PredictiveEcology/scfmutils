@@ -1,6 +1,6 @@
 #' `scfmRegime`: `calcZonalRegimePars`
 #'
-#' @param polygonID TODO  
+#' @param polygonID TODO
 #' @param firePolys TODO
 #' @param firePoints TODO
 #' @param epochLength TODO
@@ -127,7 +127,6 @@ calcZonalRegimePars <- function(polygonID, firePolys, firePoints, epochLength, m
     xMax <- targetMaxFireSize
     ## TODO: add check that max is larger than mean, else stop
   }
-
 
   paramData <- cbind(ignitionRate, pEscape, xBar, lxBar, xMax, emfs_ha, empiricalBurnRate) |>
     as.data.table()

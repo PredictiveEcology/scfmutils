@@ -97,7 +97,7 @@ plot_burnMap <- function(x, title = NULL, subtitle = NULL) {
     scale_fill_viridis(na.value = "transparent") +
     theme_bw()
 
-    gg_bm <- gg_bm + ggtitle(title) + labs(subtitle = subtitle)
+  gg_bm <- gg_bm + ggtitle(title) + labs(subtitle = subtitle)
 
   return(gg_bm)
 }
@@ -118,7 +118,7 @@ plot_flammableMap <- function(x, title) {
     geom_spatraster(data = x) +
     scale_fill_distiller(palette = "RdBu", na.value = "transparent") +
     theme_bw()
-  
+
   if (!is.null(title)) {
     gg_fm <- gg_fm + ggtitle(title)
   }
