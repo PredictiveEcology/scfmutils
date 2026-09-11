@@ -14,7 +14,7 @@ getFirePoints_NFDB_scfm(
 }
 \arguments{
 \item{url}{URL from which to download the fire points data. Default \code{NULL} fetches data from
-\url{http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point.zip}.}
+\url{https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point_shp.zip}.}
 
 \item{studyArea}{\code{sf} object corresponding to the study area of interest.}
 

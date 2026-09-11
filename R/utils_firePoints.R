@@ -1,7 +1,7 @@
 #' Get fire points data from the Canadian National Fire Database
 #'
 #' @param url URL from which to download the fire points data. Default `NULL` fetches data from
-#'            <http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point.zip>.
+#'            <https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point_shp.zip>.
 #'
 #' @param studyArea `sf` object corresponding to the study area of interest.
 #'
@@ -27,7 +27,7 @@ getFirePoints_NFDB_scfm <- function(url = NULL,
   if (is.null(NFDB_pointPath)) stop("NFDB_pointPath cannot be null. Specify a file path.")
 
   if (is.null(url))
-    url <- "http://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_pnt/current_version/NFDB_point.zip"
+    url <- nfdbPointUrl()
 
   check <- Checksums(NFDB_pointPath, checksumFile = file.path(NFDB_pointPath, "CHECKSUMS.txt"),
                      write = TRUE)

@@ -1,5 +1,7 @@
 # scfmutils (development version)
 
+- `getFirePoints_NFDB_scfm()` downloads from `.../current_version/NFDB_point_shp.zip`: CFS renamed the
+  archive from `NFDB_point.zip`, which now returns HTTP 404, so no newer release could be fetched;
 - add `withr` to Imports from Suggests, for use in examples;
 - streamline `prepInputsFireRegimePolys()` for BEC;
 - `prepInputsFireRegimePolys()` gets a new argument `subsetType` to retrieve entire polygons
