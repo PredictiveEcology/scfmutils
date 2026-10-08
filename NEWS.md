@@ -1,5 +1,10 @@
 # scfmutils (development version)
 
+- `comparePredictions_summaryDT()`: the achieved fire return interval (and the internal mean annual area
+  burned) now count the area burned inside the reporting area, from fires ignited there or outside
+  (`burnSummary` groups 1 and 3). The groups-1-and-3 table was overwritten by the groups-1-and-2 one
+  used for mean fire size, so a fire that crossed the reporting boundary was counted by where it was
+  ignited, not where it burned;
 - `getFirePoints_NFDB_scfm()` downloads from `.../current_version/NFDB_point_shp.zip`: CFS renamed the
   archive from `NFDB_point.zip`, which now returns HTTP 404, so no newer release could be fetched;
 - add `withr` to Imports from Suggests, for use in examples;
