@@ -3,6 +3,8 @@
 - `calibrateFireRegimePolys()` no longer fails (`'xmin' not less than 'xmax'`) when every flammable
   cell of a fire regime polygon has 8 flammable neighbours, e.g., with no non-flammable cells
   (PredictiveEcology/scfm#22): `p0` is then `hatP0(pEscape, 8)` exactly;
+- `calibrateFireRegimePolys()` estimates `p0` correctly from 4-neighbour counts: `escapeProbDelta()`
+  assumed 0 to 8 neighbours, so with `neighbours = 4` it recycled the weights and underestimated `p0`;
 - `getFirePoints_NFDB_scfm()` downloads from `.../current_version/NFDB_point_shp.zip`: CFS renamed the
   archive from `NFDB_point.zip`, which now returns HTTP 404, so no newer release could be fetched;
 - add `withr` to Imports from Suggests, for use in examples;

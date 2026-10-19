@@ -56,10 +56,10 @@ toyFlammableMap <- function() {
 
 ## one fire regime polygon (PolyID 1) covering the square [lo, hi] x [lo, hi] (m),
 ## with neighbour counts from genFireMapAttr() and fixed fire regime attributes
-toyFireRegimePoly <- function(lo, hi, pEscape = 0.2) {
+toyFireRegimePoly <- function(lo, hi, pEscape = 0.2, neighbours = 8) {
   bbox <- sf::st_bbox(c(xmin = lo, ymin = lo, xmax = hi, ymax = hi), crs = sf::st_crs(3005))
   frp <- sf::st_sf(PolyID = 1L, geometry = sf::st_as_sfc(bbox))
-  frp <- genFireMapAttr(toyFlammableMap(), frp, neighbours = 8)
+  frp <- genFireMapAttr(toyFlammableMap(), frp, neighbours = neighbours)
   frp$ignitionRate <- 1e-4 ## fires / ha / yr
   frp$pEscape <- pEscape
   frp$xBar <- 25 ## ha
@@ -84,10 +84,13 @@ toyCalibrate <- function(frp) {
   ))
 }
 
-## escape probability implied by p0, given the polygon's neighbour counts
+## escape probability implied by p0, given the polygon's neighbour counts; optimise() finds p0
+## to 1e-4, which puts this within 1e-3 of pEscape
 toyEscapeProb <- function(p0, frp) {
-  nNbrs <- unlist(sf::st_drop_geometry(frp)[paste0("nNbr_", 0:8)])
-  sum(nNbrs / sum(nNbrs) * (1 - (1 - p0)^(0:8)))
+  nNbrCols <- grep("^nNbr_", names(frp), value = TRUE)
+  nNbrs <- unlist(sf::st_drop_geometry(frp)[nNbrCols])
+  k <- as.integer(sub("nNbr_", "", nNbrCols))
+  sum(nNbrs / sum(nNbrs) * (1 - (1 - p0)^k))
 }
 
 test_that("p0 is calibrated when every flammable cell has 8 flammable neighbours (scfm#22)", {
@@ -96,7 +99,7 @@ test_that("p0 is calibrated when every flammable cell has 8 flammable neighbours
   expect_equal(frp$nNbr_8, frp$nFlammable)
 
   out <- toyCalibrate(frp)
-  expect_equal(toyEscapeProb(out$p0, frp), frp$pEscape, tolerance = 0.01)
+  expect_lt(abs(toyEscapeProb(out$p0, frp) - frp$pEscape), 1e-3)
 })
 
 test_that("p0 is calibrated for a fully flammable polygon that reaches the raster edge", {
@@ -105,5 +108,14 @@ test_that("p0 is calibrated for a fully flammable polygon that reaches the raste
   expect_lt(frp$nNbr_8, frp$nFlammable)
 
   out <- toyCalibrate(frp)
-  expect_equal(toyEscapeProb(out$p0, frp), frp$pEscape, tolerance = 0.01)
+  expect_lt(abs(toyEscapeProb(out$p0, frp) - frp$pEscape), 1e-3)
+})
+
+test_that("p0 is calibrated from 4-neighbour counts", {
+  withr::local_seed(123)
+  frp <- toyFireRegimePoly(0, 5000, neighbours = 4) ## nNbr_0 to nNbr_4 only
+  expect_false("nNbr_8" %in% names(frp))
+
+  out <- toyCalibrate(frp)
+  expect_lt(abs(toyEscapeProb(out$p0, frp) - frp$pEscape), 1e-3)
 })

@@ -236,7 +236,8 @@ hatP0 <- function(pEscape, n = 8) {
 #' @rdname pEscape
 escapeProbDelta <- function(p0, w, hatPE) {
   ## TODO: a real clever boots would minimise the abs log odds ratio.
-  abs(sum(w * (1 - (1 - p0)**(0:8))) - hatPE)
+  ## w[k + 1] is the proportion of flammable cells with k flammable neighbours, k = 0 to 4 or 8
+  abs(sum(w * (1 - (1 - p0)**(seq_along(w) - 1))) - hatPE)
 }
 
 #' `scfmDriver`: `calibrateFireRegimePolys`
