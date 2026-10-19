@@ -450,6 +450,10 @@ calibrateFireRegimePolys <- function(
     } else if (hatPE == 1) {
       # all fires in polygon zone escaped
       p0 <- 1
+    } else if (isTRUE(w[neighbours + 1] == 1)) {
+      ## every flammable cell has `neighbours` flammable neighbours (e.g., no non-flammable cells),
+      ## so the optimise() interval below has zero width; 1 - (1 - p0)^neighbours = hatPE is exact
+      p0 <- hatP0(hatPE, neighbours)
     } else {
       message("running optimise() to determine p0...")
       res <- optimise(
