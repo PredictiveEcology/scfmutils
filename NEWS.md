@@ -1,5 +1,10 @@
 # scfmutils (development version)
 
+- new functions `calcIgnitions()`, `countBurnedPixelsInSAR()`, and `fireRegimeParRaster()`,
+  moved from the `scfmIgnition`, `scfmSpread`, and `scfmEscape`/`scfmIgnition`/`scfmSpread` modules
+  (#13). `calcIgnitions()` drops the module version's unused `fireRegimePolys` argument, and
+  `countBurnedPixelsInSAR()` takes the reporting-area pixels as `pixInSAR` instead of reading them
+  from the module;
 - `calibrateFireRegimePolys()` no longer fails (`'xmin' not less than 'xmax'`) when every flammable
   cell of a fire regime polygon has 8 flammable neighbours, e.g., with no non-flammable cells
   (PredictiveEcology/scfm#22): `p0` is then `hatP0(pEscape, 8)` exactly;
