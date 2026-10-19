@@ -49,6 +49,7 @@ Imports:
     withr
 Suggests:
     bcdata,
+    curl,
     googledrive,
     gridExtra,
     knitr,
