@@ -8,6 +8,7 @@ test_that("the NFDB point default URL is the full shapefile archive", {
 
 test_that("the NFDB point default URL is reachable", {
   skip_on_cran()
+  skip_if_not_installed("curl") ## skip_if_offline() needs it
   skip_if_offline("cwfis.cfs.nrcan.gc.ca")
   expect_identical(attr(curlGetHeaders(scfmutils:::nfdbPointUrl(), timeout = 30), "status"), 200L)
 })
