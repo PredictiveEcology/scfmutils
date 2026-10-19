@@ -68,5 +68,5 @@ VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/scfmutils/issues
 ByteCompile: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 LazyData: true
+Config/roxygen2/version: 8.1.1
