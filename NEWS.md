@@ -1,5 +1,10 @@
 # scfmutils (development version)
 
+- `comparePredictions_summaryDT()`: the achieved fire return interval (and the internal mean annual area
+  burned) again count the area burned inside the reporting area, from fires ignited there or outside
+  (`burnSummary` groups 1 and 3). This fixes a regression in scfmutils 0.0.9 (cbcd0b5): the
+  groups-1-and-3 table was overwritten by the groups-1-and-2 one used for mean fire size, so a fire
+  that crossed the reporting boundary was counted by where it was ignited, not where it burned;
 - new functions `calcIgnitions()`, `countBurnedPixelsInSAR()`, and `fireRegimeParRaster()`,
   moved from the `scfmIgnition`, `scfmSpread`, and `scfmEscape`/`scfmIgnition`/`scfmSpread` modules
   (#13). `calcIgnitions()` drops the module version's unused `fireRegimePolys` argument, and

@@ -98,7 +98,7 @@ comparePredictions_summaryDT <- function(fireRegimePoints = NULL, burnSummary = 
 
     ## Mean Annual Area Burned: total area of all burned pixels in SAR over n years of simulation
     burnSum2 <- burnSum[grp %in% c(1, 3), lapply(.SD, sum), by = c("igLoc", "year"), .SDcols = "areaBurned"] # nolint
-    burnSum2 <- burnSum1[areaBurned > fireRegimePoly$cellSize, ]
+    burnSum2 <- burnSum2[areaBurned > fireRegimePoly$cellSize, ]
     MAAB <- sum(burnSum2$areaBurned) / simLength
 
     achievedFRI <- simLength / (sum(0, burnSum2$areaBurned) / fireRegimePoly$burnyArea)
