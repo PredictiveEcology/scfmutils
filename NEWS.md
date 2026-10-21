@@ -1,5 +1,9 @@
 # scfmutils (development version)
 
+- `calibrateFireRegimePolys()`: when no spread probability in the calibration range gives a
+  polygon's mean fire size, it now uses the end of the range whose fitted size is closer, not always
+  the bottom of the range. A polygon whose mean fire size was just above the range got the lowest
+  spread probability, so its fires barely spread;
 - `comparePredictions_summaryDT()`: the achieved fire return interval (and the internal mean annual area
   burned) again count the area burned inside the reporting area, from fires ignited there or outside
   (`burnSummary` groups 1 and 3). This fixes a regression in scfmutils 0.0.9 (cbcd0b5): the
