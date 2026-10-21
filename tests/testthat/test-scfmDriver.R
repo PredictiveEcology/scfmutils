@@ -119,3 +119,29 @@ test_that("p0 is calibrated from 4-neighbour counts", {
   out <- toyCalibrate(frp)
   expect_lt(abs(toyEscapeProb(out$p0, frp) - frp$pEscape), 1e-3)
 })
+
+## The inverse step: the spread probability whose fitted mean fire size is xBar. A linear model stands
+## in for the scam fit: fitted size = 1000 * (p - 0.15), so p = 0.185 gives 35 and p = 0.253 gives 103.
+toyCalibModel <- function() {
+  cD <- data.frame(p = seq(0.185, 0.253, length.out = 20))
+  cD$finalSize <- 1000 * (cD$p - 0.15)
+  stats::lm(finalSize ~ p, data = cD)
+}
+
+test_that("invertCalibration() finds p when xBar is within the fitted sizes", {
+  out <- invertCalibration(toyCalibModel(), xBar = 60, pRange = c(0.185, 0.253))
+  expect_lt(abs(out$pJmp - 0.21), 1e-4)
+  expect_false(inherits(out$Res, "try-error"))
+})
+
+test_that("invertCalibration() uses the top of the range when xBar is above the fitted sizes", {
+  out <- invertCalibration(toyCalibModel(), xBar = 110, pRange = c(0.185, 0.253))
+  expect_identical(out$pJmp, 0.253)
+  expect_true(inherits(out$Res, "try-error"))
+})
+
+test_that("invertCalibration() uses the bottom of the range when xBar is below the fitted sizes", {
+  out <- invertCalibration(toyCalibModel(), xBar = 20, pRange = c(0.185, 0.253))
+  expect_identical(out$pJmp, 0.185)
+  expect_true(inherits(out$Res, "try-error"))
+})

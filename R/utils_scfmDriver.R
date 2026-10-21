@@ -405,26 +405,24 @@ calibrateFireRegimePolys <- function(
     xBar <- frp$xBar / frp$cellSize
     if (!inherits(calibModel, "try-error")) {
       ## now for the inverse step.
-      Res <- try(
-        stats::uniroot(
-          unirootFunction,
-          calibModel,
-          xBar, # "..."
-          interval = c(min(cD$p), max(cD$p)),
-          extendInt = "no",
-          tol = 0.00001
-        ),
-        silent = TRUE
-      )
+      inv <- invertCalibration(calibModel, xBar, pRange = c(min(cD$p), max(cD$p)))
+      Res <- inv$Res
+      pJmp <- inv$pJmp
       if (inherits(Res, "try-error")) {
-        ## TODO: should pick the closest value (of min and max) if error is value not of opposite sign
-        pJmp <- min(cD$p)
         message(
-          "the loess model may underestimate the spread probability for polygon ",
-          polygonType
+          "no spread probability in [",
+          min(cD$p),
+          ", ",
+          max(cD$p),
+          "] gives the mean fire size of ",
+          "polygon ",
+          polygonType,
+          " (",
+          round(xBar, 1),
+          " cells); using ",
+          pJmp,
+          ", the end of the range whose fitted size is closest to it"
         )
-      } else {
-        pJmp <- Res$root
       }
     } else {
       calibModel <- "No Model"
@@ -509,4 +507,29 @@ calibrateFireRegimePolys <- function(
 #' @importFrom stats predict
 unirootFunction <- function(x, cM, xBar) {
   predict(cM, list("p" = x)) - xBar
+}
+
+## The spread probability in `pRange` whose fitted mean fire size (`calibModel`) is `xBar`. When
+## `xBar` is outside the sizes fitted over `pRange`, there is no root: use the end of the range whose
+## fitted size is closer to `xBar` (the bottom of the range if neither end can be predicted).
+## Returns `pJmp` and the `uniroot()` result `Res` (a `try-error` when there was no root).
+invertCalibration <- function(calibModel, xBar, pRange) {
+  Res <- try(
+    stats::uniroot(
+      unirootFunction,
+      calibModel,
+      xBar, # "..."
+      interval = pRange,
+      extendInt = "no",
+      tol = 0.00001
+    ),
+    silent = TRUE
+  )
+  if (inherits(Res, "try-error")) {
+    gap <- abs(unirootFunction(pRange, calibModel, xBar))
+    pJmp <- if (all(is.na(gap))) min(pRange) else pRange[which.min(gap)]
+  } else {
+    pJmp <- Res$root
+  }
+  list(pJmp = pJmp, Res = Res)
 }
