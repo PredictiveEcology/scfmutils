@@ -2,7 +2,7 @@
 
 ## Dependency changes
 
-* scfmutils now needs R >= 4.4 (was 4.2), the oldest R version its checks run on.
+* scfmutils now needs R >= 4.4 (was 4.2), the oldest R version its checks run on (#19).
 
 - `calibrateFireRegimePolys()`: when no spread probability in the calibration range gives a
   polygon's mean fire size, it now uses the end of the range whose fitted size is closer, not always
